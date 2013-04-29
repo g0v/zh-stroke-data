@@ -17,10 +17,9 @@ func fetchStroke(code int) {
 	filename := path.Join( baseDir, hex + ".xml" )
 
 	fi, err := os.Stat(filename)
-	if fi == nil && err != nil {
-		if os.IsExist(err) {
-			return
-		}
+	if fi != nil {
+		fmt.Print("-")
+		return
 	}
 
 	res, err := http.Get(url)
@@ -39,6 +38,7 @@ func fetchStroke(code int) {
 	}
 
 	if ! strings.HasPrefix(string(xmlContent), "<?xml") {
+		fmt.Print("x")
 		// log.Printf("ERROR: %s returns non-XML response",url)
 		return
 	}
