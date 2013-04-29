@@ -55,9 +55,10 @@ func main() {
 	worker := func(in chan int, done chan bool) {
 		for {
 			c := <-in
-			if c > 0 {
-				fetchStroke(c)
+			if c == 0 {
+				break
 			}
+			fetchStroke(c)
 		}
 		done <- true
 	}
@@ -74,14 +75,8 @@ func main() {
 		in <- code
 	}
 
-	/*
-	there is no stroke data on the website
-	for code := 0xc940 ; code < 0xf9d5 ; code++ {
-		in <- code
-	}
-	*/
-
 	for i := 0 ; i < runtime.NumCPU() ; i++ {
+		in <- 0
 		<-done
 		fmt.Printf("goroutine %d finished", i)
 	}
