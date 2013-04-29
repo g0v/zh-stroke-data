@@ -28,9 +28,7 @@ func fetchStroke(code int) {
 	}
 	xmlContent, err := ioutil.ReadAll(res.Body)
 
-	defer func() {
-		res.Body.Close()
-	}()
+	defer res.Body.Close()
 
 	if err != nil {
 		log.Println(err)
