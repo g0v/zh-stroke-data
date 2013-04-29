@@ -9,11 +9,26 @@ import "strings"
 import "runtime"
 
 const baseDir = "data"
-const baseUrl = "http://stroke-order.learningweb.moe.edu.tw/provideStrokeInfo.do?big5="
+const xmlBaseUrl = "http://stroke-order.learningweb.moe.edu.tw/provideStrokeInfo.do?big5="
+const imageBaseUrl = "http://stroke-order.learningweb.moe.edu.tw/showWordImage.do?big5="
 
-func fetchStroke(code int) {
+
+func fetchUrl(url string) (*[]byte, error) {
+	res, err := http.Get(url)
+	defer res.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	return &body, nil
+}
+
+func fetchStrokeXml(code int) {
 	hex := fmt.Sprintf("%x",code)
-	url := baseUrl + hex
+	url := xmlBaseUrl + hex
 	filename := path.Join( baseDir, hex + ".xml" )
 
 	fi, err := os.Stat(filename)
@@ -22,18 +37,13 @@ func fetchStroke(code int) {
 		return
 	}
 
-	res, err := http.Get(url)
-	if err != nil {
-		log.Println(err)
-	}
-	xmlContent, err := ioutil.ReadAll(res.Body)
-
-	defer res.Body.Close()
-
+	xmlContentP, err := fetchUrl(url)
 	if err != nil {
 		log.Println(err)
 		return
 	}
+
+	xmlContent := *xmlContentP
 
 	if ! strings.HasPrefix(string(xmlContent), "<?xml") {
 		fmt.Print("x")
@@ -56,7 +66,7 @@ func main() {
 			if c == 0 {
 				break
 			}
-			fetchStroke(c)
+			fetchStrokeXml(c)
 		}
 		done <- true
 	}
