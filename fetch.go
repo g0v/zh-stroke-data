@@ -76,6 +76,6 @@ func main() {
 	for i := 0 ; i < runtime.NumCPU() ; i++ {
 		in <- 0
 		<-done
-		fmt.Printf("goroutine %d finished", i)
+		fmt.Printf("goroutine %d finished\n", i)
 	}
 }
