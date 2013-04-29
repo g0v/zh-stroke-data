@@ -73,9 +73,13 @@ func main() {
 	for code := 0xa440 ; code < 0xc67e ; code++ {
 		in <- code
 	}
+
+	/*
+	there is no stroke data on the website
 	for code := 0xc940 ; code < 0xf9d5 ; code++ {
 		in <- code
 	}
+	*/
 
 	for i := 0 ; i < runtime.NumCPU() ; i++ {
 		<-done
