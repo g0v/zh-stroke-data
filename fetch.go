@@ -55,7 +55,7 @@ func fetchStrokeXml(code int) {
 	// filename string, data []byte, perm os.FileMode
 	fmt.Print(".")
 	ioutil.WriteFile(filename, xmlContent, 0666)
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
 }
 
 func main() {
