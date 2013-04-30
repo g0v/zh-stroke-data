@@ -38,7 +38,7 @@ func fetchStrokeXml(code int) {
 		return
 	}
 
-	time.Sleep(800 * time.Millisecond)
+	time.Sleep(1000 * time.Millisecond)
 	xmlContentP, err := fetchUrl(url)
 	if err != nil {
 		log.Println(err)
