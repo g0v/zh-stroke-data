@@ -47,4 +47,7 @@ $ ->
     $('#holder').empty()
     word = $(this).val()
     strokeWords(word)
+
+  w = location.hash.replace /^#/, ""
+  $('#word').val(w) if w
   strokeWords($('#word').val())
