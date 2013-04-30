@@ -1,10 +1,31 @@
+.clearfix:after {
+	content: ".";
+	display: block;
+	clear: both;
+	visibility: hidden;
+	line-height: 0;
+	height: 0;
+}
+ 
+.clearfix {
+	display: inline-block;
+}
+
 body {
     background: #333;
     color: #fff;
     font: 300 100.1% "Helvetica Neue", Helvetica, "Arial Unicode MS", Arial, sans-serif;
 }
+
+#word {
+  font-size: 22px;
+  width: 90%;
+}
 #holder {
     border: 1px solid #ccc;
+}
+#holder svg {
+    float: left;
 }
 #copyright {
     bottom: 0;
