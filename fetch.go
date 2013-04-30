@@ -7,6 +7,7 @@ import "os"
 import "path"
 import "strings"
 import "runtime"
+import "time"
 
 const baseDir = "data"
 const xmlBaseUrl = "http://stroke-order.learningweb.moe.edu.tw/provideStrokeInfo.do?big5="
@@ -54,6 +55,7 @@ func fetchStrokeXml(code int) {
 	// filename string, data []byte, perm os.FileMode
 	fmt.Print(".")
 	ioutil.WriteFile(filename, xmlContent, 0666)
+	time.Sleep(100 * time.Millisecond)
 }
 
 func main() {
