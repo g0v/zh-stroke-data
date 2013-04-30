@@ -18,7 +18,7 @@ $ ->
           path.push [ "L", parseFloat(a.x.value) , parseFloat(a.y.value) ]
         when "QuadTo"
           path.push [ "Q", parseFloat(a.x1.value) , parseFloat(a.y1.value), parseFloat(a.x2.value), parseFloat(a.y2.value) ]
-    paper.path(path).attr(pathAttrs).transform("s0.2,0.2,0,0")
+    return paper.path(path).attr(pathAttrs).transform("s0.2,0.2,0,0")
 
   fetchStrokeXml = (code, cb) -> $.get "utf8/" + code.toLowerCase() + ".xml", cb, "xml"
 
@@ -32,13 +32,14 @@ $ ->
       Raphael.getColor() # skip 1st color
       Raphael.getColor() # skip 2second color
       color = Raphael.getColor()
-      pathAttrs = { stroke: color, "stroke-width": 5, "stroke-linecap": "round", "fill": color }
+      pathAttrs = { stroke: color, "stroke-width": 5, "stroke-linecap": "round", "fill": color, "opacity": 0.5 }
       timeoutSeconds = 0
-      delay = 350
+      delay = 400
       for outline in outlines
         do (outline) ->
           setTimeout (->
-            strokeOutline(paper, outline, pathAttrs)
+            outline = strokeOutline(paper, outline, pathAttrs)
+            outline.animate({ "opacity": 1 }, 400)
           ), timeoutSeconds += delay
 
   strokeWords = (words) -> strokeWord(a) for a in words.split(//).reverse()
