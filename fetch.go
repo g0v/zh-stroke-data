@@ -38,6 +38,7 @@ func fetchStrokeXml(code int) {
 		return
 	}
 
+	time.Sleep(800 * time.Millisecond)
 	xmlContentP, err := fetchUrl(url)
 	if err != nil {
 		log.Println(err)
@@ -55,7 +56,6 @@ func fetchStrokeXml(code int) {
 	// filename string, data []byte, perm os.FileMode
 	fmt.Print(".")
 	ioutil.WriteFile(filename, xmlContent, 0666)
-	time.Sleep(500 * time.Millisecond)
 }
 
 func main() {
