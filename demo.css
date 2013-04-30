@@ -15,14 +15,17 @@ body {
     background: #333;
     color: #fff;
     font: 300 100.1% "Helvetica Neue", Helvetica, "Arial Unicode MS", Arial, sans-serif;
+    padding: 0;
+    margin: 0;
 }
-
 #word {
   font-size: 22px;
-  width: 90%;
+  width: 99%;
+  padding: 5px 3px;
 }
 #holder {
-    border: 1px solid #ccc;
+  border: 1px solid #ccc;
+  width: 99%;
 }
 #holder svg {
     float: left;
