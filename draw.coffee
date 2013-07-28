@@ -25,7 +25,21 @@ $ ->
   strokeWord = (word) ->
     utf8code = escape(word).replace(/%u/ , "")
     fetchStrokeXml utf8code, (doc) ->
-      paper = Raphael("holder", 430, 430)
+      dim = 430
+      paper = Raphael("holder", dim, dim)
+      gridLines = [
+        "M0,0 L0,#{dim}",
+        "M#{dim},0 L#{dim},#{dim}",
+        "M0,0 L#{dim},0",
+        "M0,#{dim},0 L#{dim},#{dim}",
+        "M#{Math.round( dim / 3 )},0 L#{Math.round( dim / 3 )},#{dim}",
+        "M#{Math.round( dim / 3 *2 )},0 L#{Math.round( dim / 3 *2 )},#{dim}",
+        "M0,#{Math.round( dim / 3 )} L#{dim},#{Math.round( dim / 3 )}",
+        "M0,#{Math.round( dim / 3 *2 )} L#{dim},#{Math.round( dim / 3 *2 )}"
+      ]
+      for line in gridLines
+        paper.path(line).attr({'stroke-width': 1, 'stroke': '#a33'})
+
       # color = "hsb(.8, .75, .75)"
       Raphael.getColor() # skip 1st color
       Raphael.getColor() # skip 2second color
