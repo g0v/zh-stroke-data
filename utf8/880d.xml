@@ -1,0 +1,647 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Word version="1.0" unicode="蠍">
+  <Stroke>
+    <Outline>
+      <MoveTo x="272.0" y="1095.0" />
+      <QuadTo flexible="false" x1="267.0" y1="1118.0" x2="259.0" y2="1131.5" />
+      <QuadTo flexible="false" x1="251.0" y1="1145.0" x2="239.5" y2="1146.5" />
+      <QuadTo flexible="false" x1="228.0" y1="1148.0" x2="216.0" y2="1136.0" />
+      <QuadTo flexible="false" x1="202.0" y1="1124.0" x2="196.5" y2="1104.5" />
+      <QuadTo flexible="false" x1="191.0" y1="1085.0" x2="189.0" y2="1057.0" />
+      <LineTo flexible="false" x="171.0" y="881.0" />
+      <QuadTo flexible="false" x1="168.0" y1="860.0" x2="157.5" y2="831.0" />
+      <QuadTo flexible="false" x1="147.0" y1="802.0" x2="142.0" y2="793.5" />
+      <QuadTo flexible="false" x1="137.0" y1="785.0" x2="126.5" y2="776.0" />
+      <QuadTo flexible="false" x1="116.0" y1="767.0" x2="115.0" y2="761.0" />
+      <QuadTo flexible="false" x1="114.0" y1="755.0" x2="119.0" y2="751.0" />
+      <QuadTo flexible="false" x1="124.0" y1="747.0" x2="138.5" y2="746.5" />
+      <QuadTo flexible="false" x1="153.0" y1="746.0" x2="159.0" y2="748.0" />
+      <LineTo flexible="false" x="219.0" y="768.0" />
+      <LineTo flexible="true" x="252.0" y="827.0" />
+      <LineTo flexible="false" x="272.0" y="1033.0" />
+      <LineTo flexible="true" x="272.0" y="1095.0" />
+    </Outline>
+    <Track>
+      <MoveTo x="180.0" y="770.0" />
+      <MoveTo x="240.0" y="1133.0" />
+    </Track>
+  </Stroke>
+  <Stroke>
+    <Outline>
+      <MoveTo x="219.0" y="768.0" />
+      <LineTo flexible="false" x="347.0" y="749.0" />
+      <LineTo flexible="false" x="370.0" y="745.0" />
+      <LineTo flexible="true" x="479.0" y="724.0" />
+      <LineTo flexible="false" x="512.0" y="718.0" />
+      <QuadTo flexible="false" x1="522.0" y1="717.0" x2="554.0" y2="706.5" />
+      <QuadTo flexible="false" x1="586.0" y1="696.0" x2="600.0" y2="693.0" />
+      <QuadTo flexible="false" x1="614.0" y1="690.0" x2="628.0" y2="690.0" />
+      <QuadTo flexible="false" x1="639.0" y1="691.0" x2="656.5" y2="696.5" />
+      <QuadTo flexible="false" x1="674.0" y1="702.0" x2="697.5" y2="716.5" />
+      <QuadTo flexible="false" x1="721.0" y1="731.0" x2="740.0" y2="746.5" />
+      <QuadTo flexible="false" x1="759.0" y1="762.0" x2="759.5" y2="774.0" />
+      <QuadTo flexible="false" x1="760.0" y1="786.0" x2="745.0" y2="804.0" />
+      <QuadTo flexible="false" x1="717.0" y1="837.0" x2="715.0" y2="840.5" />
+      <QuadTo flexible="false" x1="713.0" y1="844.0" x2="697.0" y2="885.0" />
+      <LineTo flexible="false" x="657.0" y="985.0" />
+      <LineTo flexible="true" x="569.0" y="978.0" />
+      <LineTo flexible="false" x="587.0" y="881.0" />
+      <LineTo flexible="false" x="595.0" y="842.0" />
+      <QuadTo flexible="false" x1="597.0" y1="830.0" x2="596.5" y2="807.5" />
+      <QuadTo flexible="false" x1="596.0" y1="785.0" x2="583.5" y2="776.0" />
+      <QuadTo flexible="false" x1="571.0" y1="767.0" x2="532.0" y2="774.0" />
+      <QuadTo flexible="false" x1="515.0" y1="778.0" x2="501.0" y2="779.0" />
+      <LineTo flexible="false" x="477.0" y="782.0" />
+      <LineTo flexible="true" x="369.0" y="801.0" />
+      <QuadTo flexible="false" x1="350.0" y1="804.0" x2="330.5" y2="807.5" />
+      <QuadTo flexible="false" x1="311.0" y1="811.0" x2="284.0" y2="818.0" />
+      <LineTo flexible="false" x="252.0" y="827.0" />
+      <LineTo flexible="true" x="219.0" y="768.0" />
+    </Outline>
+    <Track>
+      <MoveTo x="233.0" y="800.0" />
+      <MoveTo x="546.0" y="740.0" />
+      <MoveTo x="750.0" y="773.0" />
+      <MoveTo x="646.0" y="783.0" />
+      <MoveTo x="616.0" y="973.0" />
+    </Track>
+  </Stroke>
+  <Stroke>
+    <Outline>
+      <MoveTo x="362.0" y="1085.0" />
+      <QuadTo flexible="false" x1="318.0" y1="1093.0" x2="307.0" y2="1093.0" />
+      <LineTo flexible="false" x="272.0" y="1095.0" />
+      <LineTo flexible="true" x="272.0" y="1033.0" />
+      <QuadTo flexible="false" x1="323.0" y1="1027.0" x2="340.0" y2="1024.0" />
+      <LineTo flexible="false" x="364.0" y="1020.0" />
+      <LineTo flexible="true" x="469.0" y="998.0" />
+      <QuadTo flexible="false" x1="492.0" y1="993.0" x2="511.5" y2="988.5" />
+      <QuadTo flexible="false" x1="531.0" y1="984.0" x2="537.0" y2="983.0" />
+      <LineTo flexible="false" x="569.0" y="978.0" />
+      <LineTo flexible="true" x="657.0" y="985.0" />
+      <LineTo flexible="false" x="679.0" y="1007.0" />
+      <QuadTo flexible="false" x1="692.0" y1="1021.0" x2="688.0" y2="1030.0" />
+      <QuadTo flexible="false" x1="684.0" y1="1039.0" x2="678.0" y2="1043.0" />
+      <LineTo flexible="false" x="606.0" y="1049.0" />
+      <LineTo flexible="false" x="548.0" y="1054.0" />
+      <LineTo flexible="false" x="508.0" y="1062.0" />
+      <LineTo flexible="false" x="467.0" y="1069.0" />
+      <LineTo flexible="true" x="362.0" y="1085.0" />
+    </Outline>
+    <Track>
+      <MoveTo x="280.0" y="1066.0" />
+      <MoveTo x="643.0" y="1006.0" />
+    </Track>
+  </Stroke>
+  <Stroke>
+    <Outline>
+      <MoveTo x="355.0" y="1322.0" />
+      <LineTo flexible="false" x="362.0" y="1085.0" />
+      <LineTo flexible="true" x="364.0" y="1020.0" />
+      <LineTo flexible="false" x="369.0" y="801.0" />
+      <LineTo flexible="true" x="370.0" y="745.0" />
+      <LineTo flexible="false" x="374.0" y="596.0" />
+      <QuadTo flexible="false" x1="374.0" y1="581.0" x2="366.0" y2="511.0" />
+      <LineTo flexible="false" x="361.0" y="468.0" />
+      <QuadTo flexible="false" x1="356.0" y1="438.0" x2="349.0" y2="421.0" />
+      <QuadTo flexible="false" x1="342.0" y1="404.0" x2="331.5" y2="385.5" />
+      <QuadTo flexible="false" x1="321.0" y1="367.0" x2="320.0" y2="355.5" />
+      <QuadTo flexible="false" x1="319.0" y1="344.0" x2="325.5" y2="336.5" />
+      <QuadTo flexible="false" x1="332.0" y1="329.0" x2="348.0" y2="327.0" />
+      <QuadTo flexible="false" x1="363.0" y1="326.0" x2="390.5" y2="332.5" />
+      <QuadTo flexible="false" x1="418.0" y1="339.0" x2="446.0" y2="351.0" />
+      <QuadTo flexible="false" x1="474.0" y1="363.0" x2="497.5" y2="379.0" />
+      <QuadTo flexible="false" x1="521.0" y1="395.0" x2="524.0" y2="408.0" />
+      <QuadTo flexible="false" x1="527.0" y1="421.0" x2="516.0" y2="452.0" />
+      <QuadTo flexible="false" x1="506.0" y1="477.0" x2="502.0" y2="500.0" />
+      <QuadTo flexible="false" x1="498.0" y1="523.0" x2="490.5" y2="573.5" />
+      <QuadTo flexible="false" x1="483.0" y1="624.0" x2="482.0" y2="649.0" />
+      <LineTo flexible="false" x="479.0" y="724.0" />
+      <LineTo flexible="true" x="477.0" y="782.0" />
+      <LineTo flexible="false" x="469.0" y="998.0" />
+      <LineTo flexible="true" x="467.0" y="1069.0" />
+      <LineTo flexible="false" x="459.0" y="1289.0" />
+      <QuadTo flexible="true" x1="363.0" y1="1412.5" x2="355.0" y2="1322.0" />
+    </Outline>
+    <Track>
+      <MoveTo x="333.0" y="346.0" />
+      <MoveTo x="426.0" y="426.0" />
+      <MoveTo x="433.0" y="610.0" />
+      <MoveTo x="410.0" y="1330.0" />
+    </Track>
+  </Stroke>
+  <Stroke>
+    <Outline>
+      <MoveTo x="459.0" y="1289.0" />
+      <LineTo flexible="false" x="548.0" y="1262.0" />
+      <QuadTo flexible="true" x1="637.5" y1="1250.0" x2="567.0" y2="1312.0" />
+      <LineTo flexible="false" x="518.0" y="1339.0" />
+      <LineTo flexible="false" x="439.0" y="1378.0" />
+      <LineTo flexible="false" x="346.0" y="1427.0" />
+      <QuadTo flexible="false" x1="306.0" y1="1448.0" x2="297.0" y2="1453.0" />
+      <LineTo flexible="false" x="250.0" y="1481.0" />
+      <QuadTo flexible="false" x1="230.0" y1="1491.0" x2="217.0" y2="1492.0" />
+      <QuadTo flexible="false" x1="201.0" y1="1494.0" x2="181.0" y2="1486.0" />
+      <QuadTo flexible="false" x1="161.0" y1="1478.0" x2="139.0" y2="1464.0" />
+      <QuadTo flexible="false" x1="117.0" y1="1450.0" x2="91.0" y2="1430.5" />
+      <QuadTo flexible="false" x1="65.0" y1="1411.0" x2="64.5" y2="1399.5" />
+      <QuadTo flexible="false" x1="64.0" y1="1388.0" x2="67.0" y2="1382.0" />
+      <QuadTo flexible="false" x1="71.0" y1="1377.0" x2="85.0" y2="1375.0" />
+      <LineTo flexible="false" x="129.0" y="1373.0" />
+      <QuadTo flexible="false" x1="143.0" y1="1372.0" x2="176.0" y2="1365.0" />
+      <QuadTo flexible="false" x1="209.0" y1="1358.0" x2="257.0" y2="1348.5" />
+      <QuadTo flexible="false" x1="305.0" y1="1339.0" x2="319.0" y2="1334.0" />
+      <LineTo flexible="false" x="355.0" y="1322.0" />
+      <LineTo flexible="true" x="459.0" y="1289.0" />
+    </Outline>
+    <Track>
+      <MoveTo x="76.0" y="1386.0" />
+      <MoveTo x="253.0" y="1426.0" />
+      <MoveTo x="590.0" y="1266.0" />
+    </Track>
+  </Stroke>
+  <Stroke>
+    <Outline>
+      <MoveTo x="548.0" y="1262.0" />
+      <QuadTo flexible="false" x1="542.0" y1="1250.0" x2="537.5" y2="1240.0" />
+      <QuadTo flexible="false" x1="533.0" y1="1230.0" x2="521.0" y2="1206.5" />
+      <QuadTo flexible="false" x1="509.0" y1="1183.0" x2="507.0" y2="1177.0" />
+      <LineTo flexible="false" x="499.0" y="1156.0" />
+      <QuadTo flexible="false" x1="493.0" y1="1143.0" x2="499.0" y2="1137.0" />
+      <QuadTo flexible="false" x1="505.0" y1="1131.0" x2="520.0" y2="1140.0" />
+      <LineTo flexible="false" x="539.0" y="1153.0" />
+      <QuadTo flexible="false" x1="555.0" y1="1165.0" x2="576.5" y2="1182.0" />
+      <QuadTo flexible="false" x1="598.0" y1="1199.0" x2="615.5" y2="1215.5" />
+      <QuadTo flexible="false" x1="633.0" y1="1232.0" x2="650.0" y2="1259.0" />
+      <QuadTo flexible="false" x1="667.0" y1="1286.0" x2="669.5" y2="1307.5" />
+      <QuadTo flexible="false" x1="672.0" y1="1329.0" x2="665.0" y2="1361.0" />
+      <QuadTo flexible="false" x1="659.0" y1="1386.0" x2="646.0" y2="1400.5" />
+      <QuadTo flexible="false" x1="633.0" y1="1415.0" x2="617.0" y2="1410.0" />
+      <QuadTo flexible="false" x1="606.0" y1="1408.0" x2="593.0" y2="1377.0" />
+      <LineTo flexible="false" x="580.0" y="1348.0" />
+      <LineTo flexible="false" x="567.0" y="1312.0" />
+      <LineTo flexible="true" x="548.0" y="1262.0" />
+    </Outline>
+    <Track>
+      <MoveTo x="500.0" y="1146.0" />
+      <MoveTo x="656.0" y="1356.0" />
+    </Track>
+  </Stroke>
+  <Stroke>
+    <Outline>
+      <MoveTo x="839.0" y="788.0" />
+      <QuadTo flexible="false" x1="826.0" y1="771.0" x2="821.0" y2="760.0" />
+      <QuadTo flexible="false" x1="816.0" y1="749.0" x2="814.0" y2="722.0" />
+      <LineTo flexible="false" x="793.0" y="510.0" />
+      <QuadTo flexible="false" x1="787.0" y1="451.0" x2="780.5" y2="423.0" />
+      <QuadTo flexible="false" x1="774.0" y1="395.0" x2="768.5" y2="378.0" />
+      <QuadTo flexible="false" x1="763.0" y1="361.0" x2="758.0" y2="353.5" />
+      <QuadTo flexible="false" x1="753.0" y1="346.0" x2="745.0" y2="338.0" />
+      <QuadTo flexible="false" x1="737.0" y1="330.0" x2="734.5" y2="323.0" />
+      <QuadTo flexible="false" x1="732.0" y1="316.0" x2="738.0" y2="308.0" />
+      <QuadTo flexible="false" x1="741.0" y1="304.0" x2="752.5" y2="299.5" />
+      <QuadTo flexible="false" x1="764.0" y1="295.0" x2="777.0" y2="300.0" />
+      <LineTo flexible="false" x="848.0" y="323.0" />
+      <LineTo flexible="true" x="866.0" y="373.0" />
+      <LineTo flexible="false" x="881.0" y="530.0" />
+      <LineTo flexible="true" x="881.0" y="581.0" />
+      <LineTo flexible="false" x="891.0" y="716.0" />
+      <LineTo flexible="true" x="886.0" y="763.0" />
+      <LineTo flexible="false" x="877.0" y="785.0" />
+      <LineTo flexible="true" x="839.0" y="788.0" />
+    </Outline>
+    <Track>
+      <MoveTo x="770.0" y="320.0" />
+      <MoveTo x="833.0" y="383.0" />
+      <MoveTo x="860.0" y="776.0" />
+    </Track>
+  </Stroke>
+  <Stroke>
+    <Outline>
+      <MoveTo x="848.0" y="323.0" />
+      <QuadTo flexible="false" x1="884.0" y1="318.0" x2="910.0" y2="314.0" />
+      <QuadTo flexible="false" x1="936.0" y1="310.0" x2="986.5" y2="299.0" />
+      <QuadTo flexible="false" x1="1037.0" y1="288.0" x2="1072.5" y2="274.0" />
+      <QuadTo flexible="false" x1="1108.0" y1="260.0" x2="1120.0" y2="258.0" />
+      <QuadTo flexible="false" x1="1138.0" y1="257.0" x2="1171.5" y2="268.0" />
+      <QuadTo flexible="false" x1="1205.0" y1="279.0" x2="1244.5" y2="301.5" />
+      <QuadTo flexible="false" x1="1284.0" y1="324.0" x2="1289.0" y2="337.5" />
+      <QuadTo flexible="false" x1="1294.0" y1="351.0" x2="1291.0" y2="360.0" />
+      <QuadTo flexible="false" x1="1289.0" y1="365.0" x2="1279.5" y2="377.0" />
+      <QuadTo flexible="false" x1="1270.0" y1="389.0" x2="1257.5" y2="413.0" />
+      <QuadTo flexible="false" x1="1245.0" y1="437.0" x2="1233.0" y2="494.0" />
+      <LineTo flexible="false" x="1194.0" y="668.0" />
+      <QuadTo flexible="false" x1="1184.0" y1="710.0" x2="1172.0" y2="744.5" />
+      <QuadTo flexible="false" x1="1160.0" y1="779.0" x2="1145.5" y2="793.5" />
+      <QuadTo flexible="false" x1="1131.0" y1="808.0" x2="1115.0" y2="808.0" />
+      <QuadTo flexible="false" x1="1103.0" y1="809.0" x2="1093.0" y2="802.0" />
+      <QuadTo flexible="false" x1="1083.0" y1="795.0" x2="1080.0" y2="781.0" />
+      <LineTo flexible="false" x="1068.0" y="747.0" />
+      <LineTo flexible="true" x="1080.0" y="707.0" />
+      <QuadTo flexible="false" x1="1090.0" y1="667.0" x2="1096.5" y2="637.5" />
+      <QuadTo flexible="false" x1="1103.0" y1="608.0" x2="1106.0" y2="593.0" />
+      <LineTo flexible="false" x="1114.0" y="542.0" />
+      <LineTo flexible="true" x="1118.0" y="518.0" />
+      <LineTo flexible="false" x="1128.0" y="421.0" />
+      <QuadTo flexible="false" x1="1129.0" y1="403.0" x2="1128.5" y2="382.0" />
+      <QuadTo flexible="false" x1="1128.0" y1="361.0" x2="1126.0" y2="353.5" />
+      <QuadTo flexible="false" x1="1124.0" y1="346.0" x2="1118.5" y2="340.5" />
+      <QuadTo flexible="false" x1="1113.0" y1="335.0" x2="1099.0" y2="333.0" />
+      <QuadTo flexible="false" x1="1091.0" y1="333.0" x2="1085.0" y2="334.0" />
+      <QuadTo flexible="false" x1="1079.0" y1="335.0" x2="1018.0" y2="345.0" />
+      <LineTo flexible="false" x="866.0" y="373.0" />
+      <LineTo flexible="true" x="848.0" y="323.0" />
+    </Outline>
+    <Track>
+      <MoveTo x="856.0" y="343.0" />
+      <MoveTo x="1116.0" y="296.0" />
+      <MoveTo x="1266.0" y="350.0" />
+      <MoveTo x="1203.0" y="360.0" />
+      <MoveTo x="1106.0" y="790.0" />
+    </Track>
+  </Stroke>
+  <Stroke>
+    <Outline>
+      <MoveTo x="1114.0" y="542.0" />
+      <QuadTo flexible="false" x1="1088.0" y1="550.0" x2="1075.0" y2="553.5" />
+      <QuadTo flexible="false" x1="1062.0" y1="557.0" x2="1028.5" y2="562.5" />
+      <QuadTo flexible="false" x1="995.0" y1="568.0" x2="968.5" y2="575.5" />
+      <QuadTo flexible="false" x1="942.0" y1="583.0" x2="935.0" y2="583.0" />
+      <QuadTo flexible="false" x1="920.0" y1="585.0" x2="903.0" y2="583.0" />
+      <LineTo flexible="false" x="881.0" y="581.0" />
+      <LineTo flexible="true" x="881.0" y="530.0" />
+      <QuadTo flexible="false" x1="900.0" y1="528.0" x2="914.5" y2="524.5" />
+      <QuadTo flexible="false" x1="929.0" y1="521.0" x2="961.0" y2="508.5" />
+      <QuadTo flexible="false" x1="993.0" y1="496.0" x2="1010.0" y2="494.0" />
+      <QuadTo flexible="false" x1="1027.0" y1="492.0" x2="1051.0" y2="497.5" />
+      <QuadTo flexible="false" x1="1075.0" y1="503.0" x2="1085.0" y2="506.0" />
+      <LineTo flexible="false" x="1118.0" y="518.0" />
+      <LineTo flexible="true" x="1114.0" y="542.0" />
+    </Outline>
+    <Track>
+      <MoveTo x="890.0" y="560.0" />
+      <MoveTo x="1106.0" y="513.0" />
+    </Track>
+  </Stroke>
+  <Stroke>
+    <Outline>
+      <MoveTo x="1068.0" y="747.0" />
+      <QuadTo flexible="false" x1="1049.0" y1="748.0" x2="1037.5" y2="749.0" />
+      <QuadTo flexible="false" x1="1026.0" y1="750.0" x2="1005.0" y2="753.0" />
+      <LineTo flexible="false" x="963.0" y="761.0" />
+      <QuadTo flexible="false" x1="929.0" y1="768.0" x2="920.0" y2="766.0" />
+      <LineTo flexible="false" x="886.0" y="763.0" />
+      <LineTo flexible="true" x="891.0" y="716.0" />
+      <QuadTo flexible="false" x1="916.0" y1="713.0" x2="928.5" y2="710.5" />
+      <QuadTo flexible="false" x1="941.0" y1="708.0" x2="974.5" y2="700.0" />
+      <QuadTo flexible="false" x1="1008.0" y1="692.0" x2="1025.5" y2="692.5" />
+      <QuadTo flexible="false" x1="1043.0" y1="693.0" x2="1052.0" y2="696.0" />
+      <LineTo flexible="false" x="1080.0" y="707.0" />
+      <LineTo flexible="true" x="1068.0" y="747.0" />
+    </Outline>
+    <Track>
+      <MoveTo x="896.0" y="746.0" />
+      <MoveTo x="1066.0" y="716.0" />
+    </Track>
+  </Stroke>
+  <Stroke>
+    <Outline>
+      <MoveTo x="877.0" y="785.0" />
+      <QuadTo flexible="false" x1="908.0" y1="794.0" x2="921.0" y2="799.5" />
+      <QuadTo flexible="false" x1="934.0" y1="805.0" x2="947.0" y2="816.0" />
+      <QuadTo flexible="false" x1="960.0" y1="827.0" x2="959.0" y2="835.0" />
+      <QuadTo flexible="false" x1="958.0" y1="839.0" x2="949.5" y2="847.0" />
+      <QuadTo flexible="false" x1="941.0" y1="855.0" x2="924.0" y2="878.0" />
+      <LineTo flexible="false" x="906.0" y="901.0" />
+      <LineTo flexible="false" x="878.0" y="941.0" />
+      <LineTo flexible="false" x="859.0" y="963.0" />
+      <LineTo flexible="true" x="811.0" y="1017.0" />
+      <QuadTo flexible="false" x1="781.0" y1="1049.0" x2="765.0" y2="1062.0" />
+      <LineTo flexible="false" x="736.0" y="1085.0" />
+      <QuadTo flexible="false" x1="713.0" y1="1103.0" x2="707.0" y2="1107.0" />
+      <LineTo flexible="false" x="685.0" y="1121.0" />
+      <QuadTo flexible="false" x1="676.0" y1="1127.0" x2="670.0" y2="1120.5" />
+      <QuadTo flexible="false" x1="664.0" y1="1114.0" x2="674.0" y2="1102.0" />
+      <LineTo flexible="false" x="692.0" y="1081.0" />
+      <QuadTo flexible="false" x1="721.0" y1="1047.0" x2="726.0" y2="1040.5" />
+      <QuadTo flexible="false" x1="731.0" y1="1034.0" x2="762.0" y2="988.5" />
+      <QuadTo flexible="false" x1="793.0" y1="943.0" x2="800.5" y2="929.0" />
+      <QuadTo flexible="false" x1="808.0" y1="915.0" x2="819.5" y2="886.0" />
+      <QuadTo flexible="false" x1="831.0" y1="857.0" x2="834.0" y2="844.0" />
+      <LineTo flexible="false" x="837.0" y="808.0" />
+      <LineTo flexible="false" x="839.0" y="788.0" />
+      <LineTo flexible="true" x="877.0" y="785.0" />
+    </Outline>
+    <Track>
+      <MoveTo x="890.0" y="793.0" />
+      <MoveTo x="860.0" y="913.0" />
+      <MoveTo x="693.0" y="1103.0" />
+    </Track>
+  </Stroke>
+  <Stroke>
+    <Outline>
+      <MoveTo x="859.0" y="963.0" />
+      <QuadTo flexible="false" x1="877.0" y1="962.0" x2="887.0" y2="960.0" />
+      <LineTo flexible="false" x="994.0" y="943.0" />
+      <QuadTo flexible="false" x1="1060.0" y1="933.0" x2="1101.0" y2="920.5" />
+      <QuadTo flexible="false" x1="1142.0" y1="908.0" x2="1158.5" y2="907.5" />
+      <QuadTo flexible="false" x1="1175.0" y1="907.0" x2="1197.0" y2="916.5" />
+      <QuadTo flexible="false" x1="1219.0" y1="926.0" x2="1236.0" y2="938.0" />
+      <LineTo flexible="false" x="1264.0" y="958.0" />
+      <LineTo flexible="true" x="1280.0" y="973.0" />
+      <QuadTo flexible="false" x1="1291.0" y1="984.0" x2="1295.5" y2="994.5" />
+      <QuadTo flexible="false" x1="1300.0" y1="1005.0" x2="1293.0" y2="1025.0" />
+      <LineTo flexible="false" x="1279.0" y="1054.0" />
+      <QuadTo flexible="false" x1="1272.0" y1="1068.0" x2="1268.5" y2="1089.0" />
+      <QuadTo flexible="false" x1="1265.0" y1="1110.0" x2="1256.0" y2="1174.0" />
+      <LineTo flexible="false" x="1245.0" y="1251.0" />
+      <LineTo flexible="false" x="1226.0" y="1401.0" />
+      <LineTo flexible="false" x="1213.0" y="1523.0" />
+      <QuadTo flexible="false" x1="1207.0" y1="1563.0" x2="1200.0" y2="1596.0" />
+      <QuadTo flexible="false" x1="1193.0" y1="1629.0" x2="1192.0" y2="1634.0" />
+      <LineTo flexible="false" x="1179.0" y="1676.0" />
+      <LineTo flexible="true" x="1169.0" y="1701.0" />
+      <QuadTo flexible="false" x1="1163.0" y1="1714.0" x2="1157.5" y2="1726.5" />
+      <QuadTo flexible="false" x1="1152.0" y1="1739.0" x2="1141.0" y2="1758.0" />
+      <QuadTo flexible="false" x1="1130.0" y1="1777.0" x2="1102.0" y2="1807.0" />
+      <QuadTo flexible="false" x1="1074.0" y1="1837.0" x2="1063.0" y2="1835.0" />
+      <QuadTo flexible="false" x1="1055.0" y1="1835.0" x2="1049.0" y2="1829.0" />
+      <QuadTo flexible="false" x1="1043.0" y1="1823.0" x2="1029.5" y2="1796.5" />
+      <QuadTo flexible="false" x1="1016.0" y1="1770.0" x2="985.0" y2="1728.0" />
+      <LineTo flexible="false" x="946.0" y="1678.0" />
+      <LineTo flexible="false" x="913.0" y="1633.0" />
+      <QuadTo flexible="false" x1="901.0" y1="1618.0" x2="907.5" y2="1611.0" />
+      <QuadTo flexible="false" x1="914.0" y1="1604.0" x2="928.0" y2="1611.0" />
+      <LineTo flexible="false" x="960.0" y="1629.0" />
+      <LineTo flexible="false" x="995.0" y="1641.0" />
+      <QuadTo flexible="false" x1="1014.0" y1="1648.0" x2="1024.0" y2="1648.5" />
+      <QuadTo flexible="false" x1="1034.0" y1="1649.0" x2="1053.0" y2="1633.0" />
+      <QuadTo flexible="false" x1="1066.0" y1="1622.0" x2="1077.0" y2="1602.5" />
+      <QuadTo flexible="false" x1="1088.0" y1="1583.0" x2="1099.5" y2="1528.5" />
+      <QuadTo flexible="false" x1="1111.0" y1="1474.0" x2="1120.0" y2="1418.0" />
+      <QuadTo flexible="false" x1="1129.0" y1="1362.0" x2="1136.0" y2="1274.0" />
+      <LineTo flexible="false" x="1147.0" y="1106.0" />
+      <QuadTo flexible="false" x1="1150.0" y1="1059.0" x2="1151.0" y2="1033.0" />
+      <QuadTo flexible="false" x1="1152.0" y1="1007.0" x2="1144.0" y2="999.5" />
+      <QuadTo flexible="false" x1="1136.0" y1="992.0" x2="1117.0" y2="990.0" />
+      <QuadTo flexible="false" x1="1089.0" y1="988.0" x2="1028.0" y2="998.0" />
+      <LineTo flexible="false" x="927.0" y="1013.0" />
+      <QuadTo flexible="false" x1="901.0" y1="1017.0" x2="875.5" y2="1024.0" />
+      <QuadTo flexible="false" x1="850.0" y1="1031.0" x2="847.0" y2="1029.0" />
+      <LineTo flexible="false" x="811.0" y="1017.0" />
+      <LineTo flexible="true" x="859.0" y="963.0" />
+    </Outline>
+    <Track>
+      <MoveTo x="846.0" y="990.0" />
+      <MoveTo x="920.0" y="983.0" />
+      <MoveTo x="1150.0" y="943.0" />
+      <MoveTo x="1256.0" y="990.0" />
+      <MoveTo x="1213.0" y="1023.0" />
+      <MoveTo x="1130.0" y="1656.0" />
+      <MoveTo x="1073.0" y="1793.0" />
+      <MoveTo x="926.0" y="1636.0" />
+    </Track>
+  </Stroke>
+  <Stroke>
+    <Outline>
+      <MoveTo x="935.0" y="1233.0" />
+      <QuadTo flexible="false" x1="911.0" y1="1269.0" x2="884.5" y2="1305.5" />
+      <QuadTo flexible="false" x1="858.0" y1="1342.0" x2="821.0" y2="1366.0" />
+      <LineTo flexible="false" x="801.0" y="1379.0" />
+      <QuadTo flexible="false" x1="788.0" y1="1388.0" x2="784.5" y2="1377.0" />
+      <QuadTo flexible="false" x1="781.0" y1="1366.0" x2="787.0" y2="1358.0" />
+      <LineTo flexible="false" x="807.0" y="1330.0" />
+      <QuadTo flexible="false" x1="826.0" y1="1303.0" x2="845.0" y2="1261.5" />
+      <QuadTo flexible="false" x1="864.0" y1="1220.0" x2="873.5" y2="1190.5" />
+      <QuadTo flexible="false" x1="883.0" y1="1161.0" x2="887.0" y2="1115.0" />
+      <LineTo flexible="false" x="890.0" y="1073.0" />
+      <QuadTo flexible="false" x1="890.0" y1="1065.0" x2="893.0" y2="1061.5" />
+      <QuadTo flexible="false" x1="896.0" y1="1058.0" x2="909.0" y2="1059.0" />
+      <QuadTo flexible="false" x1="932.0" y1="1062.0" x2="959.0" y2="1079.0" />
+      <QuadTo flexible="false" x1="986.0" y1="1096.0" x2="993.0" y2="1106.5" />
+      <QuadTo flexible="false" x1="1000.0" y1="1117.0" x2="1000.0" y2="1125.0" />
+      <QuadTo flexible="false" x1="999.0" y1="1132.0" x2="986.0" y2="1149.0" />
+      <LineTo flexible="false" x="972.0" y="1171.0" />
+      <LineTo flexible="false" x="955.0" y="1197.0" />
+      <LineTo flexible="true" x="935.0" y="1233.0" />
+    </Outline>
+    <Track>
+      <MoveTo x="956.0" y="1080.0" />
+      <MoveTo x="920.0" y="1176.0" />
+      <MoveTo x="800.0" y="1356.0" />
+    </Track>
+  </Stroke>
+  <Stroke>
+    <Outline>
+      <MoveTo x="955.0" y="1197.0" />
+      <QuadTo flexible="false" x1="988.0" y1="1211.0" x2="1009.5" y2="1220.5" />
+      <QuadTo flexible="false" x1="1031.0" y1="1230.0" x2="1053.0" y2="1243.0" />
+      <QuadTo flexible="false" x1="1075.0" y1="1256.0" x2="1085.0" y2="1270.5" />
+      <QuadTo flexible="false" x1="1095.0" y1="1285.0" x2="1095.5" y2="1305.5" />
+      <QuadTo flexible="false" x1="1096.0" y1="1326.0" x2="1090.0" y2="1343.0" />
+      <QuadTo flexible="false" x1="1084.0" y1="1360.0" x2="1078.0" y2="1363.0" />
+      <QuadTo flexible="false" x1="1072.0" y1="1366.0" x2="1064.0" y2="1365.0" />
+      <QuadTo flexible="false" x1="1052.0" y1="1365.0" x2="1041.0" y2="1359.0" />
+      <QuadTo flexible="false" x1="1030.0" y1="1353.0" x2="995.0" y2="1309.0" />
+      <LineTo flexible="false" x="935.0" y="1233.0" />
+      <LineTo flexible="true" x="955.0" y="1197.0" />
+    </Outline>
+    <Track>
+      <MoveTo x="940.0" y="1216.0" />
+      <MoveTo x="1076.0" y="1326.0" />
+    </Track>
+  </Stroke>
+  <Stroke>
+    <Outline>
+      <MoveTo x="706.0" y="1409.0" />
+      <LineTo flexible="false" x="704.0" y="1331.0" />
+      <QuadTo flexible="false" x1="703.0" y1="1293.0" x2="701.5" y2="1271.0" />
+      <QuadTo flexible="false" x1="700.0" y1="1249.0" x2="696.0" y2="1231.5" />
+      <QuadTo flexible="false" x1="692.0" y1="1214.0" x2="691.5" y2="1206.0" />
+      <QuadTo flexible="false" x1="691.0" y1="1198.0" x2="695.0" y2="1193.5" />
+      <QuadTo flexible="false" x1="699.0" y1="1189.0" x2="714.0" y2="1190.0" />
+      <QuadTo flexible="false" x1="732.0" y1="1192.0" x2="750.5" y2="1198.0" />
+      <QuadTo flexible="false" x1="769.0" y1="1204.0" x2="783.5" y2="1214.5" />
+      <QuadTo flexible="false" x1="798.0" y1="1225.0" x2="799.0" y2="1233.5" />
+      <QuadTo flexible="false" x1="800.0" y1="1242.0" x2="796.0" y2="1254.0" />
+      <LineTo flexible="false" x="786.0" y="1279.0" />
+      <QuadTo flexible="false" x1="780.0" y1="1296.0" x2="776.5" y2="1314.5" />
+      <QuadTo flexible="false" x1="773.0" y1="1333.0" x2="769.5" y2="1360.0" />
+      <QuadTo flexible="false" x1="766.0" y1="1387.0" x2="768.0" y2="1406.0" />
+      <QuadTo flexible="false" x1="769.0" y1="1432.0" x2="777.0" y2="1441.0" />
+      <QuadTo flexible="false" x1="785.0" y1="1450.0" x2="798.0" y2="1454.5" />
+      <QuadTo flexible="false" x1="811.0" y1="1459.0" x2="840.0" y2="1455.0" />
+      <QuadTo flexible="false" x1="842.0" y1="1455.0" x2="880.5" y2="1449.0" />
+      <QuadTo flexible="false" x1="919.0" y1="1443.0" x2="936.5" y2="1439.0" />
+      <QuadTo flexible="false" x1="954.0" y1="1435.0" x2="975.0" y2="1425.0" />
+      <QuadTo flexible="false" x1="996.0" y1="1415.0" x2="1004.0" y2="1413.0" />
+      <QuadTo flexible="false" x1="1017.0" y1="1412.0" x2="1033.0" y2="1418.0" />
+      <QuadTo flexible="false" x1="1049.0" y1="1424.0" x2="1065.0" y2="1438.5" />
+      <QuadTo flexible="false" x1="1081.0" y1="1453.0" x2="1082.5" y2="1462.5" />
+      <QuadTo flexible="false" x1="1084.0" y1="1472.0" x2="1070.0" y2="1485.0" />
+      <QuadTo flexible="false" x1="1057.0" y1="1497.0" x2="1015.0" y2="1504.0" />
+      <LineTo flexible="false" x="976.0" y="1512.0" />
+      <QuadTo flexible="false" x1="959.0" y1="1516.0" x2="920.0" y2="1520.0" />
+      <QuadTo flexible="false" x1="881.0" y1="1524.0" x2="865.0" y2="1524.0" />
+      <QuadTo flexible="false" x1="828.0" y1="1526.0" x2="794.5" y2="1521.5" />
+      <QuadTo flexible="false" x1="761.0" y1="1517.0" x2="742.5" y2="1505.5" />
+      <QuadTo flexible="false" x1="724.0" y1="1494.0" x2="715.0" y2="1470.0" />
+      <QuadTo flexible="false" x1="706.0" y1="1446.0" x2="706.0" y2="1409.0" />
+    </Outline>
+    <Track>
+      <MoveTo x="736.0" y="1216.0" />
+      <MoveTo x="733.0" y="1450.0" />
+      <MoveTo x="786.0" y="1483.0" />
+      <MoveTo x="1056.0" y="1446.0" />
+    </Track>
+  </Stroke>
+  <Stroke>
+    <Outline>
+      <MoveTo x="1264.0" y="958.0" />
+      <QuadTo flexible="false" x1="1277.0" y1="933.0" x2="1281.5" y2="924.5" />
+      <QuadTo flexible="false" x1="1286.0" y1="916.0" x2="1316.5" y2="854.5" />
+      <QuadTo flexible="false" x1="1347.0" y1="793.0" x2="1355.5" y2="773.5" />
+      <QuadTo flexible="false" x1="1364.0" y1="754.0" x2="1401.5" y2="658.5" />
+      <QuadTo flexible="false" x1="1439.0" y1="563.0" x2="1452.5" y2="524.0" />
+      <QuadTo flexible="false" x1="1466.0" y1="485.0" x2="1484.0" y2="403.0" />
+      <QuadTo flexible="false" x1="1502.0" y1="321.0" x2="1504.0" y2="293.0" />
+      <QuadTo flexible="false" x1="1505.0" y1="275.0" x2="1502.5" y2="255.5" />
+      <QuadTo flexible="false" x1="1500.0" y1="236.0" x2="1502.5" y2="228.0" />
+      <QuadTo flexible="false" x1="1505.0" y1="220.0" x2="1511.5" y2="216.0" />
+      <QuadTo flexible="false" x1="1518.0" y1="212.0" x2="1533.0" y2="214.0" />
+      <QuadTo flexible="false" x1="1555.0" y1="218.0" x2="1584.0" y2="235.5" />
+      <QuadTo flexible="false" x1="1613.0" y1="253.0" x2="1636.0" y2="278.5" />
+      <QuadTo flexible="false" x1="1659.0" y1="304.0" x2="1662.5" y2="319.0" />
+      <QuadTo flexible="false" x1="1666.0" y1="334.0" x2="1661.0" y2="346.0" />
+      <QuadTo flexible="false" x1="1658.0" y1="352.0" x2="1641.5" y2="369.5" />
+      <QuadTo flexible="false" x1="1625.0" y1="387.0" x2="1617.0" y2="407.0" />
+      <LineTo flexible="false" x="1589.0" y="474.0" />
+      <LineTo flexible="false" x="1555.0" y="561.0" />
+      <QuadTo flexible="false" x1="1532.0" y1="618.0" x2="1516.0" y2="647.0" />
+      <LineTo flexible="false" x="1454.0" y="764.0" />
+      <LineTo flexible="true" x="1414.0" y="826.0" />
+      <QuadTo flexible="false" x1="1389.0" y1="859.0" x2="1376.0" y2="874.0" />
+      <LineTo flexible="false" x="1320.0" y="934.0" />
+      <LineTo flexible="false" x="1306.0" y="949.0" />
+      <LineTo flexible="false" x="1280.0" y="973.0" />
+      <LineTo flexible="true" x="1264.0" y="958.0" />
+    </Outline>
+    <Track>
+      <MoveTo x="1520.0" y="226.0" />
+      <MoveTo x="1553.0" y="363.0" />
+      <MoveTo x="1513.0" y="573.0" />
+      <MoveTo x="1280.0" y="960.0" />
+    </Track>
+  </Stroke>
+  <Stroke>
+    <Outline>
+      <MoveTo x="1454.0" y="764.0" />
+      <QuadTo flexible="false" x1="1543.0" y1="737.0" x2="1586.0" y2="718.0" />
+      <LineTo flexible="false" x="1632.0" y="698.0" />
+      <QuadTo flexible="false" x1="1659.0" y1="687.0" x2="1676.0" y2="685.0" />
+      <QuadTo flexible="false" x1="1704.0" y1="683.0" x2="1744.5" y2="701.0" />
+      <QuadTo flexible="false" x1="1785.0" y1="719.0" x2="1816.0" y2="739.0" />
+      <QuadTo flexible="false" x1="1847.0" y1="759.0" x2="1858.0" y2="776.5" />
+      <QuadTo flexible="false" x1="1869.0" y1="794.0" x2="1869.5" y2="804.5" />
+      <QuadTo flexible="false" x1="1870.0" y1="815.0" x2="1859.0" y2="826.0" />
+      <QuadTo flexible="false" x1="1852.0" y1="833.0" x2="1834.0" y2="841.5" />
+      <QuadTo flexible="false" x1="1816.0" y1="850.0" x2="1787.5" y2="867.5" />
+      <QuadTo flexible="false" x1="1759.0" y1="885.0" x2="1731.0" y2="909.0" />
+      <LineTo flexible="false" x="1636.0" y="990.0" />
+      <QuadTo flexible="false" x1="1624.0" y1="1001.0" x2="1616.0" y2="996.5" />
+      <QuadTo flexible="false" x1="1608.0" y1="992.0" x2="1613.0" y2="978.0" />
+      <LineTo flexible="false" x="1628.0" y="933.0" />
+      <QuadTo flexible="false" x1="1637.0" y1="904.0" x2="1652.5" y2="866.5" />
+      <QuadTo flexible="false" x1="1668.0" y1="829.0" x2="1669.0" y2="806.0" />
+      <QuadTo flexible="false" x1="1670.0" y1="783.0" x2="1661.0" y2="774.0" />
+      <QuadTo flexible="false" x1="1652.0" y1="765.0" x2="1602.0" y2="785.0" />
+      <LineTo flexible="false" x="1527.0" y="811.0" />
+      <QuadTo flexible="false" x1="1463.0" y1="840.0" x2="1458.0" y2="837.0" />
+      <LineTo flexible="false" x="1414.0" y="826.0" />
+      <LineTo flexible="true" x="1454.0" y="764.0" />
+    </Outline>
+    <Track>
+      <MoveTo x="1433.0" y="810.0" />
+      <MoveTo x="1660.0" y="723.0" />
+      <MoveTo x="1850.0" y="790.0" />
+      <MoveTo x="1776.0" y="800.0" />
+      <MoveTo x="1640.0" y="980.0" />
+    </Track>
+  </Stroke>
+  <Stroke>
+    <Outline>
+      <MoveTo x="1179.0" y="1676.0" />
+      <QuadTo flexible="false" x1="1190.0" y1="1666.0" x2="1196.0" y2="1660.0" />
+      <LineTo flexible="false" x="1235.0" y="1625.0" />
+      <QuadTo flexible="false" x1="1268.0" y1="1595.0" x2="1293.0" y2="1560.5" />
+      <QuadTo flexible="false" x1="1318.0" y1="1526.0" x2="1342.5" y2="1477.0" />
+      <QuadTo flexible="false" x1="1367.0" y1="1428.0" x2="1382.0" y2="1383.0" />
+      <QuadTo flexible="false" x1="1397.0" y1="1338.0" x2="1410.5" y2="1277.0" />
+      <QuadTo flexible="false" x1="1424.0" y1="1216.0" x2="1427.5" y2="1188.5" />
+      <QuadTo flexible="false" x1="1431.0" y1="1161.0" x2="1433.5" y2="1126.0" />
+      <QuadTo flexible="false" x1="1436.0" y1="1091.0" x2="1436.0" y2="1078.0" />
+      <QuadTo flexible="false" x1="1434.0" y1="1061.0" x2="1425.5" y2="1032.5" />
+      <QuadTo flexible="false" x1="1417.0" y1="1004.0" x2="1420.0" y2="994.0" />
+      <QuadTo flexible="false" x1="1422.0" y1="987.0" x2="1428.0" y2="982.5" />
+      <QuadTo flexible="false" x1="1434.0" y1="978.0" x2="1448.0" y2="979.0" />
+      <QuadTo flexible="false" x1="1455.0" y1="980.0" x2="1482.0" y2="990.5" />
+      <QuadTo flexible="false" x1="1509.0" y1="1001.0" x2="1531.0" y2="1013.5" />
+      <QuadTo flexible="false" x1="1553.0" y1="1026.0" x2="1558.0" y2="1035.5" />
+      <QuadTo flexible="false" x1="1563.0" y1="1045.0" x2="1563.0" y2="1054.0" />
+      <QuadTo flexible="false" x1="1562.0" y1="1059.0" x2="1553.0" y2="1076.5" />
+      <QuadTo flexible="false" x1="1544.0" y1="1094.0" x2="1540.0" y2="1118.0" />
+      <LineTo flexible="false" x="1522.0" y="1211.0" />
+      <LineTo flexible="true" x="1510.0" y="1271.0" />
+      <QuadTo flexible="false" x1="1498.0" y1="1306.0" x2="1489.0" y2="1334.0" />
+      <QuadTo flexible="false" x1="1480.0" y1="1362.0" x2="1471.5" y2="1386.0" />
+      <QuadTo flexible="false" x1="1463.0" y1="1410.0" x2="1445.5" y2="1449.0" />
+      <QuadTo flexible="false" x1="1428.0" y1="1488.0" x2="1409.5" y2="1517.5" />
+      <QuadTo flexible="false" x1="1391.0" y1="1547.0" x2="1358.0" y2="1581.5" />
+      <QuadTo flexible="false" x1="1325.0" y1="1616.0" x2="1292.5" y2="1638.0" />
+      <QuadTo flexible="false" x1="1260.0" y1="1660.0" x2="1190.0" y2="1687.0" />
+      <LineTo flexible="false" x="1169.0" y="1701.0" />
+      <LineTo flexible="true" x="1179.0" y="1676.0" />
+    </Outline>
+    <Track>
+      <MoveTo x="1440.0" y="993.0" />
+      <MoveTo x="1486.0" y="1080.0" />
+      <MoveTo x="1423.0" y="1420.0" />
+      <MoveTo x="1206.0" y="1680.0" />
+    </Track>
+  </Stroke>
+  <Stroke>
+    <Outline>
+      <MoveTo x="1522.0" y="1211.0" />
+      <QuadTo flexible="false" x1="1542.0" y1="1246.0" x2="1553.0" y2="1263.0" />
+      <LineTo flexible="false" x="1599.0" y="1338.0" />
+      <QuadTo flexible="false" x1="1645.0" y1="1415.0" x2="1661.0" y2="1440.5" />
+      <QuadTo flexible="false" x1="1677.0" y1="1466.0" x2="1708.0" y2="1506.5" />
+      <QuadTo flexible="false" x1="1739.0" y1="1547.0" x2="1767.5" y2="1575.0" />
+      <QuadTo flexible="false" x1="1796.0" y1="1603.0" x2="1821.5" y2="1621.0" />
+      <QuadTo flexible="false" x1="1847.0" y1="1639.0" x2="1882.0" y2="1659.5" />
+      <QuadTo flexible="false" x1="1917.0" y1="1680.0" x2="1928.0" y2="1685.0" />
+      <LineTo flexible="false" x="1959.0" y="1701.0" />
+      <QuadTo flexible="false" x1="1983.0" y1="1714.0" x2="1985.0" y2="1725.5" />
+      <QuadTo flexible="false" x1="1987.0" y1="1737.0" x2="1962.0" y2="1741.0" />
+      <LineTo flexible="false" x="1925.0" y="1748.0" />
+      <LineTo flexible="false" x="1887.0" y="1756.0" />
+      <QuadTo flexible="false" x1="1872.0" y1="1759.0" x2="1836.0" y2="1760.0" />
+      <QuadTo flexible="false" x1="1791.0" y1="1762.0" x2="1772.5" y2="1756.5" />
+      <QuadTo flexible="false" x1="1754.0" y1="1751.0" x2="1737.0" y2="1737.5" />
+      <QuadTo flexible="false" x1="1720.0" y1="1724.0" x2="1695.0" y2="1669.0" />
+      <LineTo flexible="false" x="1648.0" y="1577.0" />
+      <QuadTo flexible="false" x1="1635.0" y1="1553.0" x2="1595.0" y2="1467.5" />
+      <QuadTo flexible="false" x1="1555.0" y1="1382.0" x2="1551.0" y2="1369.0" />
+      <LineTo flexible="false" x="1520.0" y="1290.0" />
+      <LineTo flexible="false" x="1510.0" y="1271.0" />
+      <LineTo flexible="true" x="1522.0" y="1211.0" />
+    </Outline>
+    <Track>
+      <MoveTo x="1516.0" y="1246.0" />
+      <MoveTo x="1756.0" y="1656.0" />
+      <MoveTo x="1780.0" y="1720.0" />
+      <MoveTo x="1963.0" y="1723.0" />
+    </Track>
+  </Stroke>
+</Word>
+
