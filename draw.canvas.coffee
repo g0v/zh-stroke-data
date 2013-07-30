@@ -23,7 +23,7 @@ $ ->
   fetchStrokeXml = (code, cb) -> $.get "utf8/" + code.toLowerCase() + ".xml", cb, "xml"
 
   config =
-    scale: 1
+    scale: 0.4
     dim: 2150
     trackWidth: 150
     updatesPerStep: 10 # speed, higher is faster
@@ -91,13 +91,16 @@ $ ->
   drawBackground = (ctx) ->
     dim = config.dim * config.scale
     ctx.strokeStyle = "#A33"
-    ctx.lineWidth = 1
     ctx.beginPath()
+    ctx.lineWidth = 10
     ctx.moveTo(0, 0)
     ctx.lineTo(0, dim)
     ctx.lineTo(dim, dim)
     ctx.lineTo(dim, 0)
     ctx.lineTo(0, 0)
+    ctx.stroke()
+    ctx.beginPath()
+    ctx.lineWidth = 2
     ctx.moveTo(0, dim / 3)
     ctx.lineTo(dim, dim / 3)
     ctx.moveTo(0, dim / 3 * 2)
@@ -178,7 +181,7 @@ $ ->
   strokeWords = (words) -> strokeWord(a) for a in words.split //
 
   $canvas = $("<canvas></canvas>")
-  $canvas.css 'transform', 'scale(0.2)'
+  $canvas.css 'transform', 'scale(0.25)'
   $canvas.css 'transform-origin', '0 0'
   $("#holder").append($canvas)
   canvas = $canvas.get()[0]
