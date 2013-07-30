@@ -118,6 +118,15 @@ $ ->
           ctx.moveTo path.x * config.scale, path.y * config.scale
         when "L"
           ctx.lineTo path.x * config.scale, path.y * config.scale
+        when "C"
+          ctx.bezierCurveTo(
+            path.begin.x * config.scale,
+            path.begin.y * config.scale,
+            path.mid.x * config.scale,
+            path.mid.y * config.scale,
+            path.end.x * config.scale,
+            path.end.y * config.scale
+          )
         when "Q"
           ctx.quadraticCurveTo(
             path.begin.x * config.scale,
@@ -143,6 +152,18 @@ $ ->
             type: "L"
             x: parseFloat a.x.value
             y: parseFloat a.y.value
+        when "CubicTo"
+          path.push
+            type: "C"
+            begin:
+              x: parseFloat a.x1.value
+              y: parseFloat a.y1.value
+            mid:
+              x: parseFloat a.x2.value
+              y: parseFloat a.y2.value
+            end:
+              x: parseFloat a.x3.value
+              y: parseFloat a.y3.value
         when "QuadTo"
           path.push
             type: "Q"
