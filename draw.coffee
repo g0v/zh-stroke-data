@@ -16,6 +16,8 @@ $ ->
           path.push [ "M", parseFloat(a.x.value) , parseFloat(a.y.value) ]
         when "LineTo"
           path.push [ "L", parseFloat(a.x.value) , parseFloat(a.y.value) ]
+        when "CubicTo"
+          path.push [ "C", parseFloat(a.x1.value) , parseFloat(a.y1.value), parseFloat(a.x2.value), parseFloat(a.y2.value), parseFloat(a.x3.value), parseFloat(a.y3.value) ]
         when "QuadTo"
           path.push [ "Q", parseFloat(a.x1.value) , parseFloat(a.y1.value), parseFloat(a.x2.value), parseFloat(a.y2.value) ]
     paper.path(path).attr(pathAttrs).transform("s0.2,0.2,0,0")
