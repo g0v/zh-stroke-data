@@ -26,6 +26,7 @@ $ ->
     scale: .2
     dim: 2150
     trackWidth: 150
+    updatesPerStep: 5 # speed, higher is faster
 
   Word = (val) ->
     this.val = val
@@ -49,7 +50,8 @@ $ ->
     ctx.lineWidth = 5
     ctx.lineCap = "round"
     step = () ->
-      that.update ctx
+      for x in [1..config.updatesPerStep]
+        that.update ctx
       requestAnimationFrame step
     requestAnimationFrame step
 
