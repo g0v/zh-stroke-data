@@ -26,7 +26,7 @@ $ ->
     scale: 1
     dim: 2150
     trackWidth: 150
-    updatesPerStep: 5 # speed, higher is faster
+    updatesPerStep: 10 # speed, higher is faster
 
   Word = (val) ->
     this.val = val
@@ -50,7 +50,7 @@ $ ->
     ctx.lineWidth = 5
     step = () ->
       that.update ctx
-      requestAnimationFrame step
+      setTimeout step, 250
     requestAnimationFrame step
 
   Word.prototype.update = (ctx) ->
@@ -84,6 +84,8 @@ $ ->
       if this.currentTrack >= stroke.track.length - 1
         this.currentTrack = 0
         this.currentStroke += 1
+        return
+    requestAnimationFrame => this.update ctx
 
   drawBackground = (ctx) ->
     dim = config.dim * config.scale
