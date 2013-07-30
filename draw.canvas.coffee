@@ -23,28 +23,101 @@ $ ->
   fetchStrokeXml = (code, cb) -> $.get "utf8/" + code.toLowerCase() + ".xml", cb, "xml"
 
   config =
-    dim: 430
     scale: .2
-    trackWidth: 50
+    dim: 2150
+    trackWidth: 150
+
+  Word = (val) ->
+    this.val = val
+    this.utf8code = escape(val).replace(/%u/, "")
+    this.strokes = []
+    this.init()
+
+  Word.prototype.init = () ->
+    this.currentStroke = 0
+    this.currentTrack = 0
+    this.time = 0.0
+
+  Word.prototype.draw = (ctx) ->
+    that = this
+    this.init()
+    ctx.fillStyle = "#FFF"
+    ctx.fillRect(0, 0, config.dim * config.scale, config.dim * config.scale)
+    drawBackground(ctx)
+    ctx.strokeStyle = "#000"
+    ctx.fillStyle = "#000"
+    ctx.lineWidth = 5
+    ctx.lineCap = "round"
+    step = () ->
+      that.update ctx
+      requestAnimationFrame step
+    requestAnimationFrame step
+
+  Word.prototype.update = (ctx) ->
+    return if this.currentStroke >= this.strokes.length
+    stroke = this.strokes[this.currentStroke]
+    if this.time == 0.0
+      this.vector =
+        x: stroke.track[this.currentTrack + 1].x - stroke.track[this.currentTrack].x
+        y: stroke.track[this.currentTrack + 1].y - stroke.track[this.currentTrack].y
+        size: stroke.track[this.currentTrack + 1].size - stroke.track[this.currentTrack].size
+      ctx.save()
+      ctx.beginPath()
+      pathOutline(ctx, stroke.outline)
+      ctx.clip()
+    # do something
+    ctx.beginPath()
+    ctx.arc(
+      (stroke.track[this.currentTrack].x + this.vector.x * this.time) * config.scale,
+      (stroke.track[this.currentTrack].y + this.vector.y * this.time) * config.scale,
+      (stroke.track[this.currentTrack].size + this.vector.size * this.time) * config.scale,
+      0,
+      2 * Math.PI
+    )
+    ctx.fill()
+    this.time += 0.02
+    if this.time >= 1.0
+      ctx.restore()
+      this.time = 0.0
+      this.currentTrack += 1
+      if this.currentTrack >= stroke.track.length - 1
+        this.currentTrack = 0
+        this.currentStroke += 1
 
   drawBackground = (ctx) ->
+    dim = config.dim * config.scale
     ctx.strokeStyle = "#A33"
     ctx.lineWidth = 1
     ctx.beginPath()
     ctx.moveTo(0, 0)
-    ctx.lineTo(0, config.dim)
-    ctx.lineTo(config.dim, config.dim)
-    ctx.lineTo(config.dim, 0)
+    ctx.lineTo(0, dim)
+    ctx.lineTo(dim, dim)
+    ctx.lineTo(dim, 0)
     ctx.lineTo(0, 0)
-    ctx.moveTo(0, config.dim / 3)
-    ctx.lineTo(config.dim, config.dim / 3)
-    ctx.moveTo(0, config.dim / 3 * 2)
-    ctx.lineTo(config.dim, config.dim / 3 * 2)
-    ctx.moveTo(config.dim / 3, 0)
-    ctx.lineTo(config.dim / 3, config.dim)
-    ctx.moveTo(config.dim / 3 * 2, 0)
-    ctx.lineTo(config.dim / 3 * 2, config.dim)
+    ctx.moveTo(0, dim / 3)
+    ctx.lineTo(dim, dim / 3)
+    ctx.moveTo(0, dim / 3 * 2)
+    ctx.lineTo(dim, dim / 3 * 2)
+    ctx.moveTo(dim / 3, 0)
+    ctx.lineTo(dim / 3, dim)
+    ctx.moveTo(dim / 3 * 2, 0)
+    ctx.lineTo(dim / 3 * 2, dim)
     ctx.stroke()
+
+  pathOutline = (ctx, outline) ->
+    for path in outline
+      switch path.type
+        when "M"
+          ctx.moveTo path.x * config.scale, path.y * config.scale
+        when "L"
+          ctx.lineTo path.x * config.scale, path.y * config.scale
+        when "Q"
+          ctx.quadraticCurveTo(
+            path.begin.x * config.scale,
+            path.begin.y * config.scale,
+            path.end.x * config.scale,
+            path.end.y * config.scale
+          )
 
   parseOutline = (outline) ->
     path = []
@@ -89,10 +162,7 @@ $ ->
     path
 
   createWord = (val) ->
-    word =
-      value: val
-      utf8code: escape(val).replace(/%u/, "")
-      strokes: []
+    word = new Word(val)
     fetchStrokeXml word.utf8code, (doc) ->
       tracks = doc.getElementsByTagName "Track"
       for outline, index in doc.getElementsByTagName 'Outline'
@@ -101,52 +171,18 @@ $ ->
           track: parseTrack tracks[index]
     word
 
-  drawStroke = (ctx, outline, track, time) ->
-    ctx.beginPath()
-    for node in outline.childNodes
-      continue if node.nodeType != 1
-      a = node.attributes
-      continue unless a
-      switch node.nodeName
-        when "MoveTo"
-          ctx.moveTo(parseFloat(a.x.value) * .2, parseFloat(a.y.value) * .2)
-        when "LineTo"
-          ctx.lineTo(parseFloat(a.x.value) * .2, parseFloat(a.y.value) * .2)
-        when "QuadTo"
-          ctx.quadraticCurveTo(
-            parseFloat(a.x1.value) * .2,
-            parseFloat(a.y1.value) * .2,
-            parseFloat(a.x2.value) * .2,
-            parseFloat(a.y2.value) * .2
-          )
-    ctx.fill()
-
-  strokeWord = (ctx, word) ->
-    ctx.clearRect(0, 0, config.dim, config.dim)
-    utf8code = escape(word).replace(/%u/ , "")
-    fetchStrokeXml utf8code, (doc) ->
-      drawBackground(ctx)
-      ctx.strokeStyle = "#000"
-      ctx.fillStyle = "#000"
-      ctx.lineWidth = 5
-      ctx.lineCap = "round"
-      tracks = doc.getElementsByTagName "Track"
-      for outline, index in doc.getElementsByTagName 'Outline'
-        do (outline) ->
-          drawStroke(ctx, outline, tracks[index])
-
   strokeWords = (words) -> strokeWord(a) for a in words.split //
 
   $canvas = $("<canvas></canvas>")
   $("#holder").append($canvas)
   canvas = $canvas.get()[0]
-  canvas.width = config.dim
-  canvas.height = config.dim
+  canvas.width = config.dim * config.scale
+  canvas.height = config.dim * config.scale
   ctx = canvas.getContext("2d")
   
   $('#word').change (e) ->
-    word = $(this).val()
-    console.log createWord(word)
-    strokeWord(ctx, word)
-  console.log createWord($("#word").val())
-  strokeWord(ctx, $('#word').val())
+    word = createWord $(this).val()
+    word.draw ctx
+  word = createWord $("#word").val()
+  word.draw ctx
+  #strokeWord(ctx, $('#word').val())
