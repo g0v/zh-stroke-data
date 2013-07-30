@@ -23,7 +23,7 @@ $ ->
   fetchStrokeXml = (code, cb) -> $.get "utf8/" + code.toLowerCase() + ".xml", cb, "xml"
 
   config =
-    scale: .2
+    scale: 1
     dim: 2150
     trackWidth: 150
     updatesPerStep: 5 # speed, higher is faster
@@ -48,10 +48,8 @@ $ ->
     ctx.strokeStyle = "#000"
     ctx.fillStyle = "#000"
     ctx.lineWidth = 5
-    ctx.lineCap = "round"
     step = () ->
-      for x in [1..config.updatesPerStep]
-        that.update ctx
+      that.update ctx
       requestAnimationFrame step
     requestAnimationFrame step
 
@@ -62,22 +60,23 @@ $ ->
       this.vector =
         x: stroke.track[this.currentTrack + 1].x - stroke.track[this.currentTrack].x
         y: stroke.track[this.currentTrack + 1].y - stroke.track[this.currentTrack].y
-        size: stroke.track[this.currentTrack + 1].size - stroke.track[this.currentTrack].size
+        size: stroke.track[this.currentTrack].size
       ctx.save()
       ctx.beginPath()
       pathOutline(ctx, stroke.outline)
       ctx.clip()
+    this.time += 0.02 * config.updatesPerStep
+    this.time = 1 if this.time > 1
     # do something
     ctx.beginPath()
     ctx.arc(
       (stroke.track[this.currentTrack].x + this.vector.x * this.time) * config.scale,
       (stroke.track[this.currentTrack].y + this.vector.y * this.time) * config.scale,
-      (stroke.track[this.currentTrack].size + this.vector.size * this.time) * config.scale,
+      (this.vector.size * 1.5) * config.scale,
       0,
       2 * Math.PI
     )
     ctx.fill()
-    this.time += 0.02
     if this.time >= 1.0
       ctx.restore()
       this.time = 0.0
@@ -176,6 +175,8 @@ $ ->
   strokeWords = (words) -> strokeWord(a) for a in words.split //
 
   $canvas = $("<canvas></canvas>")
+  $canvas.css 'transform', 'scale(0.2)'
+  $canvas.css 'transform-origin', '0 0'
   $("#holder").append($canvas)
   canvas = $canvas.get()[0]
   canvas.width = config.dim * config.scale
