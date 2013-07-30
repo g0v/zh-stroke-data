@@ -65,18 +65,19 @@ $ ->
       ctx.beginPath()
       pathOutline(ctx, stroke.outline)
       ctx.clip()
-    this.time += 0.02 * config.updatesPerStep
-    this.time = 1 if this.time > 1
-    # do something
-    ctx.beginPath()
-    ctx.arc(
-      (stroke.track[this.currentTrack].x + this.vector.x * this.time) * config.scale,
-      (stroke.track[this.currentTrack].y + this.vector.y * this.time) * config.scale,
-      (this.vector.size * 1.5) * config.scale,
-      0,
-      2 * Math.PI
-    )
-    ctx.fill()
+    for i in [1..config.updatesPerStep]
+      this.time += 0.02
+      this.time = 1 if this.time >= 1
+      ctx.beginPath()
+      ctx.arc(
+        (stroke.track[this.currentTrack].x + this.vector.x * this.time) * config.scale,
+        (stroke.track[this.currentTrack].y + this.vector.y * this.time) * config.scale,
+        (this.vector.size * 2) * config.scale,
+        0,
+        2 * Math.PI
+      )
+      ctx.fill()
+      break if this.time >= 1
     if this.time >= 1.0
       ctx.restore()
       this.time = 0.0
