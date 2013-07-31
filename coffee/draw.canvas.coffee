@@ -19,12 +19,14 @@ $ ->
     this.currentTrack = 0
     this.time = 0.0
 
-  Word.prototype.draw = (ctx) ->
-    that = this
-    this.init()
+  Word.prototype.drawBackground = (ctx) ->
     ctx.fillStyle = "#FFF"
     ctx.fillRect(0, 0, config.dim * config.scale, config.dim * config.scale)
     drawBackground(ctx)
+
+  Word.prototype.draw = (ctx) ->
+    that = this
+    this.init()
     ctx.strokeStyle = "#000"
     ctx.fillStyle = "#000"
     ctx.lineWidth = 5
@@ -32,6 +34,7 @@ $ ->
       that.update ctx
       setTimeout step, 250
     requestAnimationFrame step
+    this.promise = $.Deferred()
 
   Word.prototype.update = (ctx) ->
     return if this.currentStroke >= this.strokes.length
@@ -65,8 +68,10 @@ $ ->
       if this.currentTrack >= stroke.track.length - 1
         this.currentTrack = 0
         this.currentStroke += 1
-        return
-    requestAnimationFrame => this.update ctx
+    if this.currentStroke >= this.strokes.length
+      this.promise.resolve()
+    else
+      requestAnimationFrame => this.update ctx
 
   drawBackground = (ctx) ->
     dim = config.dim * config.scale
@@ -189,6 +194,8 @@ $ ->
           track: parseTrack tracks[index]
 
     return {
+      drawBackground: () ->
+        word.drawBackground ctx
       draw: () ->
         word.draw ctx
     }

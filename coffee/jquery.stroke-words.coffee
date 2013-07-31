@@ -15,10 +15,13 @@ $.fn.extend
       if options.svg
         window.WordStroker.raphael.strokeWords this, words
       else
-        window.WordStroker.canvas.
-          createWordsAndViews(this, words).
-          forEach (word) ->
-            word.draw()
+        strokers = window.WordStroker.canvas.createWordsAndViews(this, words)
+        strokers.forEach (stroker) ->
+          stroker.drawBackground()
+        i = 0
+        next = ->
+          strokers[i++].draw().then next if i < strokers.length
+        next()
     ).data("strokeWords",
       play: null
     )
