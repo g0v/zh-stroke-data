@@ -1,0 +1,22 @@
+{
+  "name": "zh-stroke-data",
+  "version": "0.0.36",
+  "description": "常用國字標準字體筆劃 XML 資料檔",
+  "author": "c9s",
+  "main": "Gruntfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/caasi/zh-stroke-data.git"
+  },
+  "keywords": [
+    "stroke data"
+  ],
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "coffee-script": "~1.6.3",
+    "grunt-contrib-coffee": "~0.7.0"
+  }
+}

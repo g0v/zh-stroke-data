@@ -6,6 +6,11 @@
 go run fetch.go
 ```
 
+```compile
+npm install -g grunt-cli
+npm install --dev
+grunt
+```
 
 # 資料來源
 

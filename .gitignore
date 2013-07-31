@@ -1,0 +1,6 @@
+node_modules/
+*.swp
+/draw.js
+/draw.canvas.js
+/jquery.stroke-words.js
+/*.map

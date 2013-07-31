@@ -1,25 +1,4 @@
 $ ->
-  filterNodes = (childNodes) ->
-    nodes = []
-    for n in childNodes
-      nodes.push n if n.nodeType == 1
-    return nodes
-
-  #drawOutline = (paper, outline ,pathAttrs) ->
-  #  path = []
-  #  for node in outline.childNodes
-  #    continue if node.nodeType != 1
-  #    a = node.attributes
-  #    continue unless a
-  #    switch node.nodeName
-  #      when "MoveTo"
-  #        path.push [ "M", parseFloat(a.x.value) , parseFloat(a.y.value) ]
-  #      when "LineTo"
-  #        path.push [ "L", parseFloat(a.x.value) , parseFloat(a.y.value) ]
-  #      when "QuadTo"
-  #        path.push [ "Q", parseFloat(a.x1.value) , parseFloat(a.y1.value), parseFloat(a.x2.value), parseFloat(a.y2.value) ]
-  #  paper.path(path).attr(pathAttrs).transform("s0.2,0.2,0,0")
-
   fetchStrokeXml = (code, cb) -> $.get "utf8/" + code.toLowerCase() + ".xml", cb, "xml"
 
   config =
@@ -189,7 +168,17 @@ $ ->
             size: if a.size then parseFloat(a.size.value) else config.trackWidth
     path
 
-  createWord = (val) ->
+  createWordAndView = (element, val) ->
+    $canvas = $ "<canvas></canvas>"
+    $canvas.css 'transform', 'scale(0.25)'
+    $canvas.css 'transform-origin', '0 0'
+    $(element).append($canvas)
+
+    canvas = $canvas.get()[0]
+    canvas.width = config.dim * config.scale
+    canvas.height = config.dim * config.scale
+    ctx = canvas.getContext("2d")
+
     word = new Word(val)
     fetchStrokeXml word.utf8code, (doc) ->
       tracks = doc.getElementsByTagName "Track"
@@ -197,22 +186,24 @@ $ ->
         word.strokes.push
           outline: parseOutline outline
           track: parseTrack tracks[index]
-    word
 
-  strokeWords = (words) -> strokeWord(a) for a in words.split //
+    return {
+      draw: () ->
+        word.draw ctx
+    }
 
-  $canvas = $("<canvas></canvas>")
-  $canvas.css 'transform', 'scale(0.25)'
-  $canvas.css 'transform-origin', '0 0'
-  $("#holder").append($canvas)
-  canvas = $canvas.get()[0]
-  canvas.width = config.dim * config.scale
-  canvas.height = config.dim * config.scale
-  ctx = canvas.getContext("2d")
-  
-  $('#word').change (e) ->
-    word = createWord $(this).val()
-    word.draw ctx
-  word = createWord $("#word").val()
-  word.draw ctx
+  createWordsAndViews = (element, words) ->
+    Array.prototype.map.call words, (word) ->
+      return createWordAndView element, word
+
+  window.WordStroker or= {}
+  window.WordStroker.canvas =
+    Word: Word
+    createWordsAndViews: createWordsAndViews
+
+  #$('#word').change (e) ->
+  #  word = createWord $(this).val()
+  #  word.draw ctx
+  #word = createWord $("#word").val()
+  #word.draw ctx
   #strokeWord(ctx, $('#word').val())

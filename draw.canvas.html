@@ -8,8 +8,25 @@
         <script src="raf.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="raphael.js" type="text/javascript" charset="utf-8"></script>
         <script src="jquery-1.9.1.min.js" type="text/javascript" charset="utf-8"> </script>
-        <script src="coffee-script.js" type="text/javascript" charset="utf-8"> </script>
-        <script type="text/coffeescript" src="draw.canvas.coffee"> </script>
+        <script type="text/javascript" src="draw.canvas.js"> </script>
+        <script type="text/javascript">
+          $(document).ready(function() {
+            $word = $("#word");
+            $word.change(function() {
+              WordStroker.canvas.
+                createWordsAndViews($("#holder").get()[0], $word.val()).
+                forEach(function(word) {
+                  word.draw();
+                });
+            });
+            WordStroker.canvas.
+              createWordsAndViews($("#holder").get()[0], $word.val()).
+              forEach(function(word) {
+                word.draw();
+              });
+          });
+        </script>
+    </head>
     </head>
     <body>
         <input type="text" id="word" value="發"/>
