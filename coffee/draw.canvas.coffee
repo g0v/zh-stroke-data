@@ -3,7 +3,7 @@ $ ->
 
   config =
     scale: 0.4
-    contextScale: 0.25
+    styleScale: 0.25
     dim: 2150
     trackWidth: 150
     updatesPerStep: 10 # speed, higher is faster
@@ -171,13 +171,14 @@ $ ->
 
   createWordAndView = (element, val) ->
     $canvas = $ "<canvas></canvas>"
+    $canvas.css "width", config.dim * config.scale * config.styleScale + "px"
+    $canvas.css "height", config.dim * config.scale * config.styleScale + "px"
     $(element).append($canvas)
 
     canvas = $canvas.get()[0]
-    canvas.width = config.dim * config.scale * config.contextScale
-    canvas.height = config.dim * config.scale * config.contextScale
+    canvas.width = config.dim * config.scale
+    canvas.height = config.dim * config.scale
     ctx = canvas.getContext("2d")
-    ctx.scale(config.contextScale, config.contextScale)
 
     word = new Word(val)
     fetchStrokeXml word.utf8code, (doc) ->
