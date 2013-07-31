@@ -23,10 +23,10 @@ $ ->
   fetchStrokeXml = (code, cb) -> $.get "utf8/" + code.toLowerCase() + ".xml", cb, "xml"
 
   config =
-    scale: .2
+    scale: 0.4
     dim: 2150
     trackWidth: 150
-    updatesPerStep: 5 # speed, higher is faster
+    updatesPerStep: 10 # speed, higher is faster
 
   Word = (val) ->
     this.val = val
@@ -48,11 +48,9 @@ $ ->
     ctx.strokeStyle = "#000"
     ctx.fillStyle = "#000"
     ctx.lineWidth = 5
-    ctx.lineCap = "round"
     step = () ->
-      for x in [1..config.updatesPerStep]
-        that.update ctx
-      requestAnimationFrame step
+      that.update ctx
+      setTimeout step, 250
     requestAnimationFrame step
 
   Word.prototype.update = (ctx) ->
@@ -62,22 +60,24 @@ $ ->
       this.vector =
         x: stroke.track[this.currentTrack + 1].x - stroke.track[this.currentTrack].x
         y: stroke.track[this.currentTrack + 1].y - stroke.track[this.currentTrack].y
-        size: stroke.track[this.currentTrack + 1].size - stroke.track[this.currentTrack].size
+        size: stroke.track[this.currentTrack].size
       ctx.save()
       ctx.beginPath()
       pathOutline(ctx, stroke.outline)
       ctx.clip()
-    # do something
-    ctx.beginPath()
-    ctx.arc(
-      (stroke.track[this.currentTrack].x + this.vector.x * this.time) * config.scale,
-      (stroke.track[this.currentTrack].y + this.vector.y * this.time) * config.scale,
-      (stroke.track[this.currentTrack].size + this.vector.size * this.time) * config.scale,
-      0,
-      2 * Math.PI
-    )
-    ctx.fill()
-    this.time += 0.02
+    for i in [1..config.updatesPerStep]
+      this.time += 0.02
+      this.time = 1 if this.time >= 1
+      ctx.beginPath()
+      ctx.arc(
+        (stroke.track[this.currentTrack].x + this.vector.x * this.time) * config.scale,
+        (stroke.track[this.currentTrack].y + this.vector.y * this.time) * config.scale,
+        (this.vector.size * 2) * config.scale,
+        0,
+        2 * Math.PI
+      )
+      ctx.fill()
+      break if this.time >= 1
     if this.time >= 1.0
       ctx.restore()
       this.time = 0.0
@@ -85,17 +85,22 @@ $ ->
       if this.currentTrack >= stroke.track.length - 1
         this.currentTrack = 0
         this.currentStroke += 1
+        return
+    requestAnimationFrame => this.update ctx
 
   drawBackground = (ctx) ->
     dim = config.dim * config.scale
     ctx.strokeStyle = "#A33"
-    ctx.lineWidth = 1
     ctx.beginPath()
+    ctx.lineWidth = 10
     ctx.moveTo(0, 0)
     ctx.lineTo(0, dim)
     ctx.lineTo(dim, dim)
     ctx.lineTo(dim, 0)
     ctx.lineTo(0, 0)
+    ctx.stroke()
+    ctx.beginPath()
+    ctx.lineWidth = 2
     ctx.moveTo(0, dim / 3)
     ctx.lineTo(dim, dim / 3)
     ctx.moveTo(0, dim / 3 * 2)
@@ -113,6 +118,15 @@ $ ->
           ctx.moveTo path.x * config.scale, path.y * config.scale
         when "L"
           ctx.lineTo path.x * config.scale, path.y * config.scale
+        when "C"
+          ctx.bezierCurveTo(
+            path.begin.x * config.scale,
+            path.begin.y * config.scale,
+            path.mid.x * config.scale,
+            path.mid.y * config.scale,
+            path.end.x * config.scale,
+            path.end.y * config.scale
+          )
         when "Q"
           ctx.quadraticCurveTo(
             path.begin.x * config.scale,
@@ -138,6 +152,18 @@ $ ->
             type: "L"
             x: parseFloat a.x.value
             y: parseFloat a.y.value
+        when "CubicTo"
+          path.push
+            type: "C"
+            begin:
+              x: parseFloat a.x1.value
+              y: parseFloat a.y1.value
+            mid:
+              x: parseFloat a.x2.value
+              y: parseFloat a.y2.value
+            end:
+              x: parseFloat a.x3.value
+              y: parseFloat a.y3.value
         when "QuadTo"
           path.push
             type: "Q"
@@ -176,6 +202,8 @@ $ ->
   strokeWords = (words) -> strokeWord(a) for a in words.split //
 
   $canvas = $("<canvas></canvas>")
+  $canvas.css 'transform', 'scale(0.25)'
+  $canvas.css 'transform-origin', '0 0'
   $("#holder").append($canvas)
   canvas = $canvas.get()[0]
   canvas.width = config.dim * config.scale
