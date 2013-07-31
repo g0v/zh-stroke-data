@@ -56,8 +56,8 @@ $ ->
         0,
         2 * Math.PI
       )
-      ctx.fill()
       break if this.time >= 1
+    ctx.fill()
     if this.time >= 1.0
       ctx.restore()
       this.time = 0.0
