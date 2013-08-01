@@ -19,11 +19,19 @@ $.fn.extend
         promises.forEach (p) ->
           p.then (word) ->
             word.drawBackground()
-        i = 0
-        next = ->
-          if i < promises.length
-            promises[i++].then (word) -> word.draw().then next
-        next()
+        ##
+        # do the same as following lines with reduce
+        ##
+        # i = 0
+        # next = ->
+        #   if i < promises.length
+        #     promises[i++].then (word) -> word.draw().then next
+        # next()
+        ##
+        do promises.reverse().reduce (next, current) ->
+          -> current.then (word) ->
+            word.draw().then next
+        , null
     ).data("strokeWords",
       play: null
     )
