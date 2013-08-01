@@ -1,10 +1,13 @@
 常用國字標準字體筆劃 XML 資料檔
 ===============================
 
+## 抓資料
 
 ```go
 go run fetch.go
 ```
+
+## 產生 demo 用的 script
 
 ```compile
 npm install -g grunt-cli
@@ -12,7 +15,7 @@ npm install --dev
 grunt
 ```
 
-# 資料來源
+## 資料來源
 
 常用國字標準字體筆順學習網 <http://stroke-order.learningweb.moe.edu.tw>
 
