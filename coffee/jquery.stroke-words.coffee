@@ -28,7 +28,7 @@ $.fn.extend
         #     promises[i++].then (word) -> word.draw().then next
         # next()
         ##
-        do promises.reverse().reduce (next, current) ->
+        do promises.reduceRight (next, current) ->
           -> current.then (word) ->
             word.draw().then next
         , null
