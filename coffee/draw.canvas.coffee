@@ -2,18 +2,20 @@ $ ->
   fetchStrokeXml = (code, success, fail) ->
     $.get("utf8/" + code.toLowerCase() + ".xml", success, "xml").fail(fail)
 
+  internalOptions =
+    dim: 2150
+    trackWidth: 150
+
   Word = (val, options) ->
     this.options = $.extend(
-      dim: 2150
       scales:
         fill: 0.4
         style: 0.25
-      trackWidth: 150
       updatesPerStep: 10 # speed, higher is faster
       delays:
         stroke: 0.25
         word: 0.5
-    , options)
+    , options, internalOptions)
     this.val = val
     this.utf8code = escape(val).replace(/%u/, "")
     this.strokes = []
