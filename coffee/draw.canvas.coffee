@@ -1,43 +1,72 @@
 $ ->
   fetchStrokeXml = (code, cb) -> $.get "utf8/" + code.toLowerCase() + ".xml", cb, "xml"
 
-  config =
-    dim: 2150
-    scales:
-      fill: 0.4
-      style: 0.25
-    trackWidth: 150
-    updatesPerStep: 10 # speed, higher is faster
-    delays:
-      stroke: 0.25
-      word: 0.5
-
-  Word = (val) ->
+  Word = (val, options) ->
+    this.options = $.extend(
+      dim: 2150
+      scales:
+        fill: 0.4
+        style: 0.25
+      trackWidth: 150
+      updatesPerStep: 10 # speed, higher is faster
+      delays:
+        stroke: 0.25
+        word: 0.5
+    , options)
     this.val = val
     this.utf8code = escape(val).replace(/%u/, "")
     this.strokes = []
-    this.init()
 
-  Word.prototype.init = () ->
+    this.canvas = document.createElement("canvas")
+    $canvas = $ this.canvas
+    $canvas.css "width", this.styleWidth() + "px"
+    $canvas.css "height", this.styleHeight() + "px"
+    this.canvas.width = this.fillWidth()
+    this.canvas.height = this.fillHeight()
+
+    return this
+
+  Word.prototype.init = ->
     this.currentStroke = 0
     this.currentTrack = 0
     this.time = 0.0
 
-  Word.prototype.drawBackground = (ctx) ->
-    ctx.fillStyle = "#FFF"
-    ctx.fillRect(0, 0, config.dim * config.scales.fill, config.dim * config.scales.fill)
-    drawBackground(ctx)
+  Word.prototype.width = ->
+    this.options.dim
 
-  Word.prototype.draw = (ctx) ->
+  Word.prototype.height = ->
+    this.options.dim
+
+  Word.prototype.fillWidth = ->
+    this.width() * this.options.scales.fill
+
+  Word.prototype.fillHeight = ->
+    this.height() * this.options.scales.fill
+
+  Word.prototype.styleWidth = ->
+    this.fillWidth() * this.options.scales.style
+
+  Word.prototype.styleHeight = ->
+    this.fillHeight() * this.options.scales.style
+
+  Word.prototype.drawBackground = ->
+    ctx = this.canvas.getContext("2d")
+    ctx.fillStyle = "#FFF"
+    ctx.fillRect(0, 0, this.fillWidth(), this.fillHeight())
+    drawBackground(ctx, this.fillWidth())
+
+  Word.prototype.draw = ->
     this.init()
+    ctx = this.canvas.getContext("2d")
     ctx.strokeStyle = "#000"
     ctx.fillStyle = "#000"
     ctx.lineWidth = 5
-    requestAnimationFrame => this.update ctx
+    requestAnimationFrame => this.update()
     this.promise = $.Deferred()
 
-  Word.prototype.update = (ctx) ->
+  Word.prototype.update = ->
     return if this.currentStroke >= this.strokes.length
+    ctx = this.canvas.getContext("2d")
     stroke = this.strokes[this.currentStroke]
     # will stroke
     if this.time == 0.0
@@ -47,21 +76,21 @@ $ ->
         size: stroke.track[this.currentTrack].size
       ctx.save()
       ctx.beginPath()
-      pathOutline(ctx, stroke.outline)
+      pathOutline(ctx, stroke.outline, this.options.scales.fill)
       ctx.clip()
-    for i in [1..config.updatesPerStep]
+    for i in [1..this.options.updatesPerStep]
       this.time += 0.02
       this.time = 1 if this.time >= 1
       ctx.beginPath()
       ctx.arc(
-        (stroke.track[this.currentTrack].x + this.vector.x * this.time) * config.scales.fill,
-        (stroke.track[this.currentTrack].y + this.vector.y * this.time) * config.scales.fill,
-        (this.vector.size * 2) * config.scales.fill,
+        (stroke.track[this.currentTrack].x + this.vector.x * this.time) * this.options.scales.fill,
+        (stroke.track[this.currentTrack].y + this.vector.y * this.time) * this.options.scales.fill,
+        (this.vector.size * 2) * this.options.scales.fill,
         0,
         2 * Math.PI
       )
+      ctx.fill()
       break if this.time >= 1
-    ctx.fill()
     delay = 0
     # did track stroked
     if this.time >= 1.0
@@ -72,22 +101,21 @@ $ ->
     if this.currentTrack >= stroke.track.length - 1
       this.currentTrack = 0
       this.currentStroke += 1
-      delay = config.delays.stroke
+      delay = this.options.delays.stroke
     # did word stroked
     if this.currentStroke >= this.strokes.length
       setTimeout =>
         this.promise.resolve()
-      , config.delays.word * 1000
+      , this.options.delays.word * 1000
     else
       if delay
         setTimeout =>
-          requestAnimationFrame => this.update ctx
+          requestAnimationFrame => this.update()
         , delay * 1000
       else
-        requestAnimationFrame => this.update ctx
+        requestAnimationFrame => this.update()
 
-  drawBackground = (ctx) ->
-    dim = config.dim * config.scales.fill
+  drawBackground = (ctx, dim) ->
     ctx.strokeStyle = "#A33"
     ctx.beginPath()
     ctx.lineWidth = 10
@@ -109,28 +137,28 @@ $ ->
     ctx.lineTo(dim / 3 * 2, dim)
     ctx.stroke()
 
-  pathOutline = (ctx, outline) ->
+  pathOutline = (ctx, outline, scale) ->
     for path in outline
       switch path.type
         when "M"
-          ctx.moveTo path.x * config.scales.fill, path.y * config.scales.fill
+          ctx.moveTo path.x * scale, path.y * scale
         when "L"
-          ctx.lineTo path.x * config.scales.fill, path.y * config.scales.fill
+          ctx.lineTo path.x * scale, path.y * scale
         when "C"
           ctx.bezierCurveTo(
-            path.begin.x * config.scales.fill,
-            path.begin.y * config.scales.fill,
-            path.mid.x * config.scales.fill,
-            path.mid.y * config.scales.fill,
-            path.end.x * config.scales.fill,
-            path.end.y * config.scales.fill
+            path.begin.x * scale,
+            path.begin.y * scale,
+            path.mid.x * scale,
+            path.mid.y * scale,
+            path.end.x * scale,
+            path.end.y * scale
           )
         when "Q"
           ctx.quadraticCurveTo(
-            path.begin.x * config.scales.fill,
-            path.begin.y * config.scales.fill,
-            path.end.x * config.scales.fill,
-            path.end.y * config.scales.fill
+            path.begin.x * scale,
+            path.begin.y * scale,
+            path.end.x * scale,
+            path.end.y * scale
           )
 
   parseOutline = (outline) ->
@@ -173,7 +201,7 @@ $ ->
               y: parseFloat a.y2.value
     path
 
-  parseTrack = (track) ->
+  parseTrack = (track, defaultWidth) ->
     path = []
     for node in track.childNodes
       continue if node.nodeType != 1
@@ -184,50 +212,32 @@ $ ->
           path.push
             x: parseFloat a.x.value
             y: parseFloat a.y.value
-            size: if a.size then parseFloat(a.size.value) else config.trackWidth
+            size: if a.size then parseFloat(a.size.value) else defaultWidth
     path
 
-  createWordAndView = (element, val) ->
+  createWordAndView = (element, val, options) ->
     promise = jQuery.Deferred()
-
-    $canvas = $ "<canvas></canvas>"
-    $canvas.css "width", config.dim * config.scales.fill * config.scales.style + "px"
-    $canvas.css "height", config.dim * config.scales.fill * config.scales.style + "px"
-    $(element).append($canvas)
-
-    canvas = $canvas.get()[0]
-    canvas.width = config.dim * config.scales.fill
-    canvas.height = config.dim * config.scales.fill
-    ctx = canvas.getContext("2d")
-
-    word = new Word(val)
+    word = new Word(val, options)
+    $(element).append word.canvas
     fetchStrokeXml word.utf8code, (doc) ->
       tracks = doc.getElementsByTagName "Track"
       for outline, index in doc.getElementsByTagName 'Outline'
         word.strokes.push
           outline: parseOutline outline
-          track: parseTrack tracks[index]
+          track: parseTrack tracks[index], word.options.trackWidth
         promise.resolve {
           drawBackground: () ->
-            word.drawBackground ctx
+            word.drawBackground()
           draw: () ->
-            word.draw ctx
+            word.draw()
         }
-
     promise
 
-  createWordsAndViews = (element, words) ->
+  createWordsAndViews = (element, words, options) ->
     Array.prototype.map.call words, (word) ->
-      return createWordAndView element, word
+      return createWordAndView element, word, options
 
   window.WordStroker or= {}
   window.WordStroker.canvas =
     Word: Word
     createWordsAndViews: createWordsAndViews
-
-  #$('#word').change (e) ->
-  #  word = createWord $(this).val()
-  #  word.draw ctx
-  #word = createWord $("#word").val()
-  #word.draw ctx
-  #strokeWord(ctx, $('#word').val())

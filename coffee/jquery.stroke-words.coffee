@@ -15,7 +15,7 @@ $.fn.extend
       if options.svg
         window.WordStroker.raphael.strokeWords this, words
       else
-        promises = window.WordStroker.canvas.createWordsAndViews(this, words)
+        promises = window.WordStroker.canvas.createWordsAndViews(this, words, options)
         promises.forEach (p) ->
           p.then (word) ->
             word.drawBackground()

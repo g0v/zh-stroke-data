@@ -13,11 +13,17 @@
         <script type="text/javascript" src="jquery.stroke-words.js"></script>
         <script type="text/javascript">
           $(document).ready(function() {
+            var $word, options;
+
+            options = {
+              updatesPerStep: 1
+            };
+
             $word = $("#word");
             $word.change(function() {
-              $("#holder").strokeWords($word.val(), { svg: false });
+              $("#holder").strokeWords($word.val(), options);
             });
-            $("#holder").strokeWords($word.val(), { svg: false });
+            $("#holder").strokeWords($word.val(), options);
           });
         </script>
     </head>
