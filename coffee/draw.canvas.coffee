@@ -7,6 +7,9 @@ $ ->
     dim: 2150
     trackWidth: 150
     updatesPerStep: 10 # speed, higher is faster
+    delays:
+      stroke: 0.25
+      word: 0.5
 
   Word = (val) ->
     this.val = val
@@ -25,20 +28,17 @@ $ ->
     drawBackground(ctx)
 
   Word.prototype.draw = (ctx) ->
-    that = this
     this.init()
     ctx.strokeStyle = "#000"
     ctx.fillStyle = "#000"
     ctx.lineWidth = 5
-    step = () ->
-      that.update ctx
-      setTimeout step, 250
-    requestAnimationFrame step
+    requestAnimationFrame => this.update ctx
     this.promise = $.Deferred()
 
   Word.prototype.update = (ctx) ->
     return if this.currentStroke >= this.strokes.length
     stroke = this.strokes[this.currentStroke]
+    # will stroke
     if this.time == 0.0
       this.vector =
         x: stroke.track[this.currentTrack + 1].x - stroke.track[this.currentTrack].x
@@ -61,17 +61,29 @@ $ ->
       )
       break if this.time >= 1
     ctx.fill()
+    delay = 0
+    # did track stroked
     if this.time >= 1.0
       ctx.restore()
       this.time = 0.0
       this.currentTrack += 1
-      if this.currentTrack >= stroke.track.length - 1
-        this.currentTrack = 0
-        this.currentStroke += 1
+    # did stroked
+    if this.currentTrack >= stroke.track.length - 1
+      this.currentTrack = 0
+      this.currentStroke += 1
+      delay = config.delays.stroke
+    # did word stroked
     if this.currentStroke >= this.strokes.length
-      this.promise.resolve()
+      setTimeout =>
+        this.promise.resolve()
+      , config.delays.word * 1000
     else
-      requestAnimationFrame => this.update ctx
+      if delay
+        setTimeout =>
+          requestAnimationFrame => this.update ctx
+        , delay * 1000
+      else
+        requestAnimationFrame => this.update ctx
 
   drawBackground = (ctx) ->
     dim = config.dim * config.scale
@@ -175,6 +187,8 @@ $ ->
     path
 
   createWordAndView = (element, val) ->
+    promise = jQuery.Deferred()
+
     $canvas = $ "<canvas></canvas>"
     $canvas.css "width", config.dim * config.scale * config.styleScale + "px"
     $canvas.css "height", config.dim * config.scale * config.styleScale + "px"
@@ -192,13 +206,14 @@ $ ->
         word.strokes.push
           outline: parseOutline outline
           track: parseTrack tracks[index]
+        promise.resolve {
+          drawBackground: () ->
+            word.drawBackground ctx
+          draw: () ->
+            word.draw ctx
+        }
 
-    return {
-      drawBackground: () ->
-        word.drawBackground ctx
-      draw: () ->
-        word.draw ctx
-    }
+    promise
 
   createWordsAndViews = (element, words) ->
     Array.prototype.map.call words, (word) ->
