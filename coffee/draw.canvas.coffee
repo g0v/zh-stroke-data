@@ -2,9 +2,10 @@ $ ->
   fetchStrokeXml = (code, cb) -> $.get "utf8/" + code.toLowerCase() + ".xml", cb, "xml"
 
   config =
-    scale: 0.4
-    styleScale: 0.25
     dim: 2150
+    scales:
+      fill: 0.4
+      style: 0.25
     trackWidth: 150
     updatesPerStep: 10 # speed, higher is faster
     delays:
@@ -24,7 +25,7 @@ $ ->
 
   Word.prototype.drawBackground = (ctx) ->
     ctx.fillStyle = "#FFF"
-    ctx.fillRect(0, 0, config.dim * config.scale, config.dim * config.scale)
+    ctx.fillRect(0, 0, config.dim * config.scales.fill, config.dim * config.scales.fill)
     drawBackground(ctx)
 
   Word.prototype.draw = (ctx) ->
@@ -53,9 +54,9 @@ $ ->
       this.time = 1 if this.time >= 1
       ctx.beginPath()
       ctx.arc(
-        (stroke.track[this.currentTrack].x + this.vector.x * this.time) * config.scale,
-        (stroke.track[this.currentTrack].y + this.vector.y * this.time) * config.scale,
-        (this.vector.size * 2) * config.scale,
+        (stroke.track[this.currentTrack].x + this.vector.x * this.time) * config.scales.fill,
+        (stroke.track[this.currentTrack].y + this.vector.y * this.time) * config.scales.fill,
+        (this.vector.size * 2) * config.scales.fill,
         0,
         2 * Math.PI
       )
@@ -86,7 +87,7 @@ $ ->
         requestAnimationFrame => this.update ctx
 
   drawBackground = (ctx) ->
-    dim = config.dim * config.scale
+    dim = config.dim * config.scales.fill
     ctx.strokeStyle = "#A33"
     ctx.beginPath()
     ctx.lineWidth = 10
@@ -112,24 +113,24 @@ $ ->
     for path in outline
       switch path.type
         when "M"
-          ctx.moveTo path.x * config.scale, path.y * config.scale
+          ctx.moveTo path.x * config.scales.fill, path.y * config.scales.fill
         when "L"
-          ctx.lineTo path.x * config.scale, path.y * config.scale
+          ctx.lineTo path.x * config.scales.fill, path.y * config.scales.fill
         when "C"
           ctx.bezierCurveTo(
-            path.begin.x * config.scale,
-            path.begin.y * config.scale,
-            path.mid.x * config.scale,
-            path.mid.y * config.scale,
-            path.end.x * config.scale,
-            path.end.y * config.scale
+            path.begin.x * config.scales.fill,
+            path.begin.y * config.scales.fill,
+            path.mid.x * config.scales.fill,
+            path.mid.y * config.scales.fill,
+            path.end.x * config.scales.fill,
+            path.end.y * config.scales.fill
           )
         when "Q"
           ctx.quadraticCurveTo(
-            path.begin.x * config.scale,
-            path.begin.y * config.scale,
-            path.end.x * config.scale,
-            path.end.y * config.scale
+            path.begin.x * config.scales.fill,
+            path.begin.y * config.scales.fill,
+            path.end.x * config.scales.fill,
+            path.end.y * config.scales.fill
           )
 
   parseOutline = (outline) ->
@@ -190,13 +191,13 @@ $ ->
     promise = jQuery.Deferred()
 
     $canvas = $ "<canvas></canvas>"
-    $canvas.css "width", config.dim * config.scale * config.styleScale + "px"
-    $canvas.css "height", config.dim * config.scale * config.styleScale + "px"
+    $canvas.css "width", config.dim * config.scales.fill * config.scales.style + "px"
+    $canvas.css "height", config.dim * config.scales.fill * config.scales.style + "px"
     $(element).append($canvas)
 
     canvas = $canvas.get()[0]
-    canvas.width = config.dim * config.scale
-    canvas.height = config.dim * config.scale
+    canvas.width = config.dim * config.scales.fill
+    canvas.height = config.dim * config.scales.fill
     ctx = canvas.getContext("2d")
 
     word = new Word(val)
