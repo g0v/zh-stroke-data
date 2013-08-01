@@ -1,5 +1,6 @@
 $ ->
-  fetchStrokeXml = (code, cb) -> $.get "utf8/" + code.toLowerCase() + ".xml", cb, "xml"
+  fetchStrokeXml = (code, success, fail) ->
+    $.get("utf8/" + code.toLowerCase() + ".xml", success, "xml").fail(fail)
 
   Word = (val, options) ->
     this.options = $.extend(
@@ -219,17 +220,29 @@ $ ->
     promise = jQuery.Deferred()
     word = new Word(val, options)
     $(element).append word.canvas
-    fetchStrokeXml word.utf8code, (doc) ->
-      tracks = doc.getElementsByTagName "Track"
-      for outline, index in doc.getElementsByTagName 'Outline'
-        word.strokes.push
-          outline: parseOutline outline
-          track: parseTrack tracks[index], word.options.trackWidth
+    fetchStrokeXml word.utf8code,
+      # success
+      (doc) ->
+        tracks = doc.getElementsByTagName "Track"
+        for outline, index in doc.getElementsByTagName 'Outline'
+          word.strokes.push
+            outline: parseOutline outline
+            track: parseTrack tracks[index], word.options.trackWidth
+          promise.resolve {
+            drawBackground: () ->
+              word.drawBackground()
+            draw: () ->
+              word.draw()
+          }
+      # fail
+      , ->
         promise.resolve {
           drawBackground: () ->
             word.drawBackground()
           draw: () ->
-            word.draw()
+            p = jQuery.Deferred()
+            $(word.canvas).fadeTo("fast", 0.5, -> p.resolve())
+            p
         }
     promise
 
