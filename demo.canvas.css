@@ -1,5 +1,7 @@
 #holder {
     border-width: 0;
+    width: auto;
+    height: auto;
 }
 body {
     background: #eee;
