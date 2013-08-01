@@ -21,9 +21,8 @@ $.fn.extend
             word.drawBackground()
         i = 0
         next = ->
-          promises[i].then (word) ->
-            word.draw().then next if i < promises.length
-            i += 1
+          if i < promises.length
+            promises[i++].then (word) -> word.draw().then next
         next()
     ).data("strokeWords",
       play: null
