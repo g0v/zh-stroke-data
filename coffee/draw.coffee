@@ -16,17 +16,19 @@ $ ->
           path.push [ "M", parseFloat(a.x.value) , parseFloat(a.y.value) ]
         when "LineTo"
           path.push [ "L", parseFloat(a.x.value) , parseFloat(a.y.value) ]
+        when "CubicTo"
+          path.push [ "C", parseFloat(a.x1.value) , parseFloat(a.y1.value), parseFloat(a.x2.value), parseFloat(a.y2.value), parseFloat(a.x3.value), parseFloat(a.y3.value) ]
         when "QuadTo"
           path.push [ "Q", parseFloat(a.x1.value) , parseFloat(a.y1.value), parseFloat(a.x2.value), parseFloat(a.y2.value) ]
     paper.path(path).attr(pathAttrs).transform("s0.2,0.2,0,0")
 
   fetchStrokeXml = (code, cb) -> $.get "utf8/" + code.toLowerCase() + ".xml", cb, "xml"
 
-  strokeWord = (word) ->
+  strokeWord = (element, word) ->
     utf8code = escape(word).replace(/%u/ , "")
     fetchStrokeXml utf8code, (doc) ->
       dim = 430
-      paper = Raphael("holder", dim, dim)
+      paper = Raphael(element, dim, dim)
       gridLines = [
         "M0,0 L0,#{dim}",
         "M#{dim},0 L#{dim},#{dim}",
@@ -53,9 +55,14 @@ $ ->
             drawOutline(paper,outline,pathAttrs)
           ), timeoutSeconds += delay
 
-  strokeWords = (words) -> strokeWord(a) for a in words.split //
+  strokeWords = (element, words) ->
+    strokeWord(element, a) for a in words.split //
 
-  $('#word').change (e) ->
-    word = $(this).val()
-    strokeWords(word)
-  strokeWords($('#word').val())
+  window.WordStroker or= {}
+  window.WordStroker.raphael =
+    strokeWords: strokeWords
+
+  #$('#word').change (e) ->
+  #  word = $(this).val()
+  #  strokeWords(word)
+  #strokeWords($('#word').val())
