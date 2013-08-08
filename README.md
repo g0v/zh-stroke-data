@@ -15,6 +15,12 @@ npm install --dev
 grunt
 ```
 
+## 將 xml 筆劃資料轉換成 json 格式
+
+```stroke2json
+node ./stroke2json.js <filename>
+```
+
 ## 資料來源
 
 常用國字標準字體筆順學習網 <http://stroke-order.learningweb.moe.edu.tw>
