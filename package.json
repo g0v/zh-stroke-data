@@ -1,9 +1,9 @@
 {
   "name": "zh-stroke-data",
-  "version": "0.0.36",
+  "version": "0.0.55",
   "description": "常用國字標準字體筆劃 XML 資料檔",
   "author": "c9s",
-  "main": "Gruntfile.js",
+  "main": "stroke2json.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,6 +17,7 @@
   "devDependencies": {
     "grunt": "~0.4.1",
     "coffee-script": "~1.6.3",
-    "grunt-contrib-coffee": "~0.7.0"
+    "grunt-contrib-coffee": "~0.7.0",
+    "sax": "~0.5.4"
   }
 }
