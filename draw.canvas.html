@@ -8,6 +8,7 @@
         <script src="raf.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="raphael.js" type="text/javascript" charset="utf-8"></script>
         <script src="jquery-1.9.1.min.js" type="text/javascript" charset="utf-8"> </script>
+        <script type="text/javascript" src="utils.stroke-words.js"> </script>
         <script type="text/javascript" src="draw.canvas.js"> </script>
         <script type="text/javascript">
           $(document).ready(function() {
@@ -15,14 +16,20 @@
             $word.change(function() {
               WordStroker.canvas.
                 createWordsAndViews($("#holder").get()[0], $word.val()).
-                forEach(function(word) {
-                  word.draw();
+                forEach(function(p) {
+                  p.then(function(word) {
+                    word.drawBackground();
+                    word.draw();
+                  });
                 });
             });
             WordStroker.canvas.
               createWordsAndViews($("#holder").get()[0], $word.val()).
-              forEach(function(word) {
-                word.draw();
+              forEach(function(p) {
+                p.then(function(word) {
+                  word.drawBackground();
+                  word.draw();
+                });
               });
           });
         </script>

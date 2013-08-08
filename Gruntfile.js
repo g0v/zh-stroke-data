@@ -7,6 +7,7 @@ module.exports = function(grunt) {
           sourceMap: true
         },
         files: {
+          "./utils.stroke-words.js": "./coffee/utils.stroke-words.coffee",
           "./draw.js": "./coffee/draw.coffee",
           "./draw.canvas.js": "./coffee/draw.canvas.coffee",
           "./jquery.stroke-words.js": "./coffee/jquery.stroke-words.coffee"

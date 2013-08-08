@@ -3,4 +3,5 @@ node_modules/
 /draw.js
 /draw.canvas.js
 /jquery.stroke-words.js
+/utils.stroke-words.js
 /*.map
