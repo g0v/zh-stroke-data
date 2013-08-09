@@ -4,7 +4,7 @@ $ ->
     trackWidth: 150
 
   Word = (val, options) ->
-    this.options = $.extend(
+    @options = $.extend(
       scales:
         fill: 0.4
         style: 0.25
@@ -13,107 +13,107 @@ $ ->
         stroke: 0.25
         word: 0.5
     , options, internalOptions)
-    this.val = val
-    this.utf8code = escape(val).replace(/%u/, "")
-    this.strokes = []
+    @val = val
+    @utf8code = escape(val).replace(/%u/, "")
+    @strokes = []
 
-    this.canvas = document.createElement("canvas")
-    $canvas = $ this.canvas
-    $canvas.css "width", this.styleWidth() + "px"
-    $canvas.css "height", this.styleHeight() + "px"
-    this.canvas.width = this.fillWidth()
-    this.canvas.height = this.fillHeight()
+    @canvas = document.createElement("canvas")
+    $canvas = $ @canvas
+    $canvas.css "width", @styleWidth() + "px"
+    $canvas.css "height", @styleHeight() + "px"
+    @canvas.width = @fillWidth()
+    @canvas.height = @fillHeight()
 
     return this
 
   Word.prototype.init = ->
-    this.currentStroke = 0
-    this.currentTrack = 0
-    this.time = 0.0
+    @currentStroke = 0
+    @currentTrack = 0
+    @time = 0.0
 
   Word.prototype.width = ->
-    this.options.dim
+    @options.dim
 
   Word.prototype.height = ->
-    this.options.dim
+    @options.dim
 
   Word.prototype.fillWidth = ->
-    this.width() * this.options.scales.fill
+    @width() * @options.scales.fill
 
   Word.prototype.fillHeight = ->
-    this.height() * this.options.scales.fill
+    @height() * @options.scales.fill
 
   Word.prototype.styleWidth = ->
-    this.fillWidth() * this.options.scales.style
+    @fillWidth() * @options.scales.style
 
   Word.prototype.styleHeight = ->
-    this.fillHeight() * this.options.scales.style
+    @fillHeight() * @options.scales.style
 
   Word.prototype.drawBackground = ->
-    ctx = this.canvas.getContext("2d")
+    ctx = @canvas.getContext("2d")
     ctx.fillStyle = "#FFF"
-    ctx.fillRect(0, 0, this.fillWidth(), this.fillHeight())
-    drawBackground(ctx, this.fillWidth())
+    ctx.fillRect(0, 0, @fillWidth(), @fillHeight())
+    drawBackground(ctx, @fillWidth())
 
   Word.prototype.draw = ->
-    this.init()
-    ctx = this.canvas.getContext("2d")
+    @init()
+    ctx = @canvas.getContext("2d")
     ctx.strokeStyle = "#000"
     ctx.fillStyle = "#000"
     ctx.lineWidth = 5
-    requestAnimationFrame => this.update()
-    this.promise = $.Deferred()
+    requestAnimationFrame => @update()
+    @promise = $.Deferred()
 
   Word.prototype.update = ->
-    return if this.currentStroke >= this.strokes.length
-    ctx = this.canvas.getContext("2d")
-    stroke = this.strokes[this.currentStroke]
+    return if @currentStroke >= @strokes.length
+    ctx = @canvas.getContext("2d")
+    stroke = @strokes[@currentStroke]
     # will stroke
-    if this.time == 0.0
-      this.vector =
-        x: stroke.track[this.currentTrack + 1].x - stroke.track[this.currentTrack].x
-        y: stroke.track[this.currentTrack + 1].y - stroke.track[this.currentTrack].y
-        size: stroke.track[this.currentTrack].size or this.options.trackWidth
+    if @time == 0.0
+      @vector =
+        x: stroke.track[@currentTrack + 1].x - stroke.track[@currentTrack].x
+        y: stroke.track[@currentTrack + 1].y - stroke.track[@currentTrack].y
+        size: stroke.track[@currentTrack].size or @options.trackWidth
       ctx.save()
       ctx.beginPath()
-      pathOutline(ctx, stroke.outline, this.options.scales.fill)
+      pathOutline(ctx, stroke.outline, @options.scales.fill)
       ctx.clip()
-    for i in [1..this.options.updatesPerStep]
-      this.time += 0.02
-      this.time = 1 if this.time >= 1
+    for i in [1..@options.updatesPerStep]
+      @time += 0.02
+      @time = 1 if @time >= 1
       ctx.beginPath()
       ctx.arc(
-        (stroke.track[this.currentTrack].x + this.vector.x * this.time) * this.options.scales.fill,
-        (stroke.track[this.currentTrack].y + this.vector.y * this.time) * this.options.scales.fill,
-        (this.vector.size * 2) * this.options.scales.fill,
+        (stroke.track[@currentTrack].x + @vector.x * @time) * @options.scales.fill,
+        (stroke.track[@currentTrack].y + @vector.y * @time) * @options.scales.fill,
+        (@vector.size * 2) * @options.scales.fill,
         0,
         2 * Math.PI
       )
       ctx.fill()
-      break if this.time >= 1
+      break if @time >= 1
     delay = 0
     # did track stroked
-    if this.time >= 1.0
+    if @time >= 1.0
       ctx.restore()
-      this.time = 0.0
-      this.currentTrack += 1
+      @time = 0.0
+      @currentTrack += 1
     # did stroked
-    if this.currentTrack >= stroke.track.length - 1
-      this.currentTrack = 0
-      this.currentStroke += 1
-      delay = this.options.delays.stroke
+    if @currentTrack >= stroke.track.length - 1
+      @currentTrack = 0
+      @currentStroke += 1
+      delay = @options.delays.stroke
     # did word stroked
-    if this.currentStroke >= this.strokes.length
+    if @currentStroke >= @strokes.length
       setTimeout =>
-        this.promise.resolve()
-      , this.options.delays.word * 1000
+        @promise.resolve()
+      , @options.delays.word * 1000
     else
       if delay
         setTimeout =>
-          requestAnimationFrame => this.update()
+          requestAnimationFrame => @update()
         , delay * 1000
       else
-        requestAnimationFrame => this.update()
+        requestAnimationFrame => @update()
 
   drawBackground = (ctx, dim) ->
     ctx.strokeStyle = "#A33"

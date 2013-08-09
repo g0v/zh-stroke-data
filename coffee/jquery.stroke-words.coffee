@@ -11,7 +11,7 @@ $.fn.extend
       svg: !isCanvasSupported()
     , options)
 
-    this.each(() ->
+    @each(() ->
       if options.svg
         window.WordStroker.raphael.strokeWords this, words
       else
