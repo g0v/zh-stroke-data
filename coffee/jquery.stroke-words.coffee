@@ -8,6 +8,7 @@ $.fn.extend
     return null if words is undefined or words is ""
 
     options = $.extend(
+      single: false
       svg: !isCanvasSupported()
     , options)
 
@@ -16,9 +17,6 @@ $.fn.extend
         window.WordStroker.raphael.strokeWords this, words
       else
         promises = window.WordStroker.canvas.createWordsAndViews(this, words, options)
-        promises.forEach (p) ->
-          p.then (word) ->
-            word.drawBackground()
         ##
         # do the same as following lines with reduce
         ##
@@ -28,10 +26,23 @@ $.fn.extend
         #     promises[i++].then (word) -> word.draw().then next
         # next()
         ##
-        do promises.reduceRight (next, current) ->
-          -> current.then (word) ->
-            word.draw().then next
-        , null
+        if not options.single
+          promises.forEach (p) ->
+            p.then (word) ->
+              word.drawBackground()
+          do promises.reduceRight (next, current) ->
+            -> current.then (word) ->
+              word.draw().then next
+          , null
+        else
+          do promises.reduceRight (next, current) ->
+            -> current.then (word) ->
+              do word.drawBackground
+              word.draw().then ->
+                if next
+                  do word.remove
+                  do next
+          , null
     ).data("strokeWords",
       play: null
     )

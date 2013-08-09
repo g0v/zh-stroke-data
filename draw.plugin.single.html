@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>常用國字標準字體筆劃 HTML5 Canvas</title>
+        <link rel="stylesheet" href="./css/demo.css" type="text/css" media="screen">
+        <link rel="stylesheet" href="./css/demo.canvas.css" type="text/css" media="screen">
+        <script src="./js/raf.min.js"></script>
+        <script src="./js/raphael.js"></script>
+        <script src="./js/jquery-1.9.1.min.js"></script>
+        <script src="./js/sax.js"></script>
+        <script src="./js/utils.stroke-words.js"></script>
+        <script src="./js/draw.js"> </script>
+        <script src="./js/draw.canvas.js"> </script>
+        <script src="./js/jquery.stroke-words.js"></script>
+        <script>
+          $(document).ready(function() {
+            var $word, options;
+
+            options = {
+              updatesPerStep: 5,
+              single: true
+            };
+
+            $word = $("#word");
+            $word.change(function() {
+              $("#holder").strokeWords($word.val(), options);
+            });
+            $("#holder").strokeWords($word.val(), options);
+          });
+        </script>
+    </head>
+    <body>
+        <input type="text" id="word" value="驂乘驂乘"/>
+        <div id="holder"></div>
+        <p id="copyright">常用國字標準字體筆劃</p>
+    </body>
+</html>

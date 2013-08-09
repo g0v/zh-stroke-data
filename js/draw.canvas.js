@@ -191,6 +191,9 @@
           },
           draw: function() {
             return word.draw();
+          },
+          remove: function() {
+            return $(word.canvas).remove();
           }
         });
       }, function() {
@@ -205,6 +208,9 @@
               return p.resolve();
             });
             return p;
+          },
+          remove: function() {
+            return $(word.canvas).remove();
           }
         });
       });

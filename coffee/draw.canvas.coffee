@@ -171,20 +171,24 @@ $ ->
       (json) ->
         word.strokes = json
         promise.resolve {
-          drawBackground: () ->
-            word.drawBackground()
-          draw: () ->
-            word.draw()
+          drawBackground: ->
+            do word.drawBackground
+          draw: ->
+            do word.draw
+          remove: ->
+            do $(word.canvas).remove
         }
       # fail
       , ->
         promise.resolve {
-          drawBackground: () ->
-            word.drawBackground()
-          draw: () ->
+          drawBackground: ->
+            do word.drawBackground
+          draw: ->
             p = jQuery.Deferred()
             $(word.canvas).fadeTo("fast", 0.5, -> p.resolve())
             p
+          remove: ->
+            do $(word.canvas).remove
         }
     )
     promise

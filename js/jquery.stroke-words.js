@@ -14,6 +14,7 @@
         return null;
       }
       options = $.extend({
+        single: false,
         svg: !isCanvasSupported()
       }, options);
       return this.each(function() {
@@ -22,18 +23,34 @@
           return window.WordStroker.raphael.strokeWords(this, words);
         } else {
           promises = window.WordStroker.canvas.createWordsAndViews(this, words, options);
-          promises.forEach(function(p) {
-            return p.then(function(word) {
-              return word.drawBackground();
-            });
-          });
-          return promises.reduceRight(function(next, current) {
-            return function() {
-              return current.then(function(word) {
-                return word.draw().then(next);
+          if (!options.single) {
+            promises.forEach(function(p) {
+              return p.then(function(word) {
+                return word.drawBackground();
               });
-            };
-          }, null)();
+            });
+            return promises.reduceRight(function(next, current) {
+              return function() {
+                return current.then(function(word) {
+                  return word.draw().then(next);
+                });
+              };
+            }, null)();
+          } else {
+            return promises.reduceRight(function(next, current) {
+              return function() {
+                return current.then(function(word) {
+                  word.drawBackground();
+                  return word.draw().then(function() {
+                    if (next) {
+                      word.remove();
+                      return next();
+                    }
+                  });
+                });
+              };
+            }, null)();
+          }
         }
       }).data("strokeWords", {
         play: null
