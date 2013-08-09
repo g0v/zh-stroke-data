@@ -1,6 +1,6 @@
 {
   "name": "zh-stroke-data",
-  "version": "0.0.61",
+  "version": "0.0.62",
   "description": "常用國字標準字體筆劃 XML 資料檔",
   "author": "c9s",
   "main": "stroke2json.js",

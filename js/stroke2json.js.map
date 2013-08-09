@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "file": "stroke2json.js",
+  "sourceRoot": "../coffee/",
+  "sources": [
+    "stroke2json.coffee"
+  ],
+  "names": [],
+  "mappings": "AACA;CAAA,KAAA,KAAA;;CAAA,CAAA,CAAc,IAAA,IAAd,WAAc;;CAAd,CAEA,CAAqB,CAAT,CAAS,EAAd,EAAe;CACpB,GAAA,CAAU;CAAV,WAAA;MAAA;CACY,CAEV,CAAA,CAFF,CAAiB,IAEd,EAFH,WAAA;CAGY,CAAyB,CAAjC,CAAgB,GAAT,EAAK,IAAZ;CAHJ,CAII,CAAA,EAFF,IAEE;CACQ,EAAR,IAAO,MAAP;CACE,CAAK,CAAL,KAAA,aAAA;CAAA,CACM,EAAN,IAAA;CAHF,OACA;CALJ,IAII;CANN,EAAqB;CAFrB"
+}
