@@ -16,7 +16,7 @@
             $word = $("#word");
             $word.change(function() {
               WordStroker.canvas.
-                createWordsAndViews($("#holder").get()[0], $word.val()).
+                drawElementWithWords($("#holder").get()[0], $word.val()).
                 forEach(function(p) {
                   p.then(function(word) {
                     word.drawBackground();
@@ -25,7 +25,7 @@
                 });
             });
             WordStroker.canvas.
-              createWordsAndViews($("#holder").get()[0], $word.val()).
+              drawElementWithWords($("#holder").get()[0], $word.val()).
               forEach(function(p) {
                 p.then(function(word) {
                   word.drawBackground();

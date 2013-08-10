@@ -18,12 +18,14 @@
             canvas.height = 500;
             $("#holder").append(canvas);
 
+            var cp = WordStroker.utils.sortSurrogates("你");
             WordStroker.utils.StrokeData.get(
-              "你",
+              cp[0],
               function(json) {
+                cp = WordStroker.utils.sortSurrogates("姻");
                 var strokesA = [json[0], json[1]];
                 WordStroker.utils.StrokeData.get(
-                  "姻",
+                  cp[0],
                   function(json) {
                     var strokesB = [json[3], json[4], json[5], json[6], json[7], json[8]];
                     var strokes = strokesA.concat(strokesB);
