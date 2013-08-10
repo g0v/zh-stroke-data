@@ -27,6 +27,12 @@ node ./stroke2json.js <filename>
 ./stroke2json.sh
 ```
 
+## 以 missing 中的資料組合出其他字的 json 筆劃資料
+
+```compose.sh
+./compose.sh
+```
+
 ## 資料來源
 
 常用國字標準字體筆順學習網 <http://stroke-order.learningweb.moe.edu.tw>
