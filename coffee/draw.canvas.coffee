@@ -1,9 +1,47 @@
 $ ->
+  #map = Array.prototype.map
+  forEach = Array.prototype.forEach
+
+  # expose StrokeData
+  StrokeData = undefined
+
+  do ->
+    buffer = {}
+    source = "xml" # "xml" or "json"
+    dirs =
+      "xml": "./utf8/"
+      "json": "./json/"
+    StrokeData =
+      source: (val) ->
+        source = val if val is "json" or val is "xml"
+      get: (str, success, fail) ->
+        forEach.call str, (c) ->
+          if not buffer[c]
+            utf8code = escape(c).replace(/%u/, "").toLowerCase()
+            WordStroker.utils.fetchStrokeJSONFromXml(
+              dirs[source] + utf8code + "." + source,
+              # success
+              (json) ->
+                buffer[c] = json
+                success? json
+              # fail
+              (err) ->
+                fail? err
+            )
+          else
+            success? buffer[c]
+
   internalOptions =
     dim: 2150
     trackWidth: 150
 
-  Word = (val, options) ->
+  demoMatrix = [
+    1, 0,
+    0, 1,
+    100, 100
+  ]
+
+  Word = (options) ->
     @options = $.extend(
       scales:
         fill: 0.4
@@ -13,9 +51,11 @@ $ ->
         stroke: 0.25
         word: 0.5
     , options, internalOptions)
-    @val = val
-    @utf8code = escape(val).replace(/%u/, "")
-    @strokes = []
+    @matrix = [
+      @options.scales.fill, 0,
+      0, @options.scales.fill,
+      0, 0
+    ]
 
     @canvas = document.createElement("canvas")
     $canvas = $ @canvas
@@ -55,8 +95,9 @@ $ ->
     ctx.fillRect(0, 0, @fillWidth(), @fillHeight())
     drawBackground(ctx, @fillWidth())
 
-  Word.prototype.draw = ->
+  Word.prototype.draw = (strokeJSON) ->
     @init()
+    @strokes = strokeJSON
     ctx = @canvas.getContext("2d")
     ctx.strokeStyle = "#000"
     ctx.fillStyle = "#000"
@@ -66,7 +107,8 @@ $ ->
 
   Word.prototype.update = ->
     return if @currentStroke >= @strokes.length
-    ctx = @canvas.getContext("2d")
+    ctx = @canvas.getContext "2d"
+    ctx.setTransform.apply ctx, @matrix
     stroke = @strokes[@currentStroke]
     # will stroke
     if @time == 0.0
@@ -76,16 +118,16 @@ $ ->
         size: stroke.track[@currentTrack].size or @options.trackWidth
       ctx.save()
       ctx.beginPath()
-      pathOutline(ctx, stroke.outline, @options.scales.fill)
+      pathOutline(ctx, stroke.outline)
       ctx.clip()
     for i in [1..@options.updatesPerStep]
       @time += 0.02
       @time = 1 if @time >= 1
       ctx.beginPath()
       ctx.arc(
-        (stroke.track[@currentTrack].x + @vector.x * @time) * @options.scales.fill,
-        (stroke.track[@currentTrack].y + @vector.y * @time) * @options.scales.fill,
-        (@vector.size * 2) * @options.scales.fill,
+        stroke.track[@currentTrack].x + @vector.x * @time,
+        stroke.track[@currentTrack].y + @vector.y * @time,
+        @vector.size * 2,
         0,
         2 * Math.PI
       )
@@ -137,44 +179,43 @@ $ ->
     ctx.lineTo(dim / 3 * 2, dim)
     ctx.stroke()
 
-  pathOutline = (ctx, outline, scale) ->
+  pathOutline = (ctx, outline) ->
     for path in outline
       switch path.type
         when "M"
-          ctx.moveTo path.x * scale, path.y * scale
+          ctx.moveTo path.x, path.y
         when "L"
-          ctx.lineTo path.x * scale, path.y * scale
+          ctx.lineTo path.x, path.y
         when "C"
           ctx.bezierCurveTo(
-            path.begin.x * scale,
-            path.begin.y * scale,
-            path.mid.x * scale,
-            path.mid.y * scale,
-            path.end.x * scale,
-            path.end.y * scale
+            path.begin.x,
+            path.begin.y,
+            path.mid.x,
+            path.mid.y,
+            path.end.x,
+            path.end.y
           )
         when "Q"
           ctx.quadraticCurveTo(
-            path.begin.x * scale,
-            path.begin.y * scale,
-            path.end.x * scale,
-            path.end.y * scale
+            path.begin.x,
+            path.begin.y,
+            path.end.x,
+            path.end.y
           )
 
-  createWordAndView = (element, val, options) ->
+  drawElementWithWord = (element, val, options) ->
     promise = jQuery.Deferred()
-    word = new Word(val, options)
+    word = new Word(options)
     $(element).append word.canvas
-    WordStroker.utils.fetchStrokeJSONFromXml(
-      "utf8/" + word.utf8code.toLowerCase() + ".xml",
+    StrokeData.get(
+      val,
       # success
       (json) ->
-        word.strokes = json
         promise.resolve {
           drawBackground: ->
             do word.drawBackground
           draw: ->
-            do word.draw
+            word.draw json
           remove: ->
             do $(word.canvas).remove
         }
@@ -193,11 +234,12 @@ $ ->
     )
     promise
 
-  createWordsAndViews = (element, words, options) ->
+  drawElementWithWords = (element, words, options) ->
     Array.prototype.map.call words, (word) ->
-      return createWordAndView element, word, options
+      return drawElementWithWord element, word, options
 
   window.WordStroker or= {}
   window.WordStroker.canvas =
+    StrokeData: StrokeData
     Word: Word
-    createWordsAndViews: createWordsAndViews
+    drawElementWithWords: drawElementWithWords

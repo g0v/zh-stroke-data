@@ -16,7 +16,7 @@ $.fn.extend
       if options.svg
         window.WordStroker.raphael.strokeWords this, words
       else
-        promises = window.WordStroker.canvas.createWordsAndViews(this, words, options)
+        promises = window.WordStroker.canvas.drawElementWithWords(this, words, options)
         ##
         # do the same as following lines with reduce
         ##
