@@ -1,7 +1,6 @@
 (function() {
   $(function() {
-    var Word, demoMatrix, drawBackground, drawElementWithWord, drawElementWithWords, forEach, internalOptions, pathOutline;
-    forEach = Array.prototype.forEach;
+    var Word, demoMatrix, drawBackground, drawElementWithWord, drawElementWithWords, internalOptions, pathOutline;
     internalOptions = {
       dim: 2150,
       trackWidth: 150

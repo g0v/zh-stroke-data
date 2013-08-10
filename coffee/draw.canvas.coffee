@@ -1,7 +1,4 @@
 $ ->
-  #map = Array.prototype.map
-  forEach = Array.prototype.forEach
-
   internalOptions =
     dim: 2150
     trackWidth: 150

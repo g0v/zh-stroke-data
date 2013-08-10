@@ -5,6 +5,8 @@ sax = root.sax or require "sax"
 # expose StrokeData
 StrokeData = undefined
 
+forEach = Array.prototype.forEach
+
 do ->
   buffer = {}
   source = "xml" # "xml" or "json"

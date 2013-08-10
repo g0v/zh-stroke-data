@@ -1,7 +1,7 @@
 (function() {
   var WordStroker;
 
-  WordStroker = require("./utils.stroke-words");
+  WordStroker = require("./js/utils.stroke-words");
 
   process.argv.forEach(function(path, index) {
     if (index === 0 || index === 1) {

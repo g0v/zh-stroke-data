@@ -1,5 +1,5 @@
 # this code runs in node
-WordStroker = require "./utils.stroke-words"
+WordStroker = require "./js/utils.stroke-words"
 
 process.argv.forEach (path, index) ->
   return if index is 0 or index is 1

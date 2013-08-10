@@ -1,11 +1,13 @@
 (function() {
-  var StrokeData, WordStroker, fetchStrokeJSONFromXml, fetchStrokeXml, jsonFromXml, root, sax;
+  var StrokeData, WordStroker, fetchStrokeJSONFromXml, fetchStrokeXml, forEach, jsonFromXml, root, sax;
 
   root = this;
 
   sax = root.sax || require("sax");
 
   StrokeData = void 0;
+
+  forEach = Array.prototype.forEach;
 
   (function() {
     var buffer, dirs, source;
