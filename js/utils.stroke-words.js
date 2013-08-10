@@ -1,9 +1,44 @@
 (function() {
-  var WordStroker, fetchStrokeJSONFromXml, fetchStrokeXml, jsonFromXml, root, sax;
+  var StrokeData, WordStroker, fetchStrokeJSONFromXml, fetchStrokeXml, jsonFromXml, root, sax;
 
   root = this;
 
   sax = root.sax || require("sax");
+
+  StrokeData = void 0;
+
+  (function() {
+    var buffer, dirs, source;
+    buffer = {};
+    source = "xml";
+    dirs = {
+      "xml": "./utf8/",
+      "json": "./json/"
+    };
+    return StrokeData = {
+      source: function(val) {
+        if (val === "json" || val === "xml") {
+          return source = val;
+        }
+      },
+      get: function(str, success, fail) {
+        return forEach.call(str, function(c) {
+          var utf8code;
+          if (!buffer[c]) {
+            utf8code = escape(c).replace(/%u/, "").toLowerCase();
+            return fetchStrokeJSONFromXml(dirs[source] + utf8code + "." + source, function(json) {
+              buffer[c] = json;
+              return typeof success === "function" ? success(json) : void 0;
+            }, function(err) {
+              return typeof fail === "function" ? fail(err) : void 0;
+            });
+          } else {
+            return typeof success === "function" ? success(buffer[c]) : void 0;
+          }
+        });
+      }
+    };
+  })();
 
   fetchStrokeXml = function(path, success, fail) {
     var fs;
@@ -138,6 +173,7 @@
   } else {
     WordStroker = {
       utils: {
+        StrokeData: StrokeData,
         fetchStrokeXml: fetchStrokeXml,
         fetchStrokeJSONFromXml: fetchStrokeJSONFromXml
       }

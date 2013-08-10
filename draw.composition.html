@@ -18,11 +18,11 @@
             canvas.height = 500;
             $("#holder").append(canvas);
 
-            WordStroker.canvas.StrokeData.get(
+            WordStroker.utils.StrokeData.get(
               "你",
               function(json) {
                 var strokesA = [json[0], json[1]];
-                WordStroker.canvas.StrokeData.get(
+                WordStroker.utils.StrokeData.get(
                   "姻",
                   function(json) {
                     var strokesB = [json[3], json[4], json[5], json[6], json[7], json[8]];

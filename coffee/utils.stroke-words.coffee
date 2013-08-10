@@ -2,6 +2,35 @@ root = this
 
 sax = root.sax or require "sax"
 
+# expose StrokeData
+StrokeData = undefined
+
+do ->
+  buffer = {}
+  source = "xml" # "xml" or "json"
+  dirs =
+    "xml": "./utf8/"
+    "json": "./json/"
+  StrokeData =
+    source: (val) ->
+      source = val if val is "json" or val is "xml"
+    get: (str, success, fail) ->
+      forEach.call str, (c) ->
+        if not buffer[c]
+          utf8code = escape(c).replace(/%u/, "").toLowerCase()
+          fetchStrokeJSONFromXml(
+            dirs[source] + utf8code + "." + source,
+            # success
+            (json) ->
+              buffer[c] = json
+              success? json
+            # fail
+            (err) ->
+              fail? err
+          )
+        else
+          success? buffer[c]
+
 fetchStrokeXml = (path, success, fail) ->
   if root.window # web
     jQuery.get(path, success, "text").fail(fail)
@@ -104,6 +133,7 @@ if root.window #web
 else # node
   WordStroker =
     utils:
+      StrokeData: StrokeData
       fetchStrokeXml: fetchStrokeXml
       fetchStrokeJSONFromXml: fetchStrokeJSONFromXml
   module.exports = WordStroker
