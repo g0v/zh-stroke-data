@@ -1,6 +1,7 @@
 root = this
 
 sax = root.sax or require "sax"
+glMatrix = root.glMatrix or require "./gl-matrix-min"
 
 fetchStrokeXml = (path, success, fail) ->
   if root.window # web
@@ -120,10 +121,10 @@ sortSurrogates = (str) ->
                                                 # High surrogate found low surrogate follows
       text = str.substr(0, 2)
       code_point = (text.charCodeAt(0) - 0xD800) * 0x400 + text.charCodeAt(1) - 0xDC00 + 0x10000 # au++
-      cp.push(code_point.toString(16))                       # push the two onto array
+      cp.push(code_point.toString(16))          # push the two onto array
       str = str.substr(2)                       # clip the two off the string
     else                                        # else BMP code point
-      cp.push(str.charCodeAt(0).toString(16))    # push one onto array
+      cp.push(str.charCodeAt(0).toString(16))   # push one onto array
       str = str.substr(1)                       # clip one from string 
   cp
 
@@ -136,9 +137,74 @@ do ->
   fetchers =
     "xml": fetchStrokeJSONFromXml
     "json": fetchStrokeJSON
+  transform = (mat2d, x, y) ->
+    vec = glMatrix.vec2.clone [x, y]
+    mat = glMatrix.mat2d.clone mat2d
+    out = glMatrix.vec2.create()
+    glMatrix.vec2.transformMat2d out, vec, mat
+    {
+      x: out[0]
+      y: out[1]
+    }
   StrokeData =
     source: (val) ->
       source = val if val is "json" or val is "xml"
+    # _ will do this better
+    transform: (strokes, mat2d) ->
+      ret = []
+      for stroke in strokes
+        new_stroke =
+          outline: []
+          track: []
+        for cmd in stroke.outline
+          switch cmd.type
+            when "M"
+              out = transform mat2d, cmd.x, cmd.y
+              new_stroke.outline.push
+                type: cmd.type
+                x: out.x
+                y: out.y
+            when "L"
+              out = transform mat2d, cmd.x, cmd.y
+              new_stroke.outline.push
+                type: cmd.type
+                x: out.x
+                y: out.y
+            when "C"
+              new_cmd =
+                type: cmd.type
+              out = transform mat2d, cmd.begin.x, cmd.begin.y
+              new_cmd.begin =
+                x: out.x
+                y: out.y
+              out = transform mat2d, cmd.mid.x, cmd.mid.y
+              new_cmd.mid =
+                x: out.x
+                y: out.y
+              out = transform mat2d, cmd.end.x, cmd.end.y
+              new_cmd.end =
+                x: out.x
+                y: out.y
+              new_stroke.outline.push new_cmd
+            when "Q"
+              new_cmd =
+                type: cmd.type
+              out = transform mat2d, cmd.begin.x, cmd.begin.y
+              new_cmd.begin =
+                x: out.x
+                y: out.y
+              out = transform mat2d, cmd.end.x, cmd.end.y
+              new_cmd.end =
+                x: out.x
+                y: out.y
+              new_stroke.outline.push new_cmd
+        for v in stroke.track
+          out = transform mat2d, v.x, v.y
+          new_stroke.track.push
+            x: out.x
+            y: out.y
+        ret.push new_stroke
+      ret
     get: (cp, success, fail) ->
       if not buffer[cp]
         fetchers[source](

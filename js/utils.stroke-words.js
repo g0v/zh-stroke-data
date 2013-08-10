@@ -1,9 +1,11 @@
 (function() {
-  var StrokeData, WordStroker, fetchStrokeJSON, fetchStrokeJSONFromXml, fetchStrokeXml, forEach, jsonFromXml, root, sax, sortSurrogates;
+  var StrokeData, WordStroker, fetchStrokeJSON, fetchStrokeJSONFromXml, fetchStrokeXml, forEach, glMatrix, jsonFromXml, root, sax, sortSurrogates;
 
   root = this;
 
   sax = root.sax || require("sax");
+
+  glMatrix = root.glMatrix || require("./gl-matrix-min");
 
   fetchStrokeXml = function(path, success, fail) {
     var fs;
@@ -168,7 +170,7 @@
   };
 
   (function() {
-    var buffer, dirs, fetchers, source;
+    var buffer, dirs, fetchers, source, transform;
     buffer = {};
     source = "json";
     dirs = {
@@ -179,11 +181,102 @@
       "xml": fetchStrokeJSONFromXml,
       "json": fetchStrokeJSON
     };
+    transform = function(mat2d, x, y) {
+      var mat, out, vec;
+      vec = glMatrix.vec2.clone([x, y]);
+      mat = glMatrix.mat2d.clone(mat2d);
+      out = glMatrix.vec2.create();
+      glMatrix.vec2.transformMat2d(out, vec, mat);
+      return {
+        x: out[0],
+        y: out[1]
+      };
+    };
     return StrokeData = {
       source: function(val) {
         if (val === "json" || val === "xml") {
           return source = val;
         }
+      },
+      transform: function(strokes, mat2d) {
+        var cmd, new_cmd, new_stroke, out, ret, stroke, v, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
+        ret = [];
+        for (_i = 0, _len = strokes.length; _i < _len; _i++) {
+          stroke = strokes[_i];
+          new_stroke = {
+            outline: [],
+            track: []
+          };
+          _ref = stroke.outline;
+          for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+            cmd = _ref[_j];
+            switch (cmd.type) {
+              case "M":
+                out = transform(mat2d, cmd.x, cmd.y);
+                new_stroke.outline.push({
+                  type: cmd.type,
+                  x: out.x,
+                  y: out.y
+                });
+                break;
+              case "L":
+                out = transform(mat2d, cmd.x, cmd.y);
+                new_stroke.outline.push({
+                  type: cmd.type,
+                  x: out.x,
+                  y: out.y
+                });
+                break;
+              case "C":
+                new_cmd = {
+                  type: cmd.type
+                };
+                out = transform(mat2d, cmd.begin.x, cmd.begin.y);
+                new_cmd.begin = {
+                  x: out.x,
+                  y: out.y
+                };
+                out = transform(mat2d, cmd.mid.x, cmd.mid.y);
+                new_cmd.mid = {
+                  x: out.x,
+                  y: out.y
+                };
+                out = transform(mat2d, cmd.end.x, cmd.end.y);
+                new_cmd.end = {
+                  x: out.x,
+                  y: out.y
+                };
+                new_stroke.outline.push(new_cmd);
+                break;
+              case "Q":
+                new_cmd = {
+                  type: cmd.type
+                };
+                out = transform(mat2d, cmd.begin.x, cmd.begin.y);
+                new_cmd.begin = {
+                  x: out.x,
+                  y: out.y
+                };
+                out = transform(mat2d, cmd.end.x, cmd.end.y);
+                new_cmd.end = {
+                  x: out.x,
+                  y: out.y
+                };
+                new_stroke.outline.push(new_cmd);
+            }
+          }
+          _ref1 = stroke.track;
+          for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
+            v = _ref1[_k];
+            out = transform(mat2d, v.x, v.y);
+            new_stroke.track.push({
+              x: out.x,
+              y: out.y
+            });
+          }
+          ret.push(new_stroke);
+        }
+        return ret;
       },
       get: function(cp, success, fail) {
         if (!buffer[cp]) {
