@@ -1,46 +1,9 @@
 (function() {
-  var StrokeData, WordStroker, fetchStrokeJSONFromXml, fetchStrokeXml, forEach, jsonFromXml, root, sax;
+  var StrokeData, WordStroker, fetchStrokeJSON, fetchStrokeJSONFromXml, fetchStrokeXml, forEach, jsonFromXml, root, sax, sortSurrogates;
 
   root = this;
 
   sax = root.sax || require("sax");
-
-  StrokeData = void 0;
-
-  forEach = Array.prototype.forEach;
-
-  (function() {
-    var buffer, dirs, source;
-    buffer = {};
-    source = "xml";
-    dirs = {
-      "xml": "./utf8/",
-      "json": "./json/"
-    };
-    return StrokeData = {
-      source: function(val) {
-        if (val === "json" || val === "xml") {
-          return source = val;
-        }
-      },
-      get: function(str, success, fail) {
-        return forEach.call(str, function(c) {
-          var utf8code;
-          if (!buffer[c]) {
-            utf8code = escape(c).replace(/%u/, "").toLowerCase();
-            return fetchStrokeJSONFromXml(dirs[source] + utf8code + "." + source, function(json) {
-              buffer[c] = json;
-              return typeof success === "function" ? success(json) : void 0;
-            }, function(err) {
-              return typeof fail === "function" ? fail(err) : void 0;
-            });
-          } else {
-            return typeof success === "function" ? success(buffer[c]) : void 0;
-          }
-        });
-      }
-    };
-  })();
 
   fetchStrokeXml = function(path, success, fail) {
     var fs;
@@ -55,6 +18,24 @@
           return fail(err);
         } else {
           return success(data);
+        }
+      });
+    }
+  };
+
+  fetchStrokeJSON = function(path, success, fail) {
+    var fs;
+    if (root.window) {
+      return jQuery.get(path, success, "json").fail(fail);
+    } else {
+      fs = require("fs");
+      return fs.readFile(path, {
+        encoding: "utf8"
+      }, function(err, data) {
+        if (err) {
+          return fail(err);
+        } else {
+          return success(JSON.parse(data));
         }
       });
     }
@@ -165,18 +146,76 @@
     }, fail);
   };
 
+  StrokeData = void 0;
+
+  forEach = Array.prototype.forEach;
+
+  sortSurrogates = function(str) {
+    var code_point, cp, text;
+    cp = [];
+    while (str.length) {
+      if (/[\uD800-\uDBFF]/.test(str.substr(0, 1))) {
+        text = str.substr(0, 2);
+        code_point = (text.charCodeAt(0) - 0xD800) * 0x400 + text.charCodeAt(1) - 0xDC00 + 0x10000;
+        cp.push(code_point.toString(16));
+        str = str.substr(2);
+      } else {
+        cp.push(str.charCodeAt(0).toString(16));
+        str = str.substr(1);
+      }
+    }
+    return cp;
+  };
+
+  (function() {
+    var buffer, dirs, fetchers, source;
+    buffer = {};
+    source = "json";
+    dirs = {
+      "xml": "./utf8/",
+      "json": "./json/"
+    };
+    fetchers = {
+      "xml": fetchStrokeJSONFromXml,
+      "json": fetchStrokeJSON
+    };
+    return StrokeData = {
+      source: function(val) {
+        if (val === "json" || val === "xml") {
+          return source = val;
+        }
+      },
+      get: function(cp, success, fail) {
+        if (!buffer[cp]) {
+          return fetchers[source](dirs[source] + cp + "." + source, function(json) {
+            buffer[cp] = json;
+            return typeof success === "function" ? success(json) : void 0;
+          }, function(err) {
+            return typeof fail === "function" ? fail(err) : void 0;
+          });
+        } else {
+          return typeof success === "function" ? success(buffer[cp]) : void 0;
+        }
+      }
+    };
+  })();
+
   if (root.window) {
     window.WordStroker || (window.WordStroker = {});
     window.WordStroker.utils = {
+      sortSurrogates: sortSurrogates,
+      StrokeData: StrokeData,
       fetchStrokeXml: fetchStrokeXml,
-      jsonFromXml: jsonFromXml,
+      fetchStrokeJSON: fetchStrokeJSON,
       fetchStrokeJSONFromXml: fetchStrokeJSONFromXml
     };
   } else {
     WordStroker = {
       utils: {
+        sortSurrogates: sortSurrogates,
         StrokeData: StrokeData,
         fetchStrokeXml: fetchStrokeXml,
+        fetchStrokeJSON: fetchStrokeJSON,
         fetchStrokeJSONFromXml: fetchStrokeJSONFromXml
       }
     };

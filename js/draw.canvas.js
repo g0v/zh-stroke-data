@@ -182,12 +182,12 @@
       }
       return _results;
     };
-    drawElementWithWord = function(element, val, options) {
+    drawElementWithWord = function(element, cp, options) {
       var promise, word;
       promise = jQuery.Deferred();
       word = new Word(options);
       $(element).append(word.canvas);
-      WordStroker.utils.StrokeData.get(val, function(json) {
+      WordStroker.utils.StrokeData.get(cp, function(json) {
         return promise.resolve({
           drawBackground: function() {
             return word.drawBackground();
@@ -220,8 +220,8 @@
       return promise;
     };
     drawElementWithWords = function(element, words, options) {
-      return Array.prototype.map.call(words, function(word) {
-        return drawElementWithWord(element, word, options);
+      return WordStroker.utils.sortSurrogates(words).map(function(cp) {
+        return drawElementWithWord(element, cp, options);
       });
     };
     window.WordStroker || (window.WordStroker = {});

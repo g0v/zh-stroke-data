@@ -11,7 +11,9 @@
     result = [];
     rule = require(path);
     return rule.strokes.forEach(function(source, i) {
-      return WordStroker.utils.StrokeData.get(source.val, function(json) {
+      var cp;
+      cp = WordStroker.utils.sortSurrogates(source.val);
+      return WordStroker.utils.StrokeData.get(cp[0], function(json) {
         result = result.concat(source.indices.map(function(val) {
           return json[val];
         }));

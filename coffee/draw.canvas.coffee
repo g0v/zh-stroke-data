@@ -175,12 +175,12 @@ $ ->
             path.end.y
           )
 
-  drawElementWithWord = (element, val, options) ->
+  drawElementWithWord = (element, cp, options) ->
     promise = jQuery.Deferred()
     word = new Word(options)
     $(element).append word.canvas
     WordStroker.utils.StrokeData.get(
-      val,
+      cp,
       # success
       (json) ->
         promise.resolve {
@@ -207,8 +207,8 @@ $ ->
     promise
 
   drawElementWithWords = (element, words, options) ->
-    Array.prototype.map.call words, (word) ->
-      return drawElementWithWord element, word, options
+    WordStroker.utils.sortSurrogates(words).map (cp) ->
+      drawElementWithWord element, cp, options
 
   window.WordStroker or= {}
   window.WordStroker.canvas =

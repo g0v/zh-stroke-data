@@ -6,8 +6,9 @@ process.argv.forEach (path, index) ->
   result = []
   rule = require path
   rule.strokes.forEach (source, i) ->
+    cp = WordStroker.utils.sortSurrogates source.val
     WordStroker.utils.StrokeData.get(
-      source.val,
+      cp[0],
       (json) ->
         result = result.concat source.indices.map (val) -> json[val]
         console.log JSON.stringify result, null, "  " if i is rule.strokes.length - 1

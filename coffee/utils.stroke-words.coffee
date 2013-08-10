@@ -2,37 +2,6 @@ root = this
 
 sax = root.sax or require "sax"
 
-# expose StrokeData
-StrokeData = undefined
-
-forEach = Array.prototype.forEach
-
-do ->
-  buffer = {}
-  source = "xml" # "xml" or "json"
-  dirs =
-    "xml": "./utf8/"
-    "json": "./json/"
-  StrokeData =
-    source: (val) ->
-      source = val if val is "json" or val is "xml"
-    get: (str, success, fail) ->
-      forEach.call str, (c) ->
-        if not buffer[c]
-          utf8code = escape(c).replace(/%u/, "").toLowerCase()
-          fetchStrokeJSONFromXml(
-            dirs[source] + utf8code + "." + source,
-            # success
-            (json) ->
-              buffer[c] = json
-              success? json
-            # fail
-            (err) ->
-              fail? err
-          )
-        else
-          success? buffer[c]
-
 fetchStrokeXml = (path, success, fail) ->
   if root.window # web
     jQuery.get(path, success, "text").fail(fail)
@@ -43,6 +12,17 @@ fetchStrokeXml = (path, success, fail) ->
         fail err
       else
         success data
+
+fetchStrokeJSON = (path, success, fail) ->
+  if root.window # web
+    jQuery.get(path, success, "json").fail(fail)
+  else # node
+    fs = require "fs"
+    fs.readFile path, { encoding: "utf8" }, (err, data) ->
+      if err
+        fail err
+      else
+        success JSON.parse data
 
 jsonFromXml = (doc, success, fail) ->
   ret = []
@@ -126,16 +106,68 @@ fetchStrokeJSONFromXml = (path, success, fail) ->
     jsonFromXml doc, success, fail
   , fail)
 
+# expose StrokeData
+StrokeData = undefined
+
+forEach = Array.prototype.forEach
+
+# http://stackoverflow.com/questions/6885879/javascript-and-string-manipulation-w-utf-16-surrogate-pairs
+# with @audreyt's code
+sortSurrogates = (str) ->
+  cp = []                                       # array to hold code points
+  while str.length                              # loop till we've done the whole string
+    if /[\uD800-\uDBFF]/.test(str.substr(0,1))  # test the first character
+                                                # High surrogate found low surrogate follows
+      text = str.substr(0, 2)
+      code_point = (text.charCodeAt(0) - 0xD800) * 0x400 + text.charCodeAt(1) - 0xDC00 + 0x10000 # au++
+      cp.push(code_point.toString(16))                       # push the two onto array
+      str = str.substr(2)                       # clip the two off the string
+    else                                        # else BMP code point
+      cp.push(str.charCodeAt(0).toString(16))    # push one onto array
+      str = str.substr(1)                       # clip one from string 
+  cp
+
+do ->
+  buffer = {}
+  source = "json" # "xml" or "json"
+  dirs =
+    "xml": "./utf8/"
+    "json": "./json/"
+  fetchers =
+    "xml": fetchStrokeJSONFromXml
+    "json": fetchStrokeJSON
+  StrokeData =
+    source: (val) ->
+      source = val if val is "json" or val is "xml"
+    get: (cp, success, fail) ->
+      if not buffer[cp]
+        fetchers[source](
+          dirs[source] + cp + "." + source,
+          # success
+          (json) ->
+            buffer[cp] = json
+            success? json
+          # fail
+          (err) ->
+            fail? err
+        )
+      else
+        success? buffer[cp]
+
 if root.window #web
   window.WordStroker or= {}
   window.WordStroker.utils =
+    sortSurrogates: sortSurrogates
+    StrokeData: StrokeData
     fetchStrokeXml: fetchStrokeXml
-    jsonFromXml: jsonFromXml
+    fetchStrokeJSON: fetchStrokeJSON
     fetchStrokeJSONFromXml: fetchStrokeJSONFromXml
 else # node
   WordStroker =
     utils:
+      sortSurrogates: sortSurrogates
       StrokeData: StrokeData
       fetchStrokeXml: fetchStrokeXml
+      fetchStrokeJSON: fetchStrokeJSON
       fetchStrokeJSONFromXml: fetchStrokeJSONFromXml
   module.exports = WordStroker
