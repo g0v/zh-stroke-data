@@ -54,12 +54,13 @@
         }
       }, options, internalOptions);
       this.matrix = [this.options.scales.fill, 0, 0, this.options.scales.fill, 0, 0];
-      this.canvas = document.createElement("canvas");
-      $canvas = $(this.canvas);
+      this.myCanvas = document.createElement("canvas");
+      $canvas = $(this.myCanvas);
       $canvas.css("width", this.styleWidth() + "px");
       $canvas.css("height", this.styleHeight() + "px");
-      this.canvas.width = this.fillWidth();
-      this.canvas.height = this.fillHeight();
+      this.myCanvas.width = this.fillWidth();
+      this.myCanvas.height = this.fillHeight();
+      this.canvas = this.myCanvas;
       return this;
     };
     Word.prototype.init = function() {
@@ -85,18 +86,20 @@
     Word.prototype.styleHeight = function() {
       return this.fillHeight() * this.options.scales.style;
     };
-    Word.prototype.drawBackground = function() {
+    Word.prototype.drawBackground = function(canvas) {
       var ctx;
+      this.canvas = canvas ? canvas : this.myCanvas;
       ctx = this.canvas.getContext("2d");
       ctx.fillStyle = "#FFF";
       ctx.fillRect(0, 0, this.fillWidth(), this.fillHeight());
       return drawBackground(ctx, this.fillWidth());
     };
-    Word.prototype.draw = function(strokeJSON) {
+    Word.prototype.draw = function(strokeJSON, canvas) {
       var ctx,
         _this = this;
       this.init();
       this.strokes = strokeJSON;
+      this.canvas = canvas ? canvas : this.myCanvas;
       ctx = this.canvas.getContext("2d");
       ctx.strokeStyle = "#000";
       ctx.fillStyle = "#000";

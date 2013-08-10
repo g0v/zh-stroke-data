@@ -57,12 +57,14 @@ $ ->
       0, 0
     ]
 
-    @canvas = document.createElement("canvas")
-    $canvas = $ @canvas
+    # temp hack for custom canvas
+    @myCanvas = document.createElement("canvas")
+    $canvas = $ @myCanvas
     $canvas.css "width", @styleWidth() + "px"
     $canvas.css "height", @styleHeight() + "px"
-    @canvas.width = @fillWidth()
-    @canvas.height = @fillHeight()
+    @myCanvas.width = @fillWidth()
+    @myCanvas.height = @fillHeight()
+    @canvas = @myCanvas
 
     return this
 
@@ -89,15 +91,17 @@ $ ->
   Word.prototype.styleHeight = ->
     @fillHeight() * @options.scales.style
 
-  Word.prototype.drawBackground = ->
+  Word.prototype.drawBackground = (canvas) ->
+    @canvas = if canvas then canvas else @myCanvas
     ctx = @canvas.getContext("2d")
     ctx.fillStyle = "#FFF"
     ctx.fillRect(0, 0, @fillWidth(), @fillHeight())
     drawBackground(ctx, @fillWidth())
 
-  Word.prototype.draw = (strokeJSON) ->
+  Word.prototype.draw = (strokeJSON, canvas) ->
     @init()
     @strokes = strokeJSON
+    @canvas = if canvas then canvas else @myCanvas
     ctx = @canvas.getContext("2d")
     ctx.strokeStyle = "#000"
     ctx.fillStyle = "#000"

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>常用國字標準字體筆劃 HTML5 Canvas</title>
+        <link rel="stylesheet" href="./css/demo.css" type="text/css" media="screen">
+        <link rel="stylesheet" href="./css/demo.canvas.css" type="text/css" media="screen">
+        <script src="./js/raf.min.js"></script>
+        <script src="./js/raphael.js"></script>
+        <script src="./js/jquery-1.9.1.min.js"> </script>
+        <script src="./js/sax.js"> </script>
+        <script src="./js/utils.stroke-words.js"> </script>
+        <script src="./js/draw.canvas.js"> </script>
+        <script>
+          $(document).ready(function() {
+            var canvas = document.createElement("canvas");
+            canvas.width = 500;
+            canvas.height = 500;
+            $("#holder").append(canvas);
+
+            WordStroker.canvas.StrokeData.get(
+              "你",
+              function(json) {
+                var strokesA = [json[0], json[1]];
+                WordStroker.canvas.StrokeData.get(
+                  "姻",
+                  function(json) {
+                    var strokesB = [json[3], json[4], json[5], json[6], json[7], json[8]];
+                    var strokes = strokesA.concat(strokesB);
+                    word = new WordStroker.canvas.Word({ scales: { fill: 0.2, style: 1 } })
+                    word.draw(strokes, canvas)
+                  }
+                );
+              }
+            );
+          });
+        </script>
+    </head>
+    </head>
+    <body>
+        <div id="holder"></div>
+        <p id="copyright">常用國字標準字體筆劃</p>
+    </body>
+</html>
