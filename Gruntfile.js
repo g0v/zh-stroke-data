@@ -18,9 +18,21 @@ module.exports = function(grunt) {
           "./compose.js": "./coffee/compose.coffee"
         }
       }
+    },
+    uglify: {
+      plugin: {
+        files: {
+          "./js/jquery.strokeWords.js": [ "./js/utils.stroke-words.js",
+                                          "./js/draw.js",
+                                          "./js/draw.canvas.js",
+                                          "./js/jquery.stroke-words.js" ]
+        }
+      }
     }
   });
 
   grunt.loadNpmTasks("grunt-contrib-coffee");
-  grunt.registerTask("default", ["coffee"]);
+  grunt.loadNpmTasks("grunt-contrib-uglify");
+
+  grunt.registerTask("default", ["coffee", "uglify"]);
 };
