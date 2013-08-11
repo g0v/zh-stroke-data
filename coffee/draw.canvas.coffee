@@ -1,120 +1,133 @@
 $ ->
-  fetchStrokeXml = (code, success, fail) ->
-    $.get("utf8/" + code.toLowerCase() + ".xml", success, "xml").fail(fail)
+  internalOptions =
+    dim: 2150
+    trackWidth: 150
 
-  Word = (val, options) ->
-    this.options = $.extend(
-      dim: 2150
+  demoMatrix = [
+    1, 0,
+    0, 1,
+    100, 100
+  ]
+
+  Word = (options) ->
+    @options = $.extend(
       scales:
         fill: 0.4
         style: 0.25
-      trackWidth: 150
       updatesPerStep: 10 # speed, higher is faster
       delays:
         stroke: 0.25
         word: 0.5
-    , options)
-    this.val = val
-    this.utf8code = escape(val).replace(/%u/, "")
-    this.strokes = []
+    , options, internalOptions)
+    @matrix = [
+      @options.scales.fill, 0,
+      0, @options.scales.fill,
+      0, 0
+    ]
 
-    this.canvas = document.createElement("canvas")
-    $canvas = $ this.canvas
-    $canvas.css "width", this.styleWidth() + "px"
-    $canvas.css "height", this.styleHeight() + "px"
-    this.canvas.width = this.fillWidth()
-    this.canvas.height = this.fillHeight()
+    # temp hack for custom canvas
+    @myCanvas = document.createElement("canvas")
+    $canvas = $ @myCanvas
+    $canvas.css "width", @styleWidth() + "px"
+    $canvas.css "height", @styleHeight() + "px"
+    @myCanvas.width = @fillWidth()
+    @myCanvas.height = @fillHeight()
+    @canvas = @myCanvas
 
     return this
 
   Word.prototype.init = ->
-    this.currentStroke = 0
-    this.currentTrack = 0
-    this.time = 0.0
+    @currentStroke = 0
+    @currentTrack = 0
+    @time = 0.0
 
   Word.prototype.width = ->
-    this.options.dim
+    @options.dim
 
   Word.prototype.height = ->
-    this.options.dim
+    @options.dim
 
   Word.prototype.fillWidth = ->
-    this.width() * this.options.scales.fill
+    @width() * @options.scales.fill
 
   Word.prototype.fillHeight = ->
-    this.height() * this.options.scales.fill
+    @height() * @options.scales.fill
 
   Word.prototype.styleWidth = ->
-    this.fillWidth() * this.options.scales.style
+    @fillWidth() * @options.scales.style
 
   Word.prototype.styleHeight = ->
-    this.fillHeight() * this.options.scales.style
+    @fillHeight() * @options.scales.style
 
-  Word.prototype.drawBackground = ->
-    ctx = this.canvas.getContext("2d")
+  Word.prototype.drawBackground = (canvas) ->
+    @canvas = if canvas then canvas else @myCanvas
+    ctx = @canvas.getContext("2d")
     ctx.fillStyle = "#FFF"
-    ctx.fillRect(0, 0, this.fillWidth(), this.fillHeight())
-    drawBackground(ctx, this.fillWidth())
+    ctx.fillRect(0, 0, @fillWidth(), @fillHeight())
+    drawBackground(ctx, @fillWidth())
 
-  Word.prototype.draw = ->
-    this.init()
-    ctx = this.canvas.getContext("2d")
+  Word.prototype.draw = (strokeJSON, canvas) ->
+    @init()
+    @strokes = strokeJSON
+    @canvas = if canvas then canvas else @myCanvas
+    ctx = @canvas.getContext("2d")
     ctx.strokeStyle = "#000"
     ctx.fillStyle = "#000"
     ctx.lineWidth = 5
-    requestAnimationFrame => this.update()
-    this.promise = $.Deferred()
+    requestAnimationFrame => @update()
+    @promise = $.Deferred()
 
   Word.prototype.update = ->
-    return if this.currentStroke >= this.strokes.length
-    ctx = this.canvas.getContext("2d")
-    stroke = this.strokes[this.currentStroke]
+    return if @currentStroke >= @strokes.length
+    ctx = @canvas.getContext "2d"
+    ctx.setTransform.apply ctx, @matrix
+    stroke = @strokes[@currentStroke]
     # will stroke
-    if this.time == 0.0
-      this.vector =
-        x: stroke.track[this.currentTrack + 1].x - stroke.track[this.currentTrack].x
-        y: stroke.track[this.currentTrack + 1].y - stroke.track[this.currentTrack].y
-        size: stroke.track[this.currentTrack].size
+    if @time == 0.0
+      @vector =
+        x: stroke.track[@currentTrack + 1].x - stroke.track[@currentTrack].x
+        y: stroke.track[@currentTrack + 1].y - stroke.track[@currentTrack].y
+        size: stroke.track[@currentTrack].size or @options.trackWidth
       ctx.save()
       ctx.beginPath()
-      pathOutline(ctx, stroke.outline, this.options.scales.fill)
+      pathOutline(ctx, stroke.outline)
       ctx.clip()
-    for i in [1..this.options.updatesPerStep]
-      this.time += 0.02
-      this.time = 1 if this.time >= 1
+    for i in [1..@options.updatesPerStep]
+      @time += 0.02
+      @time = 1 if @time >= 1
       ctx.beginPath()
       ctx.arc(
-        (stroke.track[this.currentTrack].x + this.vector.x * this.time) * this.options.scales.fill,
-        (stroke.track[this.currentTrack].y + this.vector.y * this.time) * this.options.scales.fill,
-        (this.vector.size * 2) * this.options.scales.fill,
+        stroke.track[@currentTrack].x + @vector.x * @time,
+        stroke.track[@currentTrack].y + @vector.y * @time,
+        @vector.size * 2,
         0,
         2 * Math.PI
       )
       ctx.fill()
-      break if this.time >= 1
+      break if @time >= 1
     delay = 0
     # did track stroked
-    if this.time >= 1.0
+    if @time >= 1.0
       ctx.restore()
-      this.time = 0.0
-      this.currentTrack += 1
+      @time = 0.0
+      @currentTrack += 1
     # did stroked
-    if this.currentTrack >= stroke.track.length - 1
-      this.currentTrack = 0
-      this.currentStroke += 1
-      delay = this.options.delays.stroke
+    if @currentTrack >= stroke.track.length - 1
+      @currentTrack = 0
+      @currentStroke += 1
+      delay = @options.delays.stroke
     # did word stroked
-    if this.currentStroke >= this.strokes.length
+    if @currentStroke >= @strokes.length
       setTimeout =>
-        this.promise.resolve()
-      , this.options.delays.word * 1000
+        @promise.resolve()
+      , @options.delays.word * 1000
     else
       if delay
         setTimeout =>
-          requestAnimationFrame => this.update()
+          requestAnimationFrame => @update()
         , delay * 1000
       else
-        requestAnimationFrame => this.update()
+        requestAnimationFrame => @update()
 
   drawBackground = (ctx, dim) ->
     ctx.strokeStyle = "#A33"
@@ -138,119 +151,66 @@ $ ->
     ctx.lineTo(dim / 3 * 2, dim)
     ctx.stroke()
 
-  pathOutline = (ctx, outline, scale) ->
+  pathOutline = (ctx, outline) ->
     for path in outline
       switch path.type
         when "M"
-          ctx.moveTo path.x * scale, path.y * scale
+          ctx.moveTo path.x, path.y
         when "L"
-          ctx.lineTo path.x * scale, path.y * scale
+          ctx.lineTo path.x, path.y
         when "C"
           ctx.bezierCurveTo(
-            path.begin.x * scale,
-            path.begin.y * scale,
-            path.mid.x * scale,
-            path.mid.y * scale,
-            path.end.x * scale,
-            path.end.y * scale
+            path.begin.x,
+            path.begin.y,
+            path.mid.x,
+            path.mid.y,
+            path.end.x,
+            path.end.y
           )
         when "Q"
           ctx.quadraticCurveTo(
-            path.begin.x * scale,
-            path.begin.y * scale,
-            path.end.x * scale,
-            path.end.y * scale
+            path.begin.x,
+            path.begin.y,
+            path.end.x,
+            path.end.y
           )
 
-  parseOutline = (outline) ->
-    path = []
-    for node in outline.childNodes
-      continue if node.nodeType != 1
-      a = node.attributes
-      continue unless a
-      switch node.nodeName
-        when "MoveTo"
-          path.push
-            type: "M"
-            x: parseFloat a.x.value
-            y: parseFloat a.y.value
-        when "LineTo"
-          path.push
-            type: "L"
-            x: parseFloat a.x.value
-            y: parseFloat a.y.value
-        when "CubicTo"
-          path.push
-            type: "C"
-            begin:
-              x: parseFloat a.x1.value
-              y: parseFloat a.y1.value
-            mid:
-              x: parseFloat a.x2.value
-              y: parseFloat a.y2.value
-            end:
-              x: parseFloat a.x3.value
-              y: parseFloat a.y3.value
-        when "QuadTo"
-          path.push
-            type: "Q"
-            begin:
-              x: parseFloat a.x1.value
-              y: parseFloat a.y1.value
-            end:
-              x: parseFloat a.x2.value
-              y: parseFloat a.y2.value
-    path
-
-  parseTrack = (track, defaultWidth) ->
-    path = []
-    for node in track.childNodes
-      continue if node.nodeType != 1
-      a = node.attributes
-      continue unless a
-      switch node.nodeName
-        when "MoveTo"
-          path.push
-            x: parseFloat a.x.value
-            y: parseFloat a.y.value
-            size: if a.size then parseFloat(a.size.value) else defaultWidth
-    path
-
-  createWordAndView = (element, val, options) ->
+  drawElementWithWord = (element, cp, options) ->
     promise = jQuery.Deferred()
-    word = new Word(val, options)
+    word = new Word(options)
     $(element).append word.canvas
-    fetchStrokeXml word.utf8code,
+    WordStroker.utils.StrokeData.get(
+      cp,
       # success
-      (doc) ->
-        tracks = doc.getElementsByTagName "Track"
-        for outline, index in doc.getElementsByTagName 'Outline'
-          word.strokes.push
-            outline: parseOutline outline
-            track: parseTrack tracks[index], word.options.trackWidth
-          promise.resolve {
-            drawBackground: () ->
-              word.drawBackground()
-            draw: () ->
-              word.draw()
-          }
+      (json) ->
+        promise.resolve {
+          drawBackground: ->
+            do word.drawBackground
+          draw: ->
+            word.draw json
+          remove: ->
+            do $(word.canvas).remove
+        }
       # fail
       , ->
         promise.resolve {
-          drawBackground: () ->
-            word.drawBackground()
-          draw: () ->
+          drawBackground: ->
+            do word.drawBackground
+          draw: ->
             p = jQuery.Deferred()
             $(word.canvas).fadeTo("fast", 0.5, -> p.resolve())
             p
+          remove: ->
+            do $(word.canvas).remove
         }
+    )
     promise
 
-  createWordsAndViews = (element, words, options) ->
-    Array.prototype.map.call words, (word) ->
-      return createWordAndView element, word, options
+  drawElementWithWords = (element, words, options) ->
+    WordStroker.utils.sortSurrogates(words).map (cp) ->
+      drawElementWithWord element, cp, options
 
   window.WordStroker or= {}
   window.WordStroker.canvas =
     Word: Word
-    createWordsAndViews: createWordsAndViews
+    drawElementWithWords: drawElementWithWords

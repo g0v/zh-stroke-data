@@ -7,9 +7,15 @@ module.exports = function(grunt) {
           sourceMap: true
         },
         files: {
-          "./draw.js": "./coffee/draw.coffee",
-          "./draw.canvas.js": "./coffee/draw.canvas.coffee",
-          "./jquery.stroke-words.js": "./coffee/jquery.stroke-words.coffee"
+          /* both */
+          "./js/utils.stroke-words.js": "./coffee/utils.stroke-words.coffee",
+          /* web */
+          "./js/draw.js": "./coffee/draw.coffee",
+          "./js/draw.canvas.js": "./coffee/draw.canvas.coffee",
+          "./js/jquery.stroke-words.js": "./coffee/jquery.stroke-words.coffee",
+          /* node */
+          "./stroke2json.js": "./coffee/stroke2json.coffee",
+          "./compose.js": "./coffee/compose.coffee"
         }
       }
     }
