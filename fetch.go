@@ -1,7 +1,7 @@
 package main
 import "fmt"
 import "net/http"
-import "log"
+//import "log"
 import "io/ioutil"
 import "os"
 import "path"
@@ -30,9 +30,7 @@ func fetchUrl(url string) (*[]byte, error) {
 
 func fetchStrokeXml(code int) {
 	var url,filename string
-	hex := fmt.Sprintf("%x",code)
-
-	fi, err := os.Stat(filename)
+	hex := fmt.Sprintf("%x", code)
 
 	if (0xA374 <= code && code <= 0xA37E) {
 		url = bpmfXmlBaseUrl + fmt.Sprintf("%d", code - 0xA374 + 1)
@@ -43,6 +41,7 @@ func fetchStrokeXml(code int) {
 	}
 
 	filename = path.Join( baseDir, hex + ".xml" )
+	fi, err := os.Stat(filename)
 
 	if fi != nil {
 		fmt.Print("-")
@@ -51,7 +50,8 @@ func fetchStrokeXml(code int) {
 
 	xmlContentP, err := fetchUrl(url)
 	if err != nil {
-		log.Println(err)
+		//log.Println(err)
+		fmt.Print("!")
 		return
 	}
 
@@ -65,6 +65,7 @@ func fetchStrokeXml(code int) {
 
 	// filename string, data []byte, perm os.FileMode
 	fmt.Print(".")
+
 	ioutil.WriteFile(filename, xmlContent, 0666)
 	time.Sleep(500 * time.Millisecond)
 }
@@ -106,9 +107,13 @@ func main() {
 		in <- code
 	}
 
+	for code := 0xc940 ; code <= 0xf9d5 ; code++ {
+		in <- code
+	}
+
 	for i := 0 ; i < runtime.NumCPU() ; i++ {
 		in <- 0
 		<-done
-		fmt.Printf("goroutine %d finished\n", i)
+		fmt.Printf("\ngoroutine %d finished\n", i)
 	}
 }
