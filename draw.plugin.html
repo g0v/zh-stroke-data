@@ -17,7 +17,10 @@
             var $word, options;
 
             options = {
-              updatesPerStep: 5
+              updatesPerStep: 5,
+              progress: function(e, codepoint) {
+                if (e.lengthComputable) console.log("loading " + codepoint + ": " +  100 * e.loaded / e.total);
+              }
             };
 
             $word = $("#word");

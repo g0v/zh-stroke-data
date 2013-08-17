@@ -18,6 +18,7 @@ $ ->
       delays:
         stroke: 0.25
         word: 0.5
+      progress: null
     , options, internalOptions)
     @matrix = [
       @options.scales.fill, 0,
@@ -203,6 +204,8 @@ $ ->
           remove: ->
             do $(word.canvas).remove
         }
+      , (e) ->
+        options.progress e, cp
     )
     promise
 

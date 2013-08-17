@@ -10,6 +10,7 @@ $.fn.extend
     options = $.extend(
       single: false
       svg: !isCanvasSupported()
+      progress: null
     , options)
 
     @each(() ->

@@ -15,7 +15,8 @@
       }
       options = $.extend({
         single: false,
-        svg: !isCanvasSupported()
+        svg: !isCanvasSupported(),
+        progress: null
       }, options);
       return this.each(function() {
         var promises;

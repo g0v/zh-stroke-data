@@ -17,7 +17,8 @@
         delays: {
           stroke: 0.25,
           word: 0.5
-        }
+        },
+        progress: null
       }, options, internalOptions);
       this.matrix = [this.options.scales.fill, 0, 0, this.options.scales.fill, 0, 0];
       this.myCanvas = document.createElement("canvas");
@@ -216,6 +217,8 @@
             return $(word.canvas).remove();
           }
         });
+      }, function(e) {
+        return options.progress(e, cp);
       });
       return promise;
     };
