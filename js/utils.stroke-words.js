@@ -7,10 +7,15 @@
 
   glMatrix = root.glMatrix || require("./gl-matrix-min");
 
-  fetchStrokeXml = function(path, success, fail) {
+  fetchStrokeXml = function(path, success, fail, progress) {
     var fs;
     if (root.window) {
-      return jQuery.get(path, success, "text").fail(fail);
+      return jQuery.ajax({
+        type: "GET",
+        url: path,
+        dataType: "text",
+        progress: progress
+      }).done(success).fail(fail);
     } else {
       fs = require("fs");
       return fs.readFile(path, {
@@ -25,10 +30,15 @@
     }
   };
 
-  fetchStrokeJSON = function(path, success, fail) {
+  fetchStrokeJSON = function(path, success, fail, progress) {
     var fs;
     if (root.window) {
-      return jQuery.get(path, success, "json").fail(fail);
+      return jQuery.ajax({
+        type: "GET",
+        url: path,
+        dataType: "json",
+        progress: progress
+      }).done(success).fail(fail);
     } else {
       fs = require("fs");
       return fs.readFile(path, {
@@ -278,14 +288,14 @@
         }
         return ret;
       },
-      get: function(cp, success, fail) {
+      get: function(cp, success, fail, progress) {
         if (!buffer[cp]) {
           return fetchers[source](dirs[source] + cp + "." + source, function(json) {
             buffer[cp] = json;
             return typeof success === "function" ? success(json) : void 0;
           }, function(err) {
             return typeof fail === "function" ? fail(err) : void 0;
-          });
+          }, progress);
         } else {
           return typeof success === "function" ? success(buffer[cp]) : void 0;
         }

@@ -3,9 +3,18 @@ root = this
 sax = root.sax or require "sax"
 glMatrix = root.glMatrix or require "./gl-matrix-min"
 
-fetchStrokeXml = (path, success, fail) ->
+# jquery ajax progress by @englercj
+# https://github.com/englercj/jquery-ajax-progress
+fetchStrokeXml = (path, success, fail, progress) ->
   if root.window # web
-    jQuery.get(path, success, "text").fail(fail)
+    jQuery.ajax(
+      type: "GET"
+      url: path
+      dataType: "text"
+      progress: progress
+    ).
+    done(success).
+    fail(fail)
   else # node
     fs = require "fs"
     fs.readFile path, { encoding: "utf8" }, (err, data) ->
@@ -14,9 +23,16 @@ fetchStrokeXml = (path, success, fail) ->
       else
         success data
 
-fetchStrokeJSON = (path, success, fail) ->
+fetchStrokeJSON = (path, success, fail, progress) ->
   if root.window # web
-    jQuery.get(path, success, "json").fail(fail)
+    jQuery.ajax(
+      type: "GET"
+      url: path
+      dataType: "json"
+      progress: progress
+    ).
+    done(success).
+    fail(fail)
   else # node
     fs = require "fs"
     fs.readFile path, { encoding: "utf8" }, (err, data) ->
@@ -205,7 +221,7 @@ do ->
             y: out.y
         ret.push new_stroke
       ret
-    get: (cp, success, fail) ->
+    get: (cp, success, fail, progress) ->
       if not buffer[cp]
         fetchers[source](
           dirs[source] + cp + "." + source,
@@ -216,6 +232,7 @@ do ->
           # fail
           (err) ->
             fail? err
+          progress
         )
       else
         success? buffer[cp]
