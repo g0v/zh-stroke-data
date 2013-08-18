@@ -163,20 +163,26 @@
   forEach = Array.prototype.forEach;
 
   sortSurrogates = function(str) {
-    var code_point, cp, text;
-    cp = [];
+    var code_point, cps, text;
+    cps = [];
     while (str.length) {
       if (/[\uD800-\uDBFF]/.test(str.substr(0, 1))) {
         text = str.substr(0, 2);
         code_point = (text.charCodeAt(0) - 0xD800) * 0x400 + text.charCodeAt(1) - 0xDC00 + 0x10000;
-        cp.push(code_point.toString(16));
+        cps.push({
+          cp: code_point.toString(16),
+          text: text
+        });
         str = str.substr(2);
       } else {
-        cp.push(str.charCodeAt(0).toString(16));
+        cps.push({
+          cp: str.charCodeAt(0).toString(16),
+          text: str.substr(0, 1)
+        });
         str = str.substr(1);
       }
     }
-    return cp;
+    return cps;
   };
 
   (function() {

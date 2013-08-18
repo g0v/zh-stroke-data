@@ -176,42 +176,42 @@ $ ->
             path.end.y
           )
 
-  drawElementWithWord = (element, cp, options) ->
+  drawElementWithWord = (element, word, options) ->
     promise = jQuery.Deferred()
-    word = new Word(options)
-    $(element).append word.canvas
+    stroker = new Word(options)
+    $(element).append stroker.canvas
     WordStroker.utils.StrokeData.get(
-      cp,
+      word.cp,
       # success
       (json) ->
         promise.resolve {
           drawBackground: ->
-            do word.drawBackground
+            do stroker.drawBackground
           draw: ->
-            word.draw json
+            stroker.draw json
           remove: ->
-            do $(word.canvas).remove
+            do $(stroker.canvas).remove
         }
       # fail
       , ->
         promise.resolve {
           drawBackground: ->
-            do word.drawBackground
+            do stroker.drawBackground
           draw: ->
             p = jQuery.Deferred()
-            $(word.canvas).fadeTo("fast", 0.5, -> p.resolve())
+            $(stroker.canvas).fadeTo("fast", 0.5, -> p.resolve())
             p
           remove: ->
-            do $(word.canvas).remove
+            do $(stroker.canvas).remove
         }
       , (e) ->
-        options.progress e, cp
+        promise.notifyWith e, [e, word.text]
     )
     promise
 
   drawElementWithWords = (element, words, options) ->
-    WordStroker.utils.sortSurrogates(words).map (cp) ->
-      drawElementWithWord element, cp, options
+    WordStroker.utils.sortSurrogates(words).map (word) ->
+      drawElementWithWord element, word, options
 
   window.WordStroker or= {}
   window.WordStroker.canvas =

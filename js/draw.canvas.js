@@ -183,48 +183,48 @@
       }
       return _results;
     };
-    drawElementWithWord = function(element, cp, options) {
-      var promise, word;
+    drawElementWithWord = function(element, word, options) {
+      var promise, stroker;
       promise = jQuery.Deferred();
-      word = new Word(options);
-      $(element).append(word.canvas);
-      WordStroker.utils.StrokeData.get(cp, function(json) {
+      stroker = new Word(options);
+      $(element).append(stroker.canvas);
+      WordStroker.utils.StrokeData.get(word.cp, function(json) {
         return promise.resolve({
           drawBackground: function() {
-            return word.drawBackground();
+            return stroker.drawBackground();
           },
           draw: function() {
-            return word.draw(json);
+            return stroker.draw(json);
           },
           remove: function() {
-            return $(word.canvas).remove();
+            return $(stroker.canvas).remove();
           }
         });
       }, function() {
         return promise.resolve({
           drawBackground: function() {
-            return word.drawBackground();
+            return stroker.drawBackground();
           },
           draw: function() {
             var p;
             p = jQuery.Deferred();
-            $(word.canvas).fadeTo("fast", 0.5, function() {
+            $(stroker.canvas).fadeTo("fast", 0.5, function() {
               return p.resolve();
             });
             return p;
           },
           remove: function() {
-            return $(word.canvas).remove();
+            return $(stroker.canvas).remove();
           }
         });
       }, function(e) {
-        return options.progress(e, cp);
+        return promise.notifyWith(e, [e, word.text]);
       });
       return promise;
     };
     drawElementWithWords = function(element, words, options) {
-      return WordStroker.utils.sortSurrogates(words).map(function(cp) {
-        return drawElementWithWord(element, cp, options);
+      return WordStroker.utils.sortSurrogates(words).map(function(word) {
+        return drawElementWithWord(element, word, options);
       });
     };
     window.WordStroker || (window.WordStroker = {});

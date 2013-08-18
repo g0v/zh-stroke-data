@@ -131,18 +131,22 @@ forEach = Array.prototype.forEach
 # http://stackoverflow.com/questions/6885879/javascript-and-string-manipulation-w-utf-16-surrogate-pairs
 # with @audreyt's code
 sortSurrogates = (str) ->
-  cp = []                                       # array to hold code points
+  cps = []                                      # array to hold code points
   while str.length                              # loop till we've done the whole string
     if /[\uD800-\uDBFF]/.test(str.substr(0,1))  # test the first character
                                                 # High surrogate found low surrogate follows
       text = str.substr(0, 2)
       code_point = (text.charCodeAt(0) - 0xD800) * 0x400 + text.charCodeAt(1) - 0xDC00 + 0x10000 # au++
-      cp.push(code_point.toString(16))          # push the two onto array
+      cps.push                                  # push two onto array
+        cp: code_point.toString(16)
+        text: text
       str = str.substr(2)                       # clip the two off the string
     else                                        # else BMP code point
-      cp.push(str.charCodeAt(0).toString(16))   # push one onto array
+      cps.push                                  # push one onto array
+        cp: str.charCodeAt(0).toString(16)
+        text: str.substr(0, 1)
       str = str.substr(1)                       # clip one from string 
-  cp
+  cps
 
 do ->
   buffer = {}

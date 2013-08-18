@@ -29,7 +29,7 @@ $.fn.extend
         ##
         if not options.single
           promises.forEach (p) ->
-            p.then (word) ->
+            p.progress(options.progress).then (word) ->
               word.drawBackground()
           do promises.reduceRight (next, current) ->
             -> current.then (word) ->

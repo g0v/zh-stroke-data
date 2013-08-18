@@ -18,8 +18,8 @@
 
             options = {
               updatesPerStep: 5,
-              progress: function(e, codepoint) {
-                if (e.lengthComputable) console.log("loading " + codepoint + ": " +  100 * e.loaded / e.total);
+              progress: function(e, word) {
+                if (e.lengthComputable) console.log("loading " + word + ": " +  100 * e.loaded / e.total);
               }
             };
 

@@ -26,7 +26,7 @@
           promises = window.WordStroker.canvas.drawElementWithWords(this, words, options);
           if (!options.single) {
             promises.forEach(function(p) {
-              return p.then(function(word) {
+              return p.progress(options.progress).then(function(word) {
                 return word.drawBackground();
               });
             });
