@@ -1,8 +1,28 @@
+body {
+    background: #eee;
+}
+
 #holder {
     border-width: 0;
     width: auto;
     height: auto;
 }
-body {
-    background: #eee;
+
+.word {
+  position: relative;
+  float: left;
+}
+
+.loader {
+  position: absolute;
+  margin: auto;
+  left: 0; top: 0; right: 0; bottom: 0;
+  width: 100%;
+  height: 100%;
+  background: #CCC;
+}
+
+.loader div {
+  height: 100%;
+  background: #FFF;
 }

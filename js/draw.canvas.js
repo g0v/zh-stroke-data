@@ -184,11 +184,15 @@
       return _results;
     };
     drawElementWithWord = function(element, word, options) {
-      var promise, stroker;
+      var $loader, $word, promise, stroker;
       promise = jQuery.Deferred();
       stroker = new Word(options);
-      $(element).append(stroker.canvas);
+      $word = $("<div class=\"word\"></div>");
+      $loader = $("<div class=\"loader\"><div style=\"width: 0\"></div></div>");
+      $word.append(stroker.canvas).append($loader);
+      $(element).append($word);
       WordStroker.utils.StrokeData.get(word.cp, function(json) {
+        $loader.remove();
         return promise.resolve({
           drawBackground: function() {
             return stroker.drawBackground();
@@ -201,6 +205,7 @@
           }
         });
       }, function() {
+        $loader.remove();
         return promise.resolve({
           drawBackground: function() {
             return stroker.drawBackground();
@@ -218,6 +223,9 @@
           }
         });
       }, function(e) {
+        if (e.lengthComputable) {
+          $loader.find("> div").css("width", e.loaded / e.total * 100 + "%");
+        }
         return promise.notifyWith(e, [e, word.text]);
       });
       return promise;
