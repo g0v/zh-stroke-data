@@ -10,6 +10,7 @@ $.fn.extend
     options = $.extend(
       single: false
       svg: !isCanvasSupported()
+      progress: null
     , options)
 
     @each(() ->
@@ -28,7 +29,7 @@ $.fn.extend
         ##
         if not options.single
           promises.forEach (p) ->
-            p.then (word) ->
+            p.progress(options.progress).then (word) ->
               word.drawBackground()
           do promises.reduceRight (next, current) ->
             -> current.then (word) ->

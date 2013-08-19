@@ -17,7 +17,8 @@
         delays: {
           stroke: 0.25,
           word: 0.5
-        }
+        },
+        progress: null
       }, options, internalOptions);
       this.matrix = [this.options.scales.fill, 0, 0, this.options.scales.fill, 0, 0];
       this.myCanvas = document.createElement("canvas");
@@ -182,46 +183,56 @@
       }
       return _results;
     };
-    drawElementWithWord = function(element, cp, options) {
-      var promise, word;
+    drawElementWithWord = function(element, word, options) {
+      var $loader, $word, promise, stroker;
       promise = jQuery.Deferred();
-      word = new Word(options);
-      $(element).append(word.canvas);
-      WordStroker.utils.StrokeData.get(cp, function(json) {
+      stroker = new Word(options);
+      $word = $("<div class=\"word\"></div>");
+      $loader = $("<div class=\"loader\"><div style=\"width: 0\"></div></div>");
+      $word.append(stroker.canvas).append($loader);
+      $(element).append($word);
+      WordStroker.utils.StrokeData.get(word.cp, function(json) {
+        $loader.remove();
         return promise.resolve({
           drawBackground: function() {
-            return word.drawBackground();
+            return stroker.drawBackground();
           },
           draw: function() {
-            return word.draw(json);
+            return stroker.draw(json);
           },
           remove: function() {
-            return $(word.canvas).remove();
+            return $(stroker.canvas).remove();
           }
         });
       }, function() {
+        $loader.remove();
         return promise.resolve({
           drawBackground: function() {
-            return word.drawBackground();
+            return stroker.drawBackground();
           },
           draw: function() {
             var p;
             p = jQuery.Deferred();
-            $(word.canvas).fadeTo("fast", 0.5, function() {
+            $(stroker.canvas).fadeTo("fast", 0.5, function() {
               return p.resolve();
             });
             return p;
           },
           remove: function() {
-            return $(word.canvas).remove();
+            return $(stroker.canvas).remove();
           }
         });
+      }, function(e) {
+        if (e.lengthComputable) {
+          $loader.find("> div").css("width", e.loaded / e.total * 100 + "%");
+        }
+        return promise.notifyWith(e, [e, word.text]);
       });
       return promise;
     };
     drawElementWithWords = function(element, words, options) {
-      return WordStroker.utils.sortSurrogates(words).map(function(cp) {
-        return drawElementWithWord(element, cp, options);
+      return WordStroker.utils.sortSurrogates(words).map(function(word) {
+        return drawElementWithWord(element, word, options);
       });
     };
     window.WordStroker || (window.WordStroker = {});

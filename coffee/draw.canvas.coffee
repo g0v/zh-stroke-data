@@ -18,6 +18,7 @@ $ ->
       delays:
         stroke: 0.25
         word: 0.5
+      progress: null
     , options, internalOptions)
     @matrix = [
       @options.scales.fill, 0,
@@ -175,40 +176,49 @@ $ ->
             path.end.y
           )
 
-  drawElementWithWord = (element, cp, options) ->
+  drawElementWithWord = (element, word, options) ->
     promise = jQuery.Deferred()
-    word = new Word(options)
-    $(element).append word.canvas
+    stroker = new Word(options)
+    $word = $("<div class=\"word\"></div>")
+    $loader = $("<div class=\"loader\"><div style=\"width: 0\"></div></div>")
+    $word.append(stroker.canvas).append($loader)
+    $(element).append $word
     WordStroker.utils.StrokeData.get(
-      cp,
+      word.cp,
       # success
       (json) ->
+        $loader.remove()
         promise.resolve {
           drawBackground: ->
-            do word.drawBackground
+            do stroker.drawBackground
           draw: ->
-            word.draw json
+            stroker.draw json
           remove: ->
-            do $(word.canvas).remove
+            do $(stroker.canvas).remove
         }
       # fail
       , ->
+        $loader.remove()
         promise.resolve {
           drawBackground: ->
-            do word.drawBackground
+            do stroker.drawBackground
           draw: ->
             p = jQuery.Deferred()
-            $(word.canvas).fadeTo("fast", 0.5, -> p.resolve())
+            $(stroker.canvas).fadeTo("fast", 0.5, -> p.resolve())
             p
           remove: ->
-            do $(word.canvas).remove
+            do $(stroker.canvas).remove
         }
+      , (e) ->
+        if e.lengthComputable
+          $loader.find("> div").css("width", e.loaded / e.total * 100 + "%")
+        promise.notifyWith e, [e, word.text]
     )
     promise
 
   drawElementWithWords = (element, words, options) ->
-    WordStroker.utils.sortSurrogates(words).map (cp) ->
-      drawElementWithWord element, cp, options
+    WordStroker.utils.sortSurrogates(words).map (word) ->
+      drawElementWithWord element, word, options
 
   window.WordStroker or= {}
   window.WordStroker.canvas =
