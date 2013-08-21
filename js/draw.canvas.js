@@ -188,7 +188,7 @@
       promise = jQuery.Deferred();
       stroker = new Word(options);
       $word = $("<div class=\"word\"></div>");
-      $loader = $("<div class=\"loader\"><div style=\"width: 0\"></div></div>");
+      $loader = $("<div class=\"loader\"><div style=\"width: 0\"></div><i class=\"icon-spinner icon-spin icon-large icon-fixed-width\"></i></div>");
       $word.append(stroker.canvas).append($loader);
       $(element).append($word);
       WordStroker.utils.StrokeData.get(word.cp, function(json) {

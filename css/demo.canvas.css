@@ -26,3 +26,20 @@ body {
   height: 100%;
   background: #FFF;
 }
+
+.loader i {
+  position: absolute;
+  top: 107.5px;
+  left: 107.5px;
+  color: #A33;
+}
+
+.loader i.icon-fixed-width {
+  margin-top: -0.5714em;
+  margin-left: -0.5714em;
+}
+
+.loader i.icon-fixed-width.icon-large {
+  margin-top: -0.714em;
+  margin-left: -0.714em;
+}
