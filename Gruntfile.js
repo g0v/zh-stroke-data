@@ -15,7 +15,8 @@ module.exports = function(grunt) {
           "./js/jquery.stroke-words.js": "./coffee/jquery.stroke-words.coffee",
           /* node */
           "./stroke2json.js": "./coffee/stroke2json.coffee",
-          "./compose.js": "./coffee/compose.coffee"
+          "./compose.js": "./coffee/compose.coffee",
+          "./json2bin.js": "./coffee/json2bin.coffee"
         }
       }
     },
