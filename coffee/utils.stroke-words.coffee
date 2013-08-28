@@ -123,10 +123,11 @@ fetchStrokeJSONFromXml = (path, success, fail) ->
     jsonFromXml doc, success, fail
   , fail)
 
-getBinary = (path, success, fail) ->
+getBinary = (path, success, fail, progress) ->
   xhr = new XMLHttpRequest
   xhr.open "GET", path, true
   xhr.responseType = "arraybuffer"
+  xhr.onprogress = progress
   xhr.onreadystatechange = (e) ->
     if @readyState is 4
       if @status is 200
@@ -214,7 +215,8 @@ fetchStrokeJSONFromRaw = (path, success, fail, progress) ->
             track: track
         success ret
       ,
-      fail
+      fail,
+      progress
     )
   else
     console.log "not implement"

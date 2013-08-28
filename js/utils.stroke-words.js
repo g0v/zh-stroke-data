@@ -158,11 +158,12 @@
     }, fail);
   };
 
-  getBinary = function(path, success, fail) {
+  getBinary = function(path, success, fail, progress) {
     var xhr;
     xhr = new XMLHttpRequest;
     xhr.open("GET", path, true);
     xhr.responseType = "arraybuffer";
+    xhr.onprogress = progress;
     xhr.onreadystatechange = function(e) {
       if (this.readyState === 4) {
         if (this.status === 200) {
@@ -272,7 +273,7 @@
           });
         }
         return success(ret);
-      }, fail);
+      }, fail, progress);
     } else {
       return console.log("not implement");
     }
