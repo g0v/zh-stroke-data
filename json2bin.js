@@ -16,6 +16,7 @@
     strokes = require(path);
     strokes.forEach(function(stroke) {
       push.call(result, 0);
+      push.call(result, stroke.outline.length);
       stroke.outline.forEach(function(cmd) {
         switch (cmd.type) {
           case "M":
@@ -29,6 +30,7 @@
         }
       });
       push.call(result, 1);
+      push.call(result, stroke.track.length);
       return stroke.track.forEach(function(pos) {
         return push.call(result, scale_down(pos.x), scale_down(pos.y));
       });

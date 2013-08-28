@@ -19,6 +19,7 @@ $ ->
         stroke: 0.25
         word: 0.5
       progress: null
+      source: "json"
     , options, internalOptions)
     @matrix = [
       @options.scales.fill, 0,
@@ -183,6 +184,7 @@ $ ->
     $loader = $("<div class=\"loader\"><div style=\"width: 0\"></div><i class=\"icon-spinner icon-spin icon-large icon-fixed-width\"></i></div>")
     $word.append(stroker.canvas).append($loader)
     $(element).append $word
+    WordStroker.utils.StrokeData.source options.source
     WordStroker.utils.StrokeData.get(
       word.cp,
       # success

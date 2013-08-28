@@ -7,6 +7,7 @@ process.argv.forEach (path, index) ->
   strokes = require path
   strokes.forEach (stroke) ->
     push.call result, 0
+    push.call result, stroke.outline.length
     stroke.outline.forEach (cmd) ->
       switch cmd.type
         when "M"
@@ -23,6 +24,7 @@ process.argv.forEach (path, index) ->
             scale_down(cmd.mid.x), scale_down(cmd.mid.y),
             scale_down(cmd.end.x), scale_down(cmd.end.y)
     push.call result, 1
+    push.call result, stroke.track.length
     stroke.track.forEach (pos) ->
       push.call result, scale_down(pos.x), scale_down(pos.y)
   process.stdout.write new Buffer result

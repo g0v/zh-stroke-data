@@ -1,5 +1,5 @@
 (function() {
-  var StrokeData, WordStroker, fetchStrokeJSON, fetchStrokeJSONFromXml, fetchStrokeXml, forEach, glMatrix, jsonFromXml, root, sax, sortSurrogates;
+  var StrokeData, WordStroker, fetchStrokeJSON, fetchStrokeJSONFromRaw, fetchStrokeJSONFromXml, fetchStrokeXml, forEach, getBinary, glMatrix, jsonFromXml, root, sax, sortSurrogates;
 
   root = this;
 
@@ -158,6 +158,126 @@
     }, fail);
   };
 
+  getBinary = function(path, success, fail) {
+    var xhr;
+    xhr = new XMLHttpRequest;
+    xhr.open("GET", path, true);
+    xhr.responseType = "arraybuffer";
+    xhr.onreadystatechange = function(e) {
+      if (this.readyState === 4) {
+        if (this.status === 200) {
+          return success(this.response);
+        } else {
+          return fail(this.status);
+        }
+      }
+    };
+    return xhr.send();
+  };
+
+  fetchStrokeJSONFromRaw = function(path, success, fail, progress) {
+    if (root.window) {
+      return getBinary(path, function(data) {
+        var c, data_view, i, j, len, outline, outlines, ret, scale, track;
+        scale = 9;
+        data_view = new DataView(data);
+        ret = [];
+        outlines = void 0;
+        i = 0;
+        c = void 0;
+        while (i < data.byteLength) {
+          if (data_view.getUint8(i) !== 0) {
+            throw new Error("ill-formated outline: " + i.toString(16));
+          }
+          i += 1;
+          outline = [];
+          len = data_view.getUint8(i);
+          i += 1;
+          j = 0;
+          while (j < len) {
+            c = data_view.getUint8(i);
+            switch (c) {
+              case 4:
+                outline.push({
+                  type: "M",
+                  x: scale * data_view.getUint8(i + 1),
+                  y: scale * data_view.getUint8(i + 2)
+                });
+                i += 3;
+                break;
+              case 5:
+                outline.push({
+                  type: "L",
+                  x: scale * data_view.getUint8(i + 1),
+                  y: scale * data_view.getUint8(i + 2)
+                });
+                i += 3;
+                break;
+              case 6:
+                outline.push({
+                  type: "Q",
+                  begin: {
+                    x: scale * data_view.getUint8(i + 1),
+                    y: scale * data_view.getUint8(i + 2)
+                  },
+                  end: {
+                    x: scale * data_view.getUint8(i + 3),
+                    y: scale * data_view.getUint8(i + 4)
+                  }
+                });
+                i += 5;
+                break;
+              case 7:
+                outline.push({
+                  type: "C",
+                  begin: {
+                    x: scale * data_view.getUint8(i + 1),
+                    y: scale * data_view.getUint8(i + 2)
+                  },
+                  mid: {
+                    x: scale * data_view.getUint8(i + 3),
+                    y: scale * data_view.getUint8(i + 4)
+                  },
+                  end: {
+                    x: scale * data_view.getUint8(i + 5),
+                    y: scale * data_view.getUint8(i + 6)
+                  }
+                });
+                i += 7;
+                break;
+              default:
+                console.log("unknown cmd: " + c.toString(16) + " at: " + i.toString(16));
+            }
+            j += 1;
+          }
+          if (data_view.getUint8(i) !== 1) {
+            throw new Error("ill-formated track: " + i.toString(16));
+          }
+          i += 1;
+          track = [];
+          len = data_view.getUint8(i);
+          i += 1;
+          j = 0;
+          while (j < len) {
+            track.push({
+              x: scale * data_view.getUint8(i),
+              y: scale * data_view.getUint8(i + 1)
+            });
+            i += 2;
+            j += 1;
+          }
+          ret.push({
+            outline: outline,
+            track: track
+          });
+        }
+        return success(ret);
+      }, fail);
+    } else {
+      return console.log("not implement");
+    }
+  };
+
   StrokeData = void 0;
 
   forEach = Array.prototype.forEach;
@@ -186,16 +306,23 @@
   };
 
   (function() {
-    var buffer, dirs, fetchers, source, transform;
+    var buffer, dirs, exts, fetchers, source, transform;
     buffer = {};
     source = "json";
     dirs = {
       "xml": "./utf8/",
-      "json": "./json/"
+      "json": "./json/",
+      "raw": "./raw/"
+    };
+    exts = {
+      "xml": ".xml",
+      "json": ".json",
+      "raw": ""
     };
     fetchers = {
       "xml": fetchStrokeJSONFromXml,
-      "json": fetchStrokeJSON
+      "json": fetchStrokeJSON,
+      "raw": fetchStrokeJSONFromRaw
     };
     transform = function(mat2d, x, y) {
       var mat, out, vec;
@@ -210,7 +337,7 @@
     };
     return StrokeData = {
       source: function(val) {
-        if (val === "json" || val === "xml") {
+        if (val === "json" || val === "xml" || val === "raw") {
           return source = val;
         }
       },
@@ -296,7 +423,7 @@
       },
       get: function(cp, success, fail, progress) {
         if (!buffer[cp]) {
-          return fetchers[source](dirs[source] + cp + "." + source, function(json) {
+          return fetchers[source](dirs[source] + cp + exts[source], function(json) {
             buffer[cp] = json;
             return typeof success === "function" ? success(json) : void 0;
           }, function(err) {

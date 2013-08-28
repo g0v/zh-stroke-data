@@ -123,6 +123,102 @@ fetchStrokeJSONFromXml = (path, success, fail) ->
     jsonFromXml doc, success, fail
   , fail)
 
+getBinary = (path, success, fail) ->
+  xhr = new XMLHttpRequest
+  xhr.open "GET", path, true
+  xhr.responseType = "arraybuffer"
+  xhr.onreadystatechange = (e) ->
+    if @readyState is 4
+      if @status is 200
+        success this.response
+      else
+        fail @status
+  xhr.send()
+
+fetchStrokeJSONFromRaw = (path, success, fail, progress) ->
+  if root.window
+    getBinary(
+      path,
+      (data) ->
+        scale = 9 # hard coded DDDDD:
+        data_view = new DataView data
+        ret = []
+        outlines = undefined
+        i = 0
+        c = undefined
+        while i < data.byteLength
+          # read outline
+          if data_view.getUint8(i) isnt 0 then throw new Error "ill-formated outline: " + i.toString(16)
+          i += 1
+          outline = []
+          len = data_view.getUint8 i
+          i += 1
+          # length will be better then 0 and 1
+          j = 0
+          while j < len
+            c = data_view.getUint8 i
+            switch c
+              when 4
+                outline.push
+                  type: "M"
+                  x: scale * data_view.getUint8 i + 1
+                  y: scale * data_view.getUint8 i + 2
+                i += 3
+              when 5
+                outline.push
+                  type: "L"
+                  x: scale * data_view.getUint8 i + 1
+                  y: scale * data_view.getUint8 i + 2
+                i += 3
+              when 6
+                outline.push
+                  type: "Q"
+                  begin:
+                    x: scale * data_view.getUint8 i + 1
+                    y: scale * data_view.getUint8 i + 2
+                  end:
+                    x: scale * data_view.getUint8 i + 3
+                    y: scale * data_view.getUint8 i + 4
+                i += 5
+              when 7
+                outline.push
+                  type: "C"
+                  begin:
+                    x: scale * data_view.getUint8 i + 1
+                    y: scale * data_view.getUint8 i + 2
+                  mid:
+                    x: scale * data_view.getUint8 i + 3
+                    y: scale * data_view.getUint8 i + 4
+                  end:
+                    x: scale * data_view.getUint8 i + 5
+                    y: scale * data_view.getUint8 i + 6
+                i += 7
+              else
+                console.log "unknown cmd: " + c.toString(16) + " at: " + i.toString(16)
+            j += 1
+          # read track
+          if data_view.getUint8(i) isnt 1 then throw new Error "ill-formated track: " + i.toString(16)
+          i += 1
+          track = []
+          len = data_view.getUint8 i
+          i += 1
+          j = 0
+          while j < len
+            track.push
+              x: scale * data_view.getUint8 i
+              y: scale * data_view.getUint8 i + 1
+            i += 2
+            j += 1
+          ret.push
+            outline: outline
+            track: track
+        success ret
+      ,
+      fail
+    )
+  else
+    console.log "not implement"
+
 # expose StrokeData
 StrokeData = undefined
 
@@ -150,13 +246,19 @@ sortSurrogates = (str) ->
 
 do ->
   buffer = {}
-  source = "json" # "xml" or "json"
+  source = "json" # "xml", "json" or "raw"
   dirs =
     "xml": "./utf8/"
     "json": "./json/"
+    "raw": "./raw/"
+  exts =
+    "xml": ".xml"
+    "json": ".json"
+    "raw": ""
   fetchers =
     "xml": fetchStrokeJSONFromXml
     "json": fetchStrokeJSON
+    "raw": fetchStrokeJSONFromRaw
   transform = (mat2d, x, y) ->
     vec = glMatrix.vec2.clone [x, y]
     mat = glMatrix.mat2d.clone mat2d
@@ -168,7 +270,7 @@ do ->
     }
   StrokeData =
     source: (val) ->
-      source = val if val is "json" or val is "xml"
+      source = val if val is "json" or val is "xml" or val is "raw"
     # _ will do this better
     transform: (strokes, mat2d) ->
       ret = []
@@ -228,7 +330,7 @@ do ->
     get: (cp, success, fail, progress) ->
       if not buffer[cp]
         fetchers[source](
-          dirs[source] + cp + "." + source,
+          dirs[source] + cp + exts[source],
           # success
           (json) ->
             buffer[cp] = json
