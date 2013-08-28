@@ -1,5 +1,5 @@
 push = Array.prototype.push
-scale_down = (val) -> return Math.floor val / 9
+scale_down = (val) -> ~~(val / 9 + 0.5)
 
 process.argv.forEach (path, index) ->
   return if index is 0 or index is 1

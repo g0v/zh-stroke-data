@@ -4,7 +4,7 @@
   push = Array.prototype.push;
 
   scale_down = function(val) {
-    return Math.floor(val / 9);
+    return ~~(val / 9 + 0.5);
   };
 
   process.argv.forEach(function(path, index) {
