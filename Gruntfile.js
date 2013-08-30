@@ -16,7 +16,8 @@ module.exports = function(grunt) {
           /* node */
           "./stroke2json.js": "./coffee/stroke2json.coffee",
           "./compose.js": "./coffee/compose.coffee",
-          "./json2bin.js": "./coffee/json2bin.coffee"
+          "./json2bin.js": "./coffee/json2bin.coffee",
+          "./pack.js": "./coffee/pack.coffee"
         }
       }
     },
