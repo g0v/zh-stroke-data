@@ -38,6 +38,7 @@
       results[i] = [];
       if (fs.existsSync(path)) {
         strokes = require(path);
+        results[i].push(strokes.length);
         strokes.forEach(function(stroke) {
           var ss, types, with_size, xs, ys;
           if (stroke.outline.length >= 256) {

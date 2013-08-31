@@ -131,89 +131,79 @@ getBinary = (path, success, fail, progress) ->
   xhr.onreadystatechange = (e) ->
     if @readyState is 4
       if @status is 200
-        success this.response
+        success? this.response
       else
-        fail @status
+        fail? @status
   xhr.send()
 
-fetchStrokeJSONFromRaw = (path, success, fail, progress) ->
+fetchStrokeJSONFromBinary = (path, success, fail, progress) ->
   if root.window
+    packed_path = "#{path.substr(0, path.length - 6)}.bin"
+    file_id = parseInt path.substr(path.length - 6, 2), 16
     getBinary(
-      path,
+      packed_path,
       (data) ->
-        scale = 9 # hard coded DDDDD:
+        scale = 2060.0 / 256 # hard coded DDDDD:
         data_view = new DataView data
+        offset = data_view.getUint32 file_id * 4, true
+        return fail? new Error "stroke not found" if offset is 0
+        p = 0
         ret = []
-        outlines = undefined
-        i = 0
-        c = undefined
-        while i < data.byteLength
-          # read outline
-          if data_view.getUint8(i) isnt 0 then throw new Error "ill-formated outline: " + i.toString(16)
-          i += 1
+        strokes_len = data_view.getUint8 offset + p++
+        for [0...strokes_len] 
           outline = []
-          len = data_view.getUint8 i
-          i += 1
-          # length will be better then 0 and 1
-          j = 0
-          while j < len
-            c = data_view.getUint8 i
-            switch c
-              when 4
-                outline.push
-                  type: "M"
-                  x: scale * data_view.getUint8 i + 1
-                  y: scale * data_view.getUint8 i + 2
-                i += 3
-              when 5
-                outline.push
-                  type: "L"
-                  x: scale * data_view.getUint8 i + 1
-                  y: scale * data_view.getUint8 i + 2
-                i += 3
-              when 6
-                outline.push
-                  type: "Q"
-                  begin:
-                    x: scale * data_view.getUint8 i + 1
-                    y: scale * data_view.getUint8 i + 2
-                  end:
-                    x: scale * data_view.getUint8 i + 3
-                    y: scale * data_view.getUint8 i + 4
-                i += 5
-              when 7
-                outline.push
-                  type: "C"
-                  begin:
-                    x: scale * data_view.getUint8 i + 1
-                    y: scale * data_view.getUint8 i + 2
-                  mid:
-                    x: scale * data_view.getUint8 i + 3
-                    y: scale * data_view.getUint8 i + 4
-                  end:
-                    x: scale * data_view.getUint8 i + 5
-                    y: scale * data_view.getUint8 i + 6
-                i += 7
-              else
-                console.log "unknown cmd: " + c.toString(16) + " at: " + i.toString(16)
-            j += 1
-          # read track
-          if data_view.getUint8(i) isnt 1 then throw new Error "ill-formated track: " + i.toString(16)
-          i += 1
+          cmd_len = data_view.getUint8 offset + p++
+          for [0...cmd_len]
+            outline.push
+              type: String.fromCharCode data_view.getUint8 offset + p++
+          for cmd in outline
+            switch cmd.type
+              when "M"
+                cmd.x = scale * data_view.getUint8 offset + p++
+              when "L"
+                cmd.x = scale * data_view.getUint8 offset + p++
+              when "Q"
+                cmd.begin =
+                  x: scale * data_view.getUint8 offset + p++
+                cmd.end =
+                  x: scale * data_view.getUint8 offset + p++
+              when "C"
+                cmd.begin =
+                  x: scale * data_view.getUint8 offset + p++
+                cmd.mid =
+                  x: scale * data_view.getUint8 offset + p++
+                cmd.end =
+                  x: scale * data_view.getUint8 offset + p++
+          for cmd in outline
+            switch cmd.type
+              when "M"
+                cmd.y = scale * data_view.getUint8 offset + p++
+              when "L"
+                cmd.y = scale * data_view.getUint8 offset + p++
+              when "Q"
+                cmd.begin.y = scale * data_view.getUint8 offset + p++
+                cmd.end.y = scale * data_view.getUint8 offset + p++
+              when "C"
+                cmd.begin.y = scale * data_view.getUint8 offset + p++
+                cmd.mid.y = scale * data_view.getUint8 offset + p++
+                cmd.end.y = scale * data_view.getUint8 offset + p++
           track = []
-          len = data_view.getUint8 i
-          i += 1
-          j = 0
-          while j < len
+          track_len = data_view.getUint8 offset + p++
+          size_indices = []
+          size_len = data_view.getUint8 offset + p++
+          for [0...size_len]
+            size_indices.push data_view.getUint8 offset + p++
+          for [0...track_len]
             track.push
-              x: scale * data_view.getUint8 i
-              y: scale * data_view.getUint8 i + 1
-            i += 2
-            j += 1
+              x: scale * data_view.getUint8 offset + p++
+          for node in track
+            node.y = scale * data_view.getUint8 offset + p++
+          for index in size_indices
+            track[index].size = scale * data_view.getUint8 offset + p++
           ret.push
             outline: outline
             track: track
-        success ret
+        success? ret
       ,
       fail,
       progress
@@ -249,18 +239,25 @@ sortSurrogates = (str) ->
 do ->
   buffer = {}
   source = "json" # "xml", "json" or "raw"
-  dirs =
-    "xml": "./utf8/"
-    "json": "./json/"
-    "raw": "./raw/"
+  # for moedict-webkit
+  if window.isCordova
+    dirs =
+      "xml":  "http://stroke.moedict.tw/"
+      "json": "http://stroke-json.moedict.tw/"
+      "bin":  "http://stroke-bin.moedict.tw/"
+  else
+    dirs =
+      "xml":  "./utf8/"
+      "json": "./json/"
+      "bin":  "./bin/"
   exts =
     "xml": ".xml"
     "json": ".json"
-    "raw": ""
+    "bin": ".bin"
   fetchers =
     "xml": fetchStrokeJSONFromXml
     "json": fetchStrokeJSON
-    "raw": fetchStrokeJSONFromRaw
+    "bin": fetchStrokeJSONFromBinary
   transform = (mat2d, x, y) ->
     vec = glMatrix.vec2.clone [x, y]
     mat = glMatrix.mat2d.clone mat2d
@@ -272,7 +269,7 @@ do ->
     }
   StrokeData =
     source: (val) ->
-      source = val if val is "json" or val is "xml" or val is "raw"
+      source = val if val is "json" or val is "xml" or val is "bin"
     # _ will do this better
     transform: (strokes, mat2d) ->
       ret = []

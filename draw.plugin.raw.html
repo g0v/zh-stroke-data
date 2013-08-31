@@ -31,14 +31,14 @@
             $word = $("#word");
             $holder = $("#holder");
             $word.change(function() {
-              options.source = "raw";
+              options.source = "bin";
               $holder.strokeWords($word.val(), options);
               $holder.append("<br/>");
               options.source = "json";
               $holder.strokeWords($word.val(), options);
               $holder.append("<hr/>");
             });
-            options.source = "raw";
+            options.source = "bin";
             $holder.strokeWords($word.val(), options);
             $holder.append("<br/>");
             options.source = "json";
@@ -48,7 +48,7 @@
         </script>
     </head>
     <body>
-        <input type="text" id="word" value="𪜶𠊎󿌇"/>
+        <input type="text" id="word" value="原地重建"/>
         <div id="holder"></div>
         <p id="copyright">常用國字標準字體筆劃</p>
     </body>

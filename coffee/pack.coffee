@@ -23,6 +23,7 @@ process.argv.forEach (packed, index) ->
     results[i] = []
     if fs.existsSync path
       strokes = require path
+      results[i].push strokes.length
       strokes.forEach (stroke) ->
         throw "outline length out of range: #{stroke.outline.length}" if stroke.outline.length >= 256
         types = []
