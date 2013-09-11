@@ -1,5 +1,6 @@
 (function() {
-  var fs, hexFromNumber, push, scale, scale_factor;
+  var fs, hexFromNumber, push, scale, scale_factor,
+    __hasProp = {}.hasOwnProperty;
 
   fs = require("fs");
 
@@ -25,18 +26,20 @@
   };
 
   process.argv.forEach(function(packed, index) {
-    var i, offset, offsets, offsetsBuffer, path, prev, results, strokes, _i;
+    var buffer, cp, i, key, offset, offsets, offsetsBuffer, path, prev, result, results, stroke_count, strokes, _i, _results;
     if (index === 0 || index === 1) {
       return;
     }
-    offsets = [];
-    results = [];
-    for (i = _i = 0; _i <= 255; i = ++_i) {
+    stroke_count = 0;
+    offsets = {};
+    results = {};
+    for (i = _i = 0; 0 <= 0x0fff ? _i <= 0x0fff : _i >= 0x0fff; i = 0 <= 0x0fff ? ++_i : --_i) {
       strokes = void 0;
-      path = "./json/" + packed + (hexFromNumber(i)) + ".json";
-      offsets[i] = 0;
-      results[i] = [];
+      cp = (i << 8) + parseInt(packed, 16);
+      path = "./json/" + (cp.toString(16)) + ".json";
       if (fs.existsSync(path)) {
+        stroke_count += 1;
+        results[i] = [];
         strokes = require(path);
         results[i].push(strokes.length);
         strokes.forEach(function(stroke) {
@@ -106,27 +109,31 @@
         });
       }
     }
-    prev = 256 * 4;
-    for (i in offsets) {
-      if (offsets[i] !== 0) {
-        offset = offsets[i];
-        offsets[i] = prev;
-        prev += offset;
-      }
+    i = 0;
+    prev = 2 + stroke_count * 6;
+    offsetsBuffer = new Buffer(prev);
+    offsetsBuffer.writeUInt16LE(stroke_count, 0);
+    for (key in offsets) {
+      if (!__hasProp.call(offsets, key)) continue;
+      offset = offsets[key];
+      offsets[key] = prev;
+      offsetsBuffer.writeUInt16LE(key, 2 + i * 6);
+      offsetsBuffer.writeUInt32LE(prev, 2 + i * 6 + 2);
+      prev += offset;
+      i += 1;
     }
-    offsetsBuffer = new Buffer(256 * 4);
-    offsets.forEach(function(offset, i) {
-      return offsetsBuffer.writeUInt32LE(offset, i * 4);
-    });
     process.stdout.write(offsetsBuffer);
-    return results.forEach(function(result) {
-      var buffer;
+    _results = [];
+    for (i in results) {
+      if (!__hasProp.call(results, i)) continue;
+      result = results[i];
       buffer = new Buffer(result);
       if (buffer.length !== result.length) {
         throw "buffer is not a pure uint8 buffer";
       }
-      return process.stdout.write(new Buffer(result));
-    });
+      _results.push(process.stdout.write(new Buffer(result)));
+    }
+    return _results;
   });
 
 }).call(this);

@@ -179,29 +179,36 @@
   fetchStrokeJSONFromBinary = function(path, success, fail, progress) {
     var file_id, packed_path;
     if (root.window) {
-      packed_path = "" + (path.substr(0, path.length - 6)) + ".bin";
-      file_id = parseInt(path.substr(path.length - 6, 2), 16);
+      packed_path = "" + (path.substr(0, 6)) + (path.substr(path.length - 6, 2)) + ".bin";
+      file_id = parseInt(path.substr(6, path.length - 12), 16);
       return getBinary(packed_path, function(data) {
-        var cmd, cmd_len, data_view, index, node, offset, outline, p, ret, scale, size_indices, size_len, strokes_len, track, track_len, _i, _j, _k, _l, _len, _len1, _len2, _len3, _m, _n, _o, _p;
+        var cmd, cmd_len, data_view, i, id, index, node, offset, outline, p, ret, scale, size_indices, size_len, stroke_count, strokes_len, track, track_len, _i, _j, _k, _l, _len, _len1, _len2, _len3, _m, _n, _o, _p, _q;
         scale = 2060.0 / 256;
         data_view = new DataView(data);
-        offset = data_view.getUint32(file_id * 4, true);
-        if (offset === 0) {
+        stroke_count = data_view.getUint16(0, true);
+        for (i = _i = 0; 0 <= stroke_count ? _i < stroke_count : _i > stroke_count; i = 0 <= stroke_count ? ++_i : --_i) {
+          id = data_view.getUint16(2 + i * 6, true);
+          if (id === file_id) {
+            offset = data_view.getUint32(2 + i * 6 + 2, true);
+            break;
+          }
+        }
+        if (i === stroke_count) {
           return typeof fail === "function" ? fail(new Error("stroke not found")) : void 0;
         }
         p = 0;
         ret = [];
         strokes_len = data_view.getUint8(offset + p++);
-        for (_i = 0; 0 <= strokes_len ? _i < strokes_len : _i > strokes_len; 0 <= strokes_len ? _i++ : _i--) {
+        for (_j = 0; 0 <= strokes_len ? _j < strokes_len : _j > strokes_len; 0 <= strokes_len ? _j++ : _j--) {
           outline = [];
           cmd_len = data_view.getUint8(offset + p++);
-          for (_j = 0; 0 <= cmd_len ? _j < cmd_len : _j > cmd_len; 0 <= cmd_len ? _j++ : _j--) {
+          for (_k = 0; 0 <= cmd_len ? _k < cmd_len : _k > cmd_len; 0 <= cmd_len ? _k++ : _k--) {
             outline.push({
               type: String.fromCharCode(data_view.getUint8(offset + p++))
             });
           }
-          for (_k = 0, _len = outline.length; _k < _len; _k++) {
-            cmd = outline[_k];
+          for (_l = 0, _len = outline.length; _l < _len; _l++) {
+            cmd = outline[_l];
             switch (cmd.type) {
               case "M":
                 cmd.x = scale * data_view.getUint8(offset + p++);
@@ -229,8 +236,8 @@
                 };
             }
           }
-          for (_l = 0, _len1 = outline.length; _l < _len1; _l++) {
-            cmd = outline[_l];
+          for (_m = 0, _len1 = outline.length; _m < _len1; _m++) {
+            cmd = outline[_m];
             switch (cmd.type) {
               case "M":
                 cmd.y = scale * data_view.getUint8(offset + p++);
@@ -252,20 +259,20 @@
           track_len = data_view.getUint8(offset + p++);
           size_indices = [];
           size_len = data_view.getUint8(offset + p++);
-          for (_m = 0; 0 <= size_len ? _m < size_len : _m > size_len; 0 <= size_len ? _m++ : _m--) {
+          for (_n = 0; 0 <= size_len ? _n < size_len : _n > size_len; 0 <= size_len ? _n++ : _n--) {
             size_indices.push(data_view.getUint8(offset + p++));
           }
-          for (_n = 0; 0 <= track_len ? _n < track_len : _n > track_len; 0 <= track_len ? _n++ : _n--) {
+          for (_o = 0; 0 <= track_len ? _o < track_len : _o > track_len; 0 <= track_len ? _o++ : _o--) {
             track.push({
               x: scale * data_view.getUint8(offset + p++)
             });
           }
-          for (_o = 0, _len2 = track.length; _o < _len2; _o++) {
-            node = track[_o];
+          for (_p = 0, _len2 = track.length; _p < _len2; _p++) {
+            node = track[_p];
             node.y = scale * data_view.getUint8(offset + p++);
           }
-          for (_p = 0, _len3 = size_indices.length; _p < _len3; _p++) {
-            index = size_indices[_p];
+          for (_q = 0, _len3 = size_indices.length; _q < _len3; _q++) {
+            index = size_indices[_q];
             track[index].size = scale * data_view.getUint8(offset + p++);
           }
           ret.push({

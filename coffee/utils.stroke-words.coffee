@@ -138,19 +138,24 @@ getBinary = (path, success, fail, progress) ->
 
 fetchStrokeJSONFromBinary = (path, success, fail, progress) ->
   if root.window
-    packed_path = "#{path.substr(0, path.length - 6)}.bin"
-    file_id = parseInt path.substr(path.length - 6, 2), 16
+    packed_path = "#{path.substr(0, 6)}#{path.substr(path.length - 6, 2)}.bin"
+    file_id = parseInt path.substr(6, path.length - 12), 16
     getBinary(
       packed_path,
       (data) ->
         scale = 2060.0 / 256 # hard coded DDDDD:
         data_view = new DataView data
-        offset = data_view.getUint32 file_id * 4, true
-        return fail? new Error "stroke not found" if offset is 0
+        stroke_count = data_view.getUint16 0, true
+        for i in [0...stroke_count]
+          id = data_view.getUint16 2 + i * 6, true
+          if id is file_id
+            offset = data_view.getUint32 2 + i * 6 + 2, true
+            break
+        return fail? new Error "stroke not found" if i is stroke_count
         p = 0
         ret = []
         strokes_len = data_view.getUint8 offset + p++
-        for [0...strokes_len] 
+        for [0...strokes_len]
           outline = []
           cmd_len = data_view.getUint8 offset + p++
           for [0...cmd_len]

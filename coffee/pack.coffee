@@ -14,14 +14,16 @@ hexFromNumber = (num) ->
 
 process.argv.forEach (packed, index) ->
   return if index is 0 or index is 1
-  offsets = []
-  results = []
-  for i in [0..255]
+  stroke_count = 0
+  offsets = {}
+  results = {}
+  for i in [0..0x0fff]
     strokes = undefined
-    path = "./json/#{packed}#{hexFromNumber(i)}.json"
-    offsets[i] = 0
-    results[i] = []
+    cp = (i << 8) + parseInt(packed, 16)
+    path = "./json/#{cp.toString(16)}.json"
     if fs.existsSync path
+      stroke_count += 1
+      results[i] = []
       strokes = require path
       results[i].push strokes.length
       strokes.forEach (stroke) ->
@@ -80,17 +82,20 @@ process.argv.forEach (packed, index) ->
         push.apply results[i], ss
         # save size of each word
         offsets[i] = results[i].length
-  prev = 256 * 4
-  for i of offsets
-    if offsets[i] isnt 0
-      offset = offsets[i]
-      offsets[i] = prev
-      prev += offset
-  offsetsBuffer = new Buffer 256 * 4
-  offsets.forEach (offset, i) ->
-    offsetsBuffer.writeUInt32LE offset, i * 4
+  i = 0
+  prev = 2 + stroke_count * 6
+  offsetsBuffer = new Buffer prev
+  offsetsBuffer.writeUInt16LE stroke_count, 0
+  for own key of offsets
+    offset = offsets[key]
+    offsets[key] = prev
+    offsetsBuffer.writeUInt16LE key, 2 + i * 6
+    offsetsBuffer.writeUInt32LE prev, 2 + i * 6 + 2
+    prev += offset
+    i += 1
   process.stdout.write offsetsBuffer
-  results.forEach (result) ->
+  for own i of results
+    result = results[i]
     buffer = new Buffer result
     throw "buffer is not a pure uint8 buffer" if buffer.length isnt result.length
     process.stdout.write new Buffer result
