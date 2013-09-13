@@ -19,7 +19,8 @@
           word: 0.5
         },
         progress: null,
-        source: "json"
+        url: "./",
+        dataType: "json"
       }, options, internalOptions);
       this.matrix = [this.options.scales.fill, 0, 0, this.options.scales.fill, 0, 0];
       this.myCanvas = document.createElement("canvas");
@@ -185,15 +186,19 @@
       return _results;
     };
     drawElementWithWord = function(element, word, options) {
-      var $loader, $word, promise, stroker;
+      var $loader, $word, data, promise, stroker;
+      options || (options = {});
       promise = jQuery.Deferred();
       stroker = new Word(options);
       $word = $("<div class=\"word\"></div>");
       $loader = $("<div class=\"loader\"><div style=\"width: 0\"></div><i class=\"icon-spinner icon-spin icon-large icon-fixed-width\"></i></div>");
       $word.append(stroker.canvas).append($loader);
       $(element).append($word);
-      WordStroker.utils.StrokeData.source(options.source);
-      WordStroker.utils.StrokeData.get(word.cp, function(json) {
+      data = WordStroker.utils.StrokeData({
+        url: options.url,
+        dataType: options.dataType
+      });
+      data.get(word.cp, function(json) {
         $loader.remove();
         return promise.resolve({
           drawBackground: function() {

@@ -241,107 +241,97 @@ sortSurrogates = (str) ->
       str = str.substr(1)                       # clip one from string 
   cps
 
-do ->
-  buffer = {}
-  source = "json" # "xml", "json" or "raw"
-  # for moedict-webkit
-  if window.isCordova
-    dirs =
-      "xml":  "http://stroke.moedict.tw/"
-      "json": "http://stroke-json.moedict.tw/"
-      "bin":  "http://stroke-bin.moedict.tw/"
-  else
-    dirs =
-      "xml":  "./utf8/"
-      "json": "./json/"
-      "bin":  "./bin/"
-  exts =
-    "xml": ".xml"
-    "json": ".json"
-    "bin": ".bin"
+transform = (mat2d, x, y) ->
+  vec = glMatrix.vec2.clone [x, y]
+  mat = glMatrix.mat2d.clone mat2d
+  out = glMatrix.vec2.create()
+  glMatrix.vec2.transformMat2d out, vec, mat
+  {
+    x: out[0]
+    y: out[1]
+  }
+
+transformWithMatrix = (strokes, mat2d) ->
+  ret = []
+  for stroke in strokes
+    new_stroke =
+      outline: []
+      track: []
+    for cmd in stroke.outline
+      switch cmd.type
+        when "M"
+          out = transform mat2d, cmd.x, cmd.y
+          new_stroke.outline.push
+            type: cmd.type
+            x: out.x
+            y: out.y
+        when "L"
+          out = transform mat2d, cmd.x, cmd.y
+          new_stroke.outline.push
+            type: cmd.type
+            x: out.x
+            y: out.y
+        when "C"
+          new_cmd =
+            type: cmd.type
+          out = transform mat2d, cmd.begin.x, cmd.begin.y
+          new_cmd.begin =
+            x: out.x
+            y: out.y
+          out = transform mat2d, cmd.mid.x, cmd.mid.y
+          new_cmd.mid =
+            x: out.x
+            y: out.y
+          out = transform mat2d, cmd.end.x, cmd.end.y
+          new_cmd.end =
+            x: out.x
+            y: out.y
+          new_stroke.outline.push new_cmd
+        when "Q"
+          new_cmd =
+            type: cmd.type
+          out = transform mat2d, cmd.begin.x, cmd.begin.y
+          new_cmd.begin =
+            x: out.x
+            y: out.y
+          out = transform mat2d, cmd.end.x, cmd.end.y
+          new_cmd.end =
+            x: out.x
+            y: out.y
+          new_stroke.outline.push new_cmd
+    for v in stroke.track
+      out = transform mat2d, v.x, v.y
+      new_stroke.track.push
+        x: out.x
+        y: out.y
+    ret.push new_stroke
+  ret
+
+StrokeData = (options) ->
   fetchers =
     "xml": fetchStrokeJSONFromXml
     "json": fetchStrokeJSON
     "bin": fetchStrokeJSONFromBinary
-  transform = (mat2d, x, y) ->
-    vec = glMatrix.vec2.clone [x, y]
-    mat = glMatrix.mat2d.clone mat2d
-    out = glMatrix.vec2.create()
-    glMatrix.vec2.transformMat2d out, vec, mat
-    {
-      x: out[0]
-      y: out[1]
-    }
-  StrokeData =
-    source: (val) ->
-      source = val if val is "json" or val is "xml" or val is "bin"
+
+  options = $.extend(
+    url: "./json/"
+    dataType: "json"
+  , options)
+
+  buffer = {}
+
+  ret =
     # _ will do this better
-    transform: (strokes, mat2d) ->
-      ret = []
-      for stroke in strokes
-        new_stroke =
-          outline: []
-          track: []
-        for cmd in stroke.outline
-          switch cmd.type
-            when "M"
-              out = transform mat2d, cmd.x, cmd.y
-              new_stroke.outline.push
-                type: cmd.type
-                x: out.x
-                y: out.y
-            when "L"
-              out = transform mat2d, cmd.x, cmd.y
-              new_stroke.outline.push
-                type: cmd.type
-                x: out.x
-                y: out.y
-            when "C"
-              new_cmd =
-                type: cmd.type
-              out = transform mat2d, cmd.begin.x, cmd.begin.y
-              new_cmd.begin =
-                x: out.x
-                y: out.y
-              out = transform mat2d, cmd.mid.x, cmd.mid.y
-              new_cmd.mid =
-                x: out.x
-                y: out.y
-              out = transform mat2d, cmd.end.x, cmd.end.y
-              new_cmd.end =
-                x: out.x
-                y: out.y
-              new_stroke.outline.push new_cmd
-            when "Q"
-              new_cmd =
-                type: cmd.type
-              out = transform mat2d, cmd.begin.x, cmd.begin.y
-              new_cmd.begin =
-                x: out.x
-                y: out.y
-              out = transform mat2d, cmd.end.x, cmd.end.y
-              new_cmd.end =
-                x: out.x
-                y: out.y
-              new_stroke.outline.push new_cmd
-        for v in stroke.track
-          out = transform mat2d, v.x, v.y
-          new_stroke.track.push
-            x: out.x
-            y: out.y
-        ret.push new_stroke
-      ret
+    #        ^
+    #        |
+    # oops, I dont remember what it means
+    transform: transformWithMatrix
     get: (cp, success, fail, progress) ->
       if not buffer[cp]
-        fetchers[source](
-          dirs[source] + cp + exts[source],
-          # success
-          (json) ->
-            buffer[cp] = json
-            success? json
-          # fail
-          (err) ->
-            fail? err
+        fetchers[options.dataType](
+          "#{options.url}#{cp}.#{options.dataType}"
+          (json) -> success? buffer[cp] = json
+          (err) -> fail? err
           progress
         )
       else

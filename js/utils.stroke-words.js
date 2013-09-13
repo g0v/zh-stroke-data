@@ -1,5 +1,5 @@
 (function() {
-  var StrokeData, WordStroker, fetchStrokeJSON, fetchStrokeJSONFromBinary, fetchStrokeJSONFromXml, fetchStrokeXml, forEach, getBinary, glMatrix, jsonFromXml, root, sax, sortSurrogates;
+  var StrokeData, WordStroker, fetchStrokeJSON, fetchStrokeJSONFromBinary, fetchStrokeJSONFromXml, fetchStrokeXml, forEach, getBinary, glMatrix, jsonFromXml, root, sax, sortSurrogates, transform, transformWithMatrix;
 
   root = this;
 
@@ -314,135 +314,117 @@
     return cps;
   };
 
-  (function() {
-    var buffer, dirs, exts, fetchers, source, transform;
-    buffer = {};
-    source = "json";
-    if (window.isCordova) {
-      dirs = {
-        "xml": "http://stroke.moedict.tw/",
-        "json": "http://stroke-json.moedict.tw/",
-        "bin": "http://stroke-bin.moedict.tw/"
-      };
-    } else {
-      dirs = {
-        "xml": "./utf8/",
-        "json": "./json/",
-        "bin": "./bin/"
-      };
-    }
-    exts = {
-      "xml": ".xml",
-      "json": ".json",
-      "bin": ".bin"
+  transform = function(mat2d, x, y) {
+    var mat, out, vec;
+    vec = glMatrix.vec2.clone([x, y]);
+    mat = glMatrix.mat2d.clone(mat2d);
+    out = glMatrix.vec2.create();
+    glMatrix.vec2.transformMat2d(out, vec, mat);
+    return {
+      x: out[0],
+      y: out[1]
     };
+  };
+
+  transformWithMatrix = function(strokes, mat2d) {
+    var cmd, new_cmd, new_stroke, out, ret, stroke, v, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
+    ret = [];
+    for (_i = 0, _len = strokes.length; _i < _len; _i++) {
+      stroke = strokes[_i];
+      new_stroke = {
+        outline: [],
+        track: []
+      };
+      _ref = stroke.outline;
+      for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+        cmd = _ref[_j];
+        switch (cmd.type) {
+          case "M":
+            out = transform(mat2d, cmd.x, cmd.y);
+            new_stroke.outline.push({
+              type: cmd.type,
+              x: out.x,
+              y: out.y
+            });
+            break;
+          case "L":
+            out = transform(mat2d, cmd.x, cmd.y);
+            new_stroke.outline.push({
+              type: cmd.type,
+              x: out.x,
+              y: out.y
+            });
+            break;
+          case "C":
+            new_cmd = {
+              type: cmd.type
+            };
+            out = transform(mat2d, cmd.begin.x, cmd.begin.y);
+            new_cmd.begin = {
+              x: out.x,
+              y: out.y
+            };
+            out = transform(mat2d, cmd.mid.x, cmd.mid.y);
+            new_cmd.mid = {
+              x: out.x,
+              y: out.y
+            };
+            out = transform(mat2d, cmd.end.x, cmd.end.y);
+            new_cmd.end = {
+              x: out.x,
+              y: out.y
+            };
+            new_stroke.outline.push(new_cmd);
+            break;
+          case "Q":
+            new_cmd = {
+              type: cmd.type
+            };
+            out = transform(mat2d, cmd.begin.x, cmd.begin.y);
+            new_cmd.begin = {
+              x: out.x,
+              y: out.y
+            };
+            out = transform(mat2d, cmd.end.x, cmd.end.y);
+            new_cmd.end = {
+              x: out.x,
+              y: out.y
+            };
+            new_stroke.outline.push(new_cmd);
+        }
+      }
+      _ref1 = stroke.track;
+      for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
+        v = _ref1[_k];
+        out = transform(mat2d, v.x, v.y);
+        new_stroke.track.push({
+          x: out.x,
+          y: out.y
+        });
+      }
+      ret.push(new_stroke);
+    }
+    return ret;
+  };
+
+  StrokeData = function(options) {
+    var buffer, fetchers, ret;
     fetchers = {
       "xml": fetchStrokeJSONFromXml,
       "json": fetchStrokeJSON,
       "bin": fetchStrokeJSONFromBinary
     };
-    transform = function(mat2d, x, y) {
-      var mat, out, vec;
-      vec = glMatrix.vec2.clone([x, y]);
-      mat = glMatrix.mat2d.clone(mat2d);
-      out = glMatrix.vec2.create();
-      glMatrix.vec2.transformMat2d(out, vec, mat);
-      return {
-        x: out[0],
-        y: out[1]
-      };
-    };
-    return StrokeData = {
-      source: function(val) {
-        if (val === "json" || val === "xml" || val === "bin") {
-          return source = val;
-        }
-      },
-      transform: function(strokes, mat2d) {
-        var cmd, new_cmd, new_stroke, out, ret, stroke, v, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
-        ret = [];
-        for (_i = 0, _len = strokes.length; _i < _len; _i++) {
-          stroke = strokes[_i];
-          new_stroke = {
-            outline: [],
-            track: []
-          };
-          _ref = stroke.outline;
-          for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
-            cmd = _ref[_j];
-            switch (cmd.type) {
-              case "M":
-                out = transform(mat2d, cmd.x, cmd.y);
-                new_stroke.outline.push({
-                  type: cmd.type,
-                  x: out.x,
-                  y: out.y
-                });
-                break;
-              case "L":
-                out = transform(mat2d, cmd.x, cmd.y);
-                new_stroke.outline.push({
-                  type: cmd.type,
-                  x: out.x,
-                  y: out.y
-                });
-                break;
-              case "C":
-                new_cmd = {
-                  type: cmd.type
-                };
-                out = transform(mat2d, cmd.begin.x, cmd.begin.y);
-                new_cmd.begin = {
-                  x: out.x,
-                  y: out.y
-                };
-                out = transform(mat2d, cmd.mid.x, cmd.mid.y);
-                new_cmd.mid = {
-                  x: out.x,
-                  y: out.y
-                };
-                out = transform(mat2d, cmd.end.x, cmd.end.y);
-                new_cmd.end = {
-                  x: out.x,
-                  y: out.y
-                };
-                new_stroke.outline.push(new_cmd);
-                break;
-              case "Q":
-                new_cmd = {
-                  type: cmd.type
-                };
-                out = transform(mat2d, cmd.begin.x, cmd.begin.y);
-                new_cmd.begin = {
-                  x: out.x,
-                  y: out.y
-                };
-                out = transform(mat2d, cmd.end.x, cmd.end.y);
-                new_cmd.end = {
-                  x: out.x,
-                  y: out.y
-                };
-                new_stroke.outline.push(new_cmd);
-            }
-          }
-          _ref1 = stroke.track;
-          for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
-            v = _ref1[_k];
-            out = transform(mat2d, v.x, v.y);
-            new_stroke.track.push({
-              x: out.x,
-              y: out.y
-            });
-          }
-          ret.push(new_stroke);
-        }
-        return ret;
-      },
+    options = $.extend({
+      url: "./json/",
+      dataType: "json"
+    }, options);
+    buffer = {};
+    return ret = {
+      transform: transformWithMatrix,
       get: function(cp, success, fail, progress) {
         if (!buffer[cp]) {
-          return fetchers[source](dirs[source] + cp + exts[source], function(json) {
-            buffer[cp] = json;
-            return typeof success === "function" ? success(json) : void 0;
+          return fetchers[options.dataType]("" + options.url + cp + "." + options.dataType, function(json) {
+            return typeof success === "function" ? success(buffer[cp] = json) : void 0;
           }, function(err) {
             return typeof fail === "function" ? fail(err) : void 0;
           }, progress);
@@ -451,7 +433,7 @@
         }
       }
     };
-  })();
+  };
 
   if (root.window) {
     window.WordStroker || (window.WordStroker = {});

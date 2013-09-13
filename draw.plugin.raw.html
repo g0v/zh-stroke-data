@@ -31,17 +31,21 @@
             $word = $("#word");
             $holder = $("#holder");
             $word.change(function() {
-              options.source = "bin";
+              options.url = "./bin/";
+              options.dataType = "bin";
               $holder.strokeWords($word.val(), options);
               $holder.append("<br/>");
-              options.source = "json";
+              options.url = "./json/";
+              options.dataType = "json";
               $holder.strokeWords($word.val(), options);
               $holder.append("<hr/>");
             });
-            options.source = "bin";
+            options.url = "./bin/";
+            options.dataType = "bin";
             $holder.strokeWords($word.val(), options);
             $holder.append("<br/>");
-            options.source = "json";
+            options.url = "./json/";
+            options.dataType = "json";
             $holder.strokeWords($word.val(), options);
             $holder.append("<hr/>");
           });
