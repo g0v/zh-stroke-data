@@ -136,83 +136,92 @@ getBinary = (path, success, fail, progress) ->
         fail? @status
   xhr.send()
 
+jsonFromBinary = (data, file_id, success, fail) ->
+  scale = 2060.0 / 256 # hard coded DDDDD:
+  data_view = new DataView data
+  stroke_count = data_view.getUint16 0, true
+  for i in [0...stroke_count]
+    id = data_view.getUint16 2 + i * 6, true
+    if id is file_id
+      offset = data_view.getUint32 2 + i * 6 + 2, true
+      break
+  return fail? new Error "stroke not found" if i is stroke_count
+  p = 0
+  ret = []
+  strokes_len = data_view.getUint8 offset + p++
+  for [0...strokes_len]
+    outline = []
+    cmd_len = data_view.getUint8 offset + p++
+    for [0...cmd_len]
+      outline.push
+        type: String.fromCharCode data_view.getUint8 offset + p++
+    for cmd in outline
+      switch cmd.type
+        when "M"
+          cmd.x = scale * data_view.getUint8 offset + p++
+        when "L"
+          cmd.x = scale * data_view.getUint8 offset + p++
+        when "Q"
+          cmd.begin =
+            x: scale * data_view.getUint8 offset + p++
+          cmd.end =
+            x: scale * data_view.getUint8 offset + p++
+        when "C"
+          cmd.begin =
+            x: scale * data_view.getUint8 offset + p++
+          cmd.mid =
+            x: scale * data_view.getUint8 offset + p++
+          cmd.end =
+            x: scale * data_view.getUint8 offset + p++
+    for cmd in outline
+      switch cmd.type
+        when "M"
+          cmd.y = scale * data_view.getUint8 offset + p++
+        when "L"
+          cmd.y = scale * data_view.getUint8 offset + p++
+        when "Q"
+          cmd.begin.y = scale * data_view.getUint8 offset + p++
+          cmd.end.y = scale * data_view.getUint8 offset + p++
+        when "C"
+          cmd.begin.y = scale * data_view.getUint8 offset + p++
+          cmd.mid.y = scale * data_view.getUint8 offset + p++
+          cmd.end.y = scale * data_view.getUint8 offset + p++
+    track = []
+    track_len = data_view.getUint8 offset + p++
+    size_indices = []
+    size_len = data_view.getUint8 offset + p++
+    for [0...size_len]
+      size_indices.push data_view.getUint8 offset + p++
+    for [0...track_len]
+      track.push
+        x: scale * data_view.getUint8 offset + p++
+    for node in track
+      node.y = scale * data_view.getUint8 offset + p++
+    for index in size_indices
+      track[index].size = scale * data_view.getUint8 offset + p++
+    ret.push
+      outline: outline
+      track: track
+  success? ret
+
+buffer_binary = {}
+
 fetchStrokeJSONFromBinary = (path, success, fail, progress) ->
   if root.window
-    packed_path = "#{path.substr(0, 6)}#{path.substr(path.length - 6, 2)}.bin"
+    packed = path.substr(path.length - 6, 2)
+    packed_path = "#{path.substr(0, 6)}#{packed}.bin"
     file_id = parseInt path.substr(6, path.length - 12), 16
-    getBinary(
-      packed_path,
-      (data) ->
-        scale = 2060.0 / 256 # hard coded DDDDD:
-        data_view = new DataView data
-        stroke_count = data_view.getUint16 0, true
-        for i in [0...stroke_count]
-          id = data_view.getUint16 2 + i * 6, true
-          if id is file_id
-            offset = data_view.getUint32 2 + i * 6 + 2, true
-            break
-        return fail? new Error "stroke not found" if i is stroke_count
-        p = 0
-        ret = []
-        strokes_len = data_view.getUint8 offset + p++
-        for [0...strokes_len]
-          outline = []
-          cmd_len = data_view.getUint8 offset + p++
-          for [0...cmd_len]
-            outline.push
-              type: String.fromCharCode data_view.getUint8 offset + p++
-          for cmd in outline
-            switch cmd.type
-              when "M"
-                cmd.x = scale * data_view.getUint8 offset + p++
-              when "L"
-                cmd.x = scale * data_view.getUint8 offset + p++
-              when "Q"
-                cmd.begin =
-                  x: scale * data_view.getUint8 offset + p++
-                cmd.end =
-                  x: scale * data_view.getUint8 offset + p++
-              when "C"
-                cmd.begin =
-                  x: scale * data_view.getUint8 offset + p++
-                cmd.mid =
-                  x: scale * data_view.getUint8 offset + p++
-                cmd.end =
-                  x: scale * data_view.getUint8 offset + p++
-          for cmd in outline
-            switch cmd.type
-              when "M"
-                cmd.y = scale * data_view.getUint8 offset + p++
-              when "L"
-                cmd.y = scale * data_view.getUint8 offset + p++
-              when "Q"
-                cmd.begin.y = scale * data_view.getUint8 offset + p++
-                cmd.end.y = scale * data_view.getUint8 offset + p++
-              when "C"
-                cmd.begin.y = scale * data_view.getUint8 offset + p++
-                cmd.mid.y = scale * data_view.getUint8 offset + p++
-                cmd.end.y = scale * data_view.getUint8 offset + p++
-          track = []
-          track_len = data_view.getUint8 offset + p++
-          size_indices = []
-          size_len = data_view.getUint8 offset + p++
-          for [0...size_len]
-            size_indices.push data_view.getUint8 offset + p++
-          for [0...track_len]
-            track.push
-              x: scale * data_view.getUint8 offset + p++
-          for node in track
-            node.y = scale * data_view.getUint8 offset + p++
-          for index in size_indices
-            track[index].size = scale * data_view.getUint8 offset + p++
-          ret.push
-            outline: outline
-            track: track
-        success? ret
-      ,
-      fail,
-      progress
-    )
+    if not buffer_binary[packed]
+      getBinary(
+        packed_path,
+        (data) ->
+          buffer_binary[packed] = data
+          jsonFromBinary(data, file_id, success, fail)
+        fail,
+        progress
+      )
+    else
+      jsonFromBinary(buffer_binary[packed], file_id, success, fail)
   else
     console.log "not implement"
 
@@ -307,18 +316,19 @@ transformWithMatrix = (strokes, mat2d) ->
     ret.push new_stroke
   ret
 
-StrokeData = (options) ->
-  fetchers =
-    "xml": fetchStrokeJSONFromXml
-    "json": fetchStrokeJSON
-    "bin": fetchStrokeJSONFromBinary
+fetchers =
+  "xml": fetchStrokeJSONFromXml
+  "json": fetchStrokeJSON
+  "bin": fetchStrokeJSONFromBinary
 
+# now cache globally
+buffer = {}
+
+StrokeData = (options) ->
   options = $.extend(
     url: "./json/"
     dataType: "json"
   , options)
-
-  buffer = {}
 
   ret =
     # _ will do this better

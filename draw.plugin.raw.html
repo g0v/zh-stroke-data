@@ -33,26 +33,34 @@
             $word.change(function() {
               options.url = "./bin/";
               options.dataType = "bin";
+              options.sequential = true;
               $holder.strokeWords($word.val(), options);
+              /*
               $holder.append("<br/>");
               options.url = "./json/";
               options.dataType = "json";
+              options.sequential = false;
               $holder.strokeWords($word.val(), options);
               $holder.append("<hr/>");
+              */
             });
             options.url = "./bin/";
             options.dataType = "bin";
+            options.sequential = true;
             $holder.strokeWords($word.val(), options);
+            /*
             $holder.append("<br/>");
             options.url = "./json/";
             options.dataType = "json";
+            options.sequential = false;
             $holder.strokeWords($word.val(), options);
             $holder.append("<hr/>");
+            */
           });
         </script>
     </head>
     <body>
-        <input type="text" id="word" value="原地重建"/>
+        <input type="text" id="word" value="一來照顧郎中，二來又醫得眼好"/>
         <div id="holder"></div>
         <p id="copyright">常用國字標準字體筆劃</p>
     </body>

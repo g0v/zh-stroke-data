@@ -186,9 +186,8 @@
       return _results;
     };
     drawElementWithWord = function(element, word, options) {
-      var $loader, $word, data, promise, stroker;
+      var $loader, $word, data, stroker;
       options || (options = {});
-      promise = jQuery.Deferred();
       stroker = new Word(options);
       $word = $("<div class=\"word\"></div>");
       $loader = $("<div class=\"loader\"><div style=\"width: 0\"></div><i class=\"icon-spinner icon-spin icon-large icon-fixed-width\"></i></div>");
@@ -198,44 +197,50 @@
         url: options.url,
         dataType: options.dataType
       });
-      data.get(word.cp, function(json) {
-        $loader.remove();
-        return promise.resolve({
-          drawBackground: function() {
-            return stroker.drawBackground();
-          },
-          draw: function() {
-            return stroker.draw(json);
-          },
-          remove: function() {
-            return $(stroker.canvas).remove();
-          }
-        });
-      }, function() {
-        $loader.remove();
-        return promise.resolve({
-          drawBackground: function() {
-            return stroker.drawBackground();
-          },
-          draw: function() {
-            var p;
-            p = jQuery.Deferred();
-            $(stroker.canvas).fadeTo("fast", 0.5, function() {
-              return p.resolve();
+      return {
+        load: function() {
+          var promise;
+          promise = jQuery.Deferred();
+          data.get(word.cp, function(json) {
+            $loader.remove();
+            return promise.resolve({
+              drawBackground: function() {
+                return stroker.drawBackground();
+              },
+              draw: function() {
+                return stroker.draw(json);
+              },
+              remove: function() {
+                return $(stroker.canvas).remove();
+              }
             });
-            return p;
-          },
-          remove: function() {
-            return $(stroker.canvas).remove();
-          }
-        });
-      }, function(e) {
-        if (e.lengthComputable) {
-          $loader.find("> div").css("width", e.loaded / e.total * 100 + "%");
+          }, function() {
+            $loader.remove();
+            return promise.resolve({
+              drawBackground: function() {
+                return stroker.drawBackground();
+              },
+              draw: function() {
+                var p;
+                p = jQuery.Deferred();
+                $(stroker.canvas).fadeTo("fast", 0.5, function() {
+                  return p.resolve();
+                });
+                return p;
+              },
+              remove: function() {
+                return $(stroker.canvas).remove();
+              }
+            });
+          }, function(e) {
+            if (e.lengthComputable) {
+              $loader.find("> div").css("width", e.loaded / e.total * 100 + "%");
+            }
+            return promise.notifyWith(e, [e, word.text]);
+          });
+          return promise;
         }
-        return promise.notifyWith(e, [e, word.text]);
-      });
-      return promise;
+      };
     };
     drawElementWithWords = function(element, words, options) {
       return WordStroker.utils.sortSurrogates(words).map(function(word) {

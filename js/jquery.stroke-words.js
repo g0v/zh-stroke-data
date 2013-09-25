@@ -15,39 +15,54 @@
       }
       options = $.extend({
         single: false,
+        sequential: false,
         svg: !isCanvasSupported(),
         progress: null
       }, options);
       return this.each(function() {
-        var promises;
+        var loaders, promises;
         if (options.svg) {
           return window.WordStroker.raphael.strokeWords(this, words);
         } else {
-          promises = window.WordStroker.canvas.drawElementWithWords(this, words, options);
-          if (!options.single) {
-            promises.forEach(function(p) {
-              return p.progress(options.progress).then(function(word) {
-                return word.drawBackground();
-              });
+          loaders = window.WordStroker.canvas.drawElementWithWords(this, words, options);
+          if (!options.sequential) {
+            promises = loaders.map(function(loader) {
+              return loader.load().progress(options.progress);
             });
-            return promises.reduceRight(function(next, current) {
-              return function() {
-                return current.then(function(word) {
-                  return word.draw().then(next);
+            if (!options.single) {
+              promises.forEach(function(p) {
+                return p.then(function(word) {
+                  return word.drawBackground();
                 });
-              };
-            }, null)();
-          } else {
-            return promises.reduceRight(function(next, current) {
-              return function() {
-                return current.then(function(word) {
-                  word.drawBackground();
-                  return word.draw().then(function() {
-                    if (next) {
-                      word.remove();
-                      return next();
-                    }
+              });
+              return promises.reduceRight(function(next, current) {
+                return function() {
+                  return current.then(function(word) {
+                    return word.draw().then(next);
                   });
+                };
+              }, null)();
+            } else {
+              return promises.reduceRight(function(next, current) {
+                return function() {
+                  return current.then(function(word) {
+                    word.drawBackground();
+                    return word.draw().then(function() {
+                      if (next) {
+                        word.remove();
+                        return next();
+                      }
+                    });
+                  });
+                };
+              }, null)();
+            }
+          } else {
+            return loaders.reduceRight(function(next, current) {
+              return function() {
+                return current.load().progress(options.progress).then(function(word) {
+                  word.drawBackground();
+                  return word.draw().then(next);
                 });
               };
             }, null)();

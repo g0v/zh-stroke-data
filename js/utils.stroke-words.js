@@ -1,5 +1,5 @@
 (function() {
-  var StrokeData, WordStroker, fetchStrokeJSON, fetchStrokeJSONFromBinary, fetchStrokeJSONFromXml, fetchStrokeXml, forEach, getBinary, glMatrix, jsonFromXml, root, sax, sortSurrogates, transform, transformWithMatrix;
+  var StrokeData, WordStroker, buffer, buffer_binary, fetchStrokeJSON, fetchStrokeJSONFromBinary, fetchStrokeJSONFromXml, fetchStrokeXml, fetchers, forEach, getBinary, glMatrix, jsonFromBinary, jsonFromXml, root, sax, sortSurrogates, transform, transformWithMatrix;
 
   root = this;
 
@@ -176,112 +176,124 @@
     return xhr.send();
   };
 
-  fetchStrokeJSONFromBinary = function(path, success, fail, progress) {
-    var file_id, packed_path;
-    if (root.window) {
-      packed_path = "" + (path.substr(0, 6)) + (path.substr(path.length - 6, 2)) + ".bin";
-      file_id = parseInt(path.substr(6, path.length - 12), 16);
-      return getBinary(packed_path, function(data) {
-        var cmd, cmd_len, data_view, i, id, index, node, offset, outline, p, ret, scale, size_indices, size_len, stroke_count, strokes_len, track, track_len, _i, _j, _k, _l, _len, _len1, _len2, _len3, _m, _n, _o, _p, _q;
-        scale = 2060.0 / 256;
-        data_view = new DataView(data);
-        stroke_count = data_view.getUint16(0, true);
-        for (i = _i = 0; 0 <= stroke_count ? _i < stroke_count : _i > stroke_count; i = 0 <= stroke_count ? ++_i : --_i) {
-          id = data_view.getUint16(2 + i * 6, true);
-          if (id === file_id) {
-            offset = data_view.getUint32(2 + i * 6 + 2, true);
+  jsonFromBinary = function(data, file_id, success, fail) {
+    var cmd, cmd_len, data_view, i, id, index, node, offset, outline, p, ret, scale, size_indices, size_len, stroke_count, strokes_len, track, track_len, _i, _j, _k, _l, _len, _len1, _len2, _len3, _m, _n, _o, _p, _q;
+    scale = 2060.0 / 256;
+    data_view = new DataView(data);
+    stroke_count = data_view.getUint16(0, true);
+    for (i = _i = 0; 0 <= stroke_count ? _i < stroke_count : _i > stroke_count; i = 0 <= stroke_count ? ++_i : --_i) {
+      id = data_view.getUint16(2 + i * 6, true);
+      if (id === file_id) {
+        offset = data_view.getUint32(2 + i * 6 + 2, true);
+        break;
+      }
+    }
+    if (i === stroke_count) {
+      return typeof fail === "function" ? fail(new Error("stroke not found")) : void 0;
+    }
+    p = 0;
+    ret = [];
+    strokes_len = data_view.getUint8(offset + p++);
+    for (_j = 0; 0 <= strokes_len ? _j < strokes_len : _j > strokes_len; 0 <= strokes_len ? _j++ : _j--) {
+      outline = [];
+      cmd_len = data_view.getUint8(offset + p++);
+      for (_k = 0; 0 <= cmd_len ? _k < cmd_len : _k > cmd_len; 0 <= cmd_len ? _k++ : _k--) {
+        outline.push({
+          type: String.fromCharCode(data_view.getUint8(offset + p++))
+        });
+      }
+      for (_l = 0, _len = outline.length; _l < _len; _l++) {
+        cmd = outline[_l];
+        switch (cmd.type) {
+          case "M":
+            cmd.x = scale * data_view.getUint8(offset + p++);
             break;
-          }
-        }
-        if (i === stroke_count) {
-          return typeof fail === "function" ? fail(new Error("stroke not found")) : void 0;
-        }
-        p = 0;
-        ret = [];
-        strokes_len = data_view.getUint8(offset + p++);
-        for (_j = 0; 0 <= strokes_len ? _j < strokes_len : _j > strokes_len; 0 <= strokes_len ? _j++ : _j--) {
-          outline = [];
-          cmd_len = data_view.getUint8(offset + p++);
-          for (_k = 0; 0 <= cmd_len ? _k < cmd_len : _k > cmd_len; 0 <= cmd_len ? _k++ : _k--) {
-            outline.push({
-              type: String.fromCharCode(data_view.getUint8(offset + p++))
-            });
-          }
-          for (_l = 0, _len = outline.length; _l < _len; _l++) {
-            cmd = outline[_l];
-            switch (cmd.type) {
-              case "M":
-                cmd.x = scale * data_view.getUint8(offset + p++);
-                break;
-              case "L":
-                cmd.x = scale * data_view.getUint8(offset + p++);
-                break;
-              case "Q":
-                cmd.begin = {
-                  x: scale * data_view.getUint8(offset + p++)
-                };
-                cmd.end = {
-                  x: scale * data_view.getUint8(offset + p++)
-                };
-                break;
-              case "C":
-                cmd.begin = {
-                  x: scale * data_view.getUint8(offset + p++)
-                };
-                cmd.mid = {
-                  x: scale * data_view.getUint8(offset + p++)
-                };
-                cmd.end = {
-                  x: scale * data_view.getUint8(offset + p++)
-                };
-            }
-          }
-          for (_m = 0, _len1 = outline.length; _m < _len1; _m++) {
-            cmd = outline[_m];
-            switch (cmd.type) {
-              case "M":
-                cmd.y = scale * data_view.getUint8(offset + p++);
-                break;
-              case "L":
-                cmd.y = scale * data_view.getUint8(offset + p++);
-                break;
-              case "Q":
-                cmd.begin.y = scale * data_view.getUint8(offset + p++);
-                cmd.end.y = scale * data_view.getUint8(offset + p++);
-                break;
-              case "C":
-                cmd.begin.y = scale * data_view.getUint8(offset + p++);
-                cmd.mid.y = scale * data_view.getUint8(offset + p++);
-                cmd.end.y = scale * data_view.getUint8(offset + p++);
-            }
-          }
-          track = [];
-          track_len = data_view.getUint8(offset + p++);
-          size_indices = [];
-          size_len = data_view.getUint8(offset + p++);
-          for (_n = 0; 0 <= size_len ? _n < size_len : _n > size_len; 0 <= size_len ? _n++ : _n--) {
-            size_indices.push(data_view.getUint8(offset + p++));
-          }
-          for (_o = 0; 0 <= track_len ? _o < track_len : _o > track_len; 0 <= track_len ? _o++ : _o--) {
-            track.push({
+          case "L":
+            cmd.x = scale * data_view.getUint8(offset + p++);
+            break;
+          case "Q":
+            cmd.begin = {
               x: scale * data_view.getUint8(offset + p++)
-            });
-          }
-          for (_p = 0, _len2 = track.length; _p < _len2; _p++) {
-            node = track[_p];
-            node.y = scale * data_view.getUint8(offset + p++);
-          }
-          for (_q = 0, _len3 = size_indices.length; _q < _len3; _q++) {
-            index = size_indices[_q];
-            track[index].size = scale * data_view.getUint8(offset + p++);
-          }
-          ret.push({
-            outline: outline,
-            track: track
-          });
+            };
+            cmd.end = {
+              x: scale * data_view.getUint8(offset + p++)
+            };
+            break;
+          case "C":
+            cmd.begin = {
+              x: scale * data_view.getUint8(offset + p++)
+            };
+            cmd.mid = {
+              x: scale * data_view.getUint8(offset + p++)
+            };
+            cmd.end = {
+              x: scale * data_view.getUint8(offset + p++)
+            };
         }
-        return typeof success === "function" ? success(ret) : void 0;
-      }, fail, progress);
+      }
+      for (_m = 0, _len1 = outline.length; _m < _len1; _m++) {
+        cmd = outline[_m];
+        switch (cmd.type) {
+          case "M":
+            cmd.y = scale * data_view.getUint8(offset + p++);
+            break;
+          case "L":
+            cmd.y = scale * data_view.getUint8(offset + p++);
+            break;
+          case "Q":
+            cmd.begin.y = scale * data_view.getUint8(offset + p++);
+            cmd.end.y = scale * data_view.getUint8(offset + p++);
+            break;
+          case "C":
+            cmd.begin.y = scale * data_view.getUint8(offset + p++);
+            cmd.mid.y = scale * data_view.getUint8(offset + p++);
+            cmd.end.y = scale * data_view.getUint8(offset + p++);
+        }
+      }
+      track = [];
+      track_len = data_view.getUint8(offset + p++);
+      size_indices = [];
+      size_len = data_view.getUint8(offset + p++);
+      for (_n = 0; 0 <= size_len ? _n < size_len : _n > size_len; 0 <= size_len ? _n++ : _n--) {
+        size_indices.push(data_view.getUint8(offset + p++));
+      }
+      for (_o = 0; 0 <= track_len ? _o < track_len : _o > track_len; 0 <= track_len ? _o++ : _o--) {
+        track.push({
+          x: scale * data_view.getUint8(offset + p++)
+        });
+      }
+      for (_p = 0, _len2 = track.length; _p < _len2; _p++) {
+        node = track[_p];
+        node.y = scale * data_view.getUint8(offset + p++);
+      }
+      for (_q = 0, _len3 = size_indices.length; _q < _len3; _q++) {
+        index = size_indices[_q];
+        track[index].size = scale * data_view.getUint8(offset + p++);
+      }
+      ret.push({
+        outline: outline,
+        track: track
+      });
+    }
+    return typeof success === "function" ? success(ret) : void 0;
+  };
+
+  buffer_binary = {};
+
+  fetchStrokeJSONFromBinary = function(path, success, fail, progress) {
+    var file_id, packed, packed_path;
+    if (root.window) {
+      packed = path.substr(path.length - 6, 2);
+      packed_path = "" + (path.substr(0, 6)) + packed + ".bin";
+      file_id = parseInt(path.substr(6, path.length - 12), 16);
+      if (!buffer_binary[packed]) {
+        return getBinary(packed_path, function(data) {
+          buffer_binary[packed] = data;
+          return jsonFromBinary(data, file_id, success, fail);
+        }, fail, progress);
+      } else {
+        return jsonFromBinary(buffer_binary[packed], file_id, success, fail);
+      }
     } else {
       return console.log("not implement");
     }
@@ -407,18 +419,20 @@
     return ret;
   };
 
+  fetchers = {
+    "xml": fetchStrokeJSONFromXml,
+    "json": fetchStrokeJSON,
+    "bin": fetchStrokeJSONFromBinary
+  };
+
+  buffer = {};
+
   StrokeData = function(options) {
-    var buffer, fetchers, ret;
-    fetchers = {
-      "xml": fetchStrokeJSONFromXml,
-      "json": fetchStrokeJSON,
-      "bin": fetchStrokeJSONFromBinary
-    };
+    var ret;
     options = $.extend({
       url: "./json/",
       dataType: "json"
     }, options);
-    buffer = {};
     return ret = {
       transform: transformWithMatrix,
       get: function(cp, success, fail, progress) {
