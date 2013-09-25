@@ -204,26 +204,33 @@ jsonFromBinary = (data, file_id, success, fail) ->
       track: track
   success? ret
 
-buffer_binary = {}
+CacheBinary = ->
+  cache = {}
+  get: (path) ->
+    packed = path.substr(path.length - 6, 2)
+    packed_path = "#{path.substr(0, 6)}#{packed}.bin"
+    if cache[packed] is undefined
+      p = jQuery.Deferred()
+      getBinary(
+        packed_path
+        (data) -> p.resolve data
+        (err) -> p.reject err
+        (event) -> p.notify event
+      )
+      cache[packed] = p
+    cache[packed]
+
+binaryCache = CacheBinary()
 
 fetchStrokeJSONFromBinary = (path, success, fail, progress) ->
   if root.window
-    packed = path.substr(path.length - 6, 2)
-    packed_path = "#{path.substr(0, 6)}#{packed}.bin"
     file_id = parseInt path.substr(6, path.length - 12), 16
-    if not buffer_binary[packed]
-      getBinary(
-        packed_path,
-        (data) ->
-          buffer_binary[packed] = data
-          jsonFromBinary(data, file_id, success, fail)
-        fail,
-        progress
-      )
-    else
-      jsonFromBinary(buffer_binary[packed], file_id, success, fail)
+    binaryCache.get(path).
+      done((data) -> jsonFromBinary(data, file_id, success, fail)).
+      fail(fail).
+      progress(progress)
   else
-    console.log "not implement"
+    console.log "not implemented"
 
 # expose StrokeData
 StrokeData = undefined
@@ -322,7 +329,21 @@ fetchers =
   "bin": fetchStrokeJSONFromBinary
 
 # now cache globally
-buffer = {}
+CacheJSON = ->
+  cache = {}
+  get: (cp, url, type) ->
+    if cache[cp] is undefined
+      p = jQuery.Deferred()
+      fetchers[type](
+        "#{url}#{cp}.#{type}"
+        (json) -> p.resolve json
+        (err) -> p.reject err
+        (event) -> p.notify event
+      )
+      cache[cp] = p
+    cache[cp]
+
+jsonCache = CacheJSON()
 
 StrokeData = (options) ->
   options = $.extend(
@@ -331,21 +352,12 @@ StrokeData = (options) ->
   , options)
 
   ret =
-    # _ will do this better
-    #        ^
-    #        |
-    # oops, I dont remember what it means
     transform: transformWithMatrix
     get: (cp, success, fail, progress) ->
-      if not buffer[cp]
-        fetchers[options.dataType](
-          "#{options.url}#{cp}.#{options.dataType}"
-          (json) -> success? buffer[cp] = json
-          (err) -> fail? err
-          progress
-        )
-      else
-        success? buffer[cp]
+      jsonCache.get(cp, options.url, options.dataType).
+        done(success).
+        fail(fail).
+        progress(progress)
 
 if root.window #web
   window.WordStroker or= {}

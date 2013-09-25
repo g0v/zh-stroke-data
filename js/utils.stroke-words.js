@@ -1,5 +1,5 @@
 (function() {
-  var StrokeData, WordStroker, buffer, buffer_binary, fetchStrokeJSON, fetchStrokeJSONFromBinary, fetchStrokeJSONFromXml, fetchStrokeXml, fetchers, forEach, getBinary, glMatrix, jsonFromBinary, jsonFromXml, root, sax, sortSurrogates, transform, transformWithMatrix;
+  var CacheBinary, CacheJSON, StrokeData, WordStroker, binaryCache, fetchStrokeJSON, fetchStrokeJSONFromBinary, fetchStrokeJSONFromXml, fetchStrokeXml, fetchers, forEach, getBinary, glMatrix, jsonCache, jsonFromBinary, jsonFromXml, root, sax, sortSurrogates, transform, transformWithMatrix;
 
   root = this;
 
@@ -278,24 +278,41 @@
     return typeof success === "function" ? success(ret) : void 0;
   };
 
-  buffer_binary = {};
+  CacheBinary = function() {
+    var cache;
+    cache = {};
+    return {
+      get: function(path) {
+        var p, packed, packed_path;
+        packed = path.substr(path.length - 6, 2);
+        packed_path = "" + (path.substr(0, 6)) + packed + ".bin";
+        if (cache[packed] === void 0) {
+          p = jQuery.Deferred();
+          getBinary(packed_path, function(data) {
+            return p.resolve(data);
+          }, function(err) {
+            return p.reject(err);
+          }, function(event) {
+            return p.notify(event);
+          });
+          cache[packed] = p;
+        }
+        return cache[packed];
+      }
+    };
+  };
+
+  binaryCache = CacheBinary();
 
   fetchStrokeJSONFromBinary = function(path, success, fail, progress) {
-    var file_id, packed, packed_path;
+    var file_id;
     if (root.window) {
-      packed = path.substr(path.length - 6, 2);
-      packed_path = "" + (path.substr(0, 6)) + packed + ".bin";
       file_id = parseInt(path.substr(6, path.length - 12), 16);
-      if (!buffer_binary[packed]) {
-        return getBinary(packed_path, function(data) {
-          buffer_binary[packed] = data;
-          return jsonFromBinary(data, file_id, success, fail);
-        }, fail, progress);
-      } else {
-        return jsonFromBinary(buffer_binary[packed], file_id, success, fail);
-      }
+      return binaryCache.get(path).done(function(data) {
+        return jsonFromBinary(data, file_id, success, fail);
+      }).fail(fail).progress(progress);
     } else {
-      return console.log("not implement");
+      return console.log("not implemented");
     }
   };
 
@@ -425,7 +442,29 @@
     "bin": fetchStrokeJSONFromBinary
   };
 
-  buffer = {};
+  CacheJSON = function() {
+    var cache;
+    cache = {};
+    return {
+      get: function(cp, url, type) {
+        var p;
+        if (cache[cp] === void 0) {
+          p = jQuery.Deferred();
+          fetchers[type]("" + url + cp + "." + type, function(json) {
+            return p.resolve(json);
+          }, function(err) {
+            return p.reject(err);
+          }, function(event) {
+            return p.notify(event);
+          });
+          cache[cp] = p;
+        }
+        return cache[cp];
+      }
+    };
+  };
+
+  jsonCache = CacheJSON();
 
   StrokeData = function(options) {
     var ret;
@@ -436,15 +475,7 @@
     return ret = {
       transform: transformWithMatrix,
       get: function(cp, success, fail, progress) {
-        if (!buffer[cp]) {
-          return fetchers[options.dataType]("" + options.url + cp + "." + options.dataType, function(json) {
-            return typeof success === "function" ? success(buffer[cp] = json) : void 0;
-          }, function(err) {
-            return typeof fail === "function" ? fail(err) : void 0;
-          }, progress);
-        } else {
-          return typeof success === "function" ? success(buffer[cp]) : void 0;
-        }
+        return jsonCache.get(cp, options.url, options.dataType).done(success).fail(fail).progress(progress);
       }
     };
   };
