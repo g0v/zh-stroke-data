@@ -136,8 +136,25 @@ getBinary = (path, success, fail, progress) ->
         fail? @status
   xhr.send()
 
+undelta = (xs) ->
+  results = [xs[0]]
+  for i in [1...xs.length]
+    results.push (results[i-1] + xs[i] + 256) % 256
+  results
+
+undeltaR = (result, current) ->
+  prev = if result.length isnt 0 then result[result.length - 1] else 0
+  result.concat [(prev + current + 256) % 256]
+
+scale = (v) ->
+  v * 2060.0 / 256 # hard coded DDDD:
+
 jsonFromBinary = (data, file_id, success, fail) ->
-  scale = 2060.0 / 256 # hard coded DDDDD:
+  size =
+    "M": 1
+    "L": 1
+    "Q": 2
+    "C": 3
   data_view = new DataView data
   stroke_count = data_view.getUint16 0, true
   for i in [0...stroke_count]
@@ -152,53 +169,71 @@ jsonFromBinary = (data, file_id, success, fail) ->
   for [0...strokes_len]
     outline = []
     cmd_len = data_view.getUint8 offset + p++
+    cood_len = 0
     for [0...cmd_len]
-      outline.push
+      cmd =
         type: String.fromCharCode data_view.getUint8 offset + p++
+      cood_len += size[cmd.type]
+      outline.push cmd
+    xs = []
+    ys = []
+    for [0...cood_len]
+      xs.push data_view.getUint8 offset + p++
+    for [0...cood_len]
+      ys.push data_view.getUint8 offset + p++
+    xs = undelta(xs).map scale
+    ys = undelta(ys).map scale
+    j = 0
     for cmd in outline
       switch cmd.type
         when "M"
-          cmd.x = scale * data_view.getUint8 offset + p++
+          cmd.x = xs[j]
+          cmd.y = ys[j++]
         when "L"
-          cmd.x = scale * data_view.getUint8 offset + p++
+          cmd.x = xs[j]
+          cmd.y = ys[j++]
         when "Q"
           cmd.begin =
-            x: scale * data_view.getUint8 offset + p++
+            x: xs[j]
+            y: ys[j++]
           cmd.end =
-            x: scale * data_view.getUint8 offset + p++
+            x: xs[j]
+            y: ys[j++]
         when "C"
           cmd.begin =
-            x: scale * data_view.getUint8 offset + p++
+            x: xs[j]
+            y: ys[j++]
           cmd.mid =
-            x: scale * data_view.getUint8 offset + p++
+            x: xs[j]
+            y: ys[j++]
           cmd.end =
-            x: scale * data_view.getUint8 offset + p++
-    for cmd in outline
-      switch cmd.type
-        when "M"
-          cmd.y = scale * data_view.getUint8 offset + p++
-        when "L"
-          cmd.y = scale * data_view.getUint8 offset + p++
-        when "Q"
-          cmd.begin.y = scale * data_view.getUint8 offset + p++
-          cmd.end.y = scale * data_view.getUint8 offset + p++
-        when "C"
-          cmd.begin.y = scale * data_view.getUint8 offset + p++
-          cmd.mid.y = scale * data_view.getUint8 offset + p++
-          cmd.end.y = scale * data_view.getUint8 offset + p++
+            x: xs[j]
+            y: ys[j++]
     track = []
     track_len = data_view.getUint8 offset + p++
     size_indices = []
     size_len = data_view.getUint8 offset + p++
     for [0...size_len]
       size_indices.push data_view.getUint8 offset + p++
+    xs = []
+    ys = []
+    ss = []
     for [0...track_len]
+      xs.push data_view.getUint8 offset + p++
+    for [0...track_len]
+      ys.push data_view.getUint8 offset + p++
+    for [0...size_len]
+      ss.push data_view.getUint8 offset + p++
+    xs = undelta(xs).map scale
+    ys = undelta(ys).map scale
+    ss = ss.map scale
+    for j in [0...track_len]
       track.push
-        x: scale * data_view.getUint8 offset + p++
-    for node in track
-      node.y = scale * data_view.getUint8 offset + p++
+        x: xs[j]
+        y: ys[j]
+    j = 0
     for index in size_indices
-      track[index].size = scale * data_view.getUint8 offset + p++
+      track[index].size = ss[j++]
     ret.push
       outline: outline
       track: track

@@ -8,6 +8,18 @@ scale = (num) ->
   throw "coordinate out of range: #{num}" if num >= 2060
   return ~~((num + scale_factor/2) / scale_factor)
 
+delta = (xs) ->
+  results = [xs[0]]
+  for i in [1...xs.length]
+    results.push (xs[i] - xs[i-1] + 256) % 256
+  results
+
+undelta = (xs) ->
+  results = [xs[0]]
+  for i in [1...xs.length]
+    results.push (results[i-1] + xs[i] + 256) % 256
+  results
+
 hexFromNumber = (num) ->
   ret = num.toString(16)
   if ret.length < 2 then "0" + ret else ret
@@ -55,8 +67,8 @@ process.argv.forEach (packed, index) ->
               ys.push cmd.end.y
             else
               throw "unknow path type: #{cmd.type}"
-        xs = xs.map scale
-        ys = ys.map scale
+        xs = delta xs.map scale
+        ys = delta ys.map scale
         push.apply results[i], types
         push.apply results[i], xs
         push.apply results[i], ys
@@ -72,8 +84,8 @@ process.argv.forEach (packed, index) ->
           if node.size isnt undefined
             with_size.push index
             ss.push node.size
-        xs = xs.map scale
-        ys = ys.map scale
+        xs = delta xs.map scale
+        ys = delta ys.map scale
         ss = ss.map scale
         results[i].push with_size.length
         push.apply results[i], with_size

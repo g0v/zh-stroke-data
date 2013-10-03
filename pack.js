@@ -1,5 +1,5 @@
 (function() {
-  var fs, hexFromNumber, push, scale, scale_factor,
+  var delta, fs, hexFromNumber, push, scale, scale_factor, undelta,
     __hasProp = {}.hasOwnProperty;
 
   fs = require("fs");
@@ -13,6 +13,24 @@
       throw "coordinate out of range: " + num;
     }
     return ~~((num + scale_factor / 2) / scale_factor);
+  };
+
+  delta = function(xs) {
+    var i, results, _i, _ref;
+    results = [xs[0]];
+    for (i = _i = 1, _ref = xs.length; 1 <= _ref ? _i < _ref : _i > _ref; i = 1 <= _ref ? ++_i : --_i) {
+      results.push((xs[i] - xs[i - 1] + 256) % 256);
+    }
+    return results;
+  };
+
+  undelta = function(xs) {
+    var i, results, _i, _ref;
+    results = [xs[0]];
+    for (i = _i = 1, _ref = xs.length; 1 <= _ref ? _i < _ref : _i > _ref; i = 1 <= _ref ? ++_i : --_i) {
+      results.push((results[i - 1] + xs[i] + 256) % 256);
+    }
+    return results;
   };
 
   hexFromNumber = function(num) {
@@ -76,8 +94,8 @@
                 throw "unknow path type: " + cmd.type;
             }
           });
-          xs = xs.map(scale);
-          ys = ys.map(scale);
+          xs = delta(xs.map(scale));
+          ys = delta(ys.map(scale));
           push.apply(results[i], types);
           push.apply(results[i], xs);
           push.apply(results[i], ys);
@@ -97,8 +115,8 @@
               return ss.push(node.size);
             }
           });
-          xs = xs.map(scale);
-          ys = ys.map(scale);
+          xs = delta(xs.map(scale));
+          ys = delta(ys.map(scale));
           ss = ss.map(scale);
           results[i].push(with_size.length);
           push.apply(results[i], with_size);

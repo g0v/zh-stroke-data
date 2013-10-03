@@ -1,5 +1,5 @@
 (function() {
-  var CacheBinary, CacheJSON, StrokeData, WordStroker, binaryCache, fetchStrokeJSON, fetchStrokeJSONFromBinary, fetchStrokeJSONFromXml, fetchStrokeXml, fetchers, forEach, getBinary, glMatrix, jsonCache, jsonFromBinary, jsonFromXml, root, sax, sortSurrogates, transform, transformWithMatrix;
+  var CacheBinary, CacheJSON, StrokeData, WordStroker, binaryCache, fetchStrokeJSON, fetchStrokeJSONFromBinary, fetchStrokeJSONFromXml, fetchStrokeXml, fetchers, forEach, getBinary, glMatrix, jsonCache, jsonFromBinary, jsonFromXml, root, sax, scale, sortSurrogates, transform, transformWithMatrix, undelta, undeltaR;
 
   root = this;
 
@@ -176,9 +176,33 @@
     return xhr.send();
   };
 
+  undelta = function(xs) {
+    var i, results, _i, _ref;
+    results = [xs[0]];
+    for (i = _i = 1, _ref = xs.length; 1 <= _ref ? _i < _ref : _i > _ref; i = 1 <= _ref ? ++_i : --_i) {
+      results.push((results[i - 1] + xs[i] + 256) % 256);
+    }
+    return results;
+  };
+
+  undeltaR = function(result, current) {
+    var prev;
+    prev = result.length !== 0 ? result[result.length - 1] : 0;
+    return result.concat([(prev + current + 256) % 256]);
+  };
+
+  scale = function(v) {
+    return v * 2060.0 / 256;
+  };
+
   jsonFromBinary = function(data, file_id, success, fail) {
-    var cmd, cmd_len, data_view, i, id, index, node, offset, outline, p, ret, scale, size_indices, size_len, stroke_count, strokes_len, track, track_len, _i, _j, _k, _l, _len, _len1, _len2, _len3, _m, _n, _o, _p, _q;
-    scale = 2060.0 / 256;
+    var cmd, cmd_len, cood_len, data_view, i, id, index, j, offset, outline, p, ret, size, size_indices, size_len, ss, stroke_count, strokes_len, track, track_len, xs, ys, _i, _j, _k, _l, _len, _len1, _m, _n, _o, _p, _q, _r, _s, _t;
+    size = {
+      "M": 1,
+      "L": 1,
+      "Q": 2,
+      "C": 3
+    };
     data_view = new DataView(data);
     stroke_count = data_view.getUint16(0, true);
     for (i = _i = 0; 0 <= stroke_count ? _i < stroke_count : _i > stroke_count; i = 0 <= stroke_count ? ++_i : --_i) {
@@ -197,78 +221,93 @@
     for (_j = 0; 0 <= strokes_len ? _j < strokes_len : _j > strokes_len; 0 <= strokes_len ? _j++ : _j--) {
       outline = [];
       cmd_len = data_view.getUint8(offset + p++);
+      cood_len = 0;
       for (_k = 0; 0 <= cmd_len ? _k < cmd_len : _k > cmd_len; 0 <= cmd_len ? _k++ : _k--) {
-        outline.push({
+        cmd = {
           type: String.fromCharCode(data_view.getUint8(offset + p++))
-        });
+        };
+        cood_len += size[cmd.type];
+        outline.push(cmd);
       }
-      for (_l = 0, _len = outline.length; _l < _len; _l++) {
-        cmd = outline[_l];
+      xs = [];
+      ys = [];
+      for (_l = 0; 0 <= cood_len ? _l < cood_len : _l > cood_len; 0 <= cood_len ? _l++ : _l--) {
+        xs.push(data_view.getUint8(offset + p++));
+      }
+      for (_m = 0; 0 <= cood_len ? _m < cood_len : _m > cood_len; 0 <= cood_len ? _m++ : _m--) {
+        ys.push(data_view.getUint8(offset + p++));
+      }
+      xs = undelta(xs).map(scale);
+      ys = undelta(ys).map(scale);
+      j = 0;
+      for (_n = 0, _len = outline.length; _n < _len; _n++) {
+        cmd = outline[_n];
         switch (cmd.type) {
           case "M":
-            cmd.x = scale * data_view.getUint8(offset + p++);
+            cmd.x = xs[j];
+            cmd.y = ys[j++];
             break;
           case "L":
-            cmd.x = scale * data_view.getUint8(offset + p++);
+            cmd.x = xs[j];
+            cmd.y = ys[j++];
             break;
           case "Q":
             cmd.begin = {
-              x: scale * data_view.getUint8(offset + p++)
+              x: xs[j],
+              y: ys[j++]
             };
             cmd.end = {
-              x: scale * data_view.getUint8(offset + p++)
+              x: xs[j],
+              y: ys[j++]
             };
             break;
           case "C":
             cmd.begin = {
-              x: scale * data_view.getUint8(offset + p++)
+              x: xs[j],
+              y: ys[j++]
             };
             cmd.mid = {
-              x: scale * data_view.getUint8(offset + p++)
+              x: xs[j],
+              y: ys[j++]
             };
             cmd.end = {
-              x: scale * data_view.getUint8(offset + p++)
+              x: xs[j],
+              y: ys[j++]
             };
-        }
-      }
-      for (_m = 0, _len1 = outline.length; _m < _len1; _m++) {
-        cmd = outline[_m];
-        switch (cmd.type) {
-          case "M":
-            cmd.y = scale * data_view.getUint8(offset + p++);
-            break;
-          case "L":
-            cmd.y = scale * data_view.getUint8(offset + p++);
-            break;
-          case "Q":
-            cmd.begin.y = scale * data_view.getUint8(offset + p++);
-            cmd.end.y = scale * data_view.getUint8(offset + p++);
-            break;
-          case "C":
-            cmd.begin.y = scale * data_view.getUint8(offset + p++);
-            cmd.mid.y = scale * data_view.getUint8(offset + p++);
-            cmd.end.y = scale * data_view.getUint8(offset + p++);
         }
       }
       track = [];
       track_len = data_view.getUint8(offset + p++);
       size_indices = [];
       size_len = data_view.getUint8(offset + p++);
-      for (_n = 0; 0 <= size_len ? _n < size_len : _n > size_len; 0 <= size_len ? _n++ : _n--) {
+      for (_o = 0; 0 <= size_len ? _o < size_len : _o > size_len; 0 <= size_len ? _o++ : _o--) {
         size_indices.push(data_view.getUint8(offset + p++));
       }
-      for (_o = 0; 0 <= track_len ? _o < track_len : _o > track_len; 0 <= track_len ? _o++ : _o--) {
+      xs = [];
+      ys = [];
+      ss = [];
+      for (_p = 0; 0 <= track_len ? _p < track_len : _p > track_len; 0 <= track_len ? _p++ : _p--) {
+        xs.push(data_view.getUint8(offset + p++));
+      }
+      for (_q = 0; 0 <= track_len ? _q < track_len : _q > track_len; 0 <= track_len ? _q++ : _q--) {
+        ys.push(data_view.getUint8(offset + p++));
+      }
+      for (_r = 0; 0 <= size_len ? _r < size_len : _r > size_len; 0 <= size_len ? _r++ : _r--) {
+        ss.push(data_view.getUint8(offset + p++));
+      }
+      xs = undelta(xs).map(scale);
+      ys = undelta(ys).map(scale);
+      ss = ss.map(scale);
+      for (j = _s = 0; 0 <= track_len ? _s < track_len : _s > track_len; j = 0 <= track_len ? ++_s : --_s) {
         track.push({
-          x: scale * data_view.getUint8(offset + p++)
+          x: xs[j],
+          y: ys[j]
         });
       }
-      for (_p = 0, _len2 = track.length; _p < _len2; _p++) {
-        node = track[_p];
-        node.y = scale * data_view.getUint8(offset + p++);
-      }
-      for (_q = 0, _len3 = size_indices.length; _q < _len3; _q++) {
-        index = size_indices[_q];
-        track[index].size = scale * data_view.getUint8(offset + p++);
+      j = 0;
+      for (_t = 0, _len1 = size_indices.length; _t < _len1; _t++) {
+        index = size_indices[_t];
+        track[index].size = ss[j++];
       }
       ret.push({
         outline: outline,
