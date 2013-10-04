@@ -9,7 +9,7 @@ $.fn.extend
 
     options = $.extend(
       single: false
-      sequential: false
+      pool_size: 4
       svg: !isCanvasSupported()
       progress: null
     , options)
@@ -19,40 +19,23 @@ $.fn.extend
         window.WordStroker.raphael.strokeWords this, words
       else
         loaders = window.WordStroker.canvas.drawElementWithWords(this, words, options)
-        if not options.sequential
-          promises = loaders.map (loader) ->
-            loader.load().progress(options.progress)
-          ##
-          # do the same as following lines with reduce
-          ##
-          # i = 0
-          # next = ->
-          #   if i < promises.length
-          #     promises[i++].then (word) -> word.draw().then next
-          # next()
-          ##
-          if not options.single
-            promises.forEach (p) ->
-              p.then (word) -> word.drawBackground()
-            do promises.reduceRight (next, current) ->
-              -> current.then (word) ->
-                word.draw().then next
-            , null
-          else
-            do promises.reduceRight (next, current) ->
-              -> current.then (word) ->
-                do word.drawBackground
-                word.draw().then ->
-                  if next
-                    do word.remove
-                    do next
-            , null
-        else
-          do loaders.reduceRight (next, current) ->
-            -> current.load().progress(options.progress).then (word) ->
-              word.drawBackground()
-              word.draw().then next
-          , null
+        index = 0
+        loaded = 0
+        do load = ->
+          while index < loaders.length and loaded < options.pool_size
+            ++loaded
+            loaders[index++].load()
+              .progress(options.progress)
+              .then (word) ->
+                word.drawBackground()
+        do loaders.reduceRight (next, current) ->
+          -> current.promise.then (word) ->
+            word.draw().then ->
+              --loaded
+              load()
+              word.remove() if options.single
+              next?()
+        , null
     ).data("strokeWords",
       play: null
     )

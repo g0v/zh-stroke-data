@@ -186,24 +186,25 @@
       return _results;
     };
     drawElementWithWord = function(element, word, options) {
-      var $loader, $word, data, stroker;
+      var $loader, $word, data, pp, stroker;
       options || (options = {});
       stroker = new Word(options);
       $word = $("<div class=\"word\"></div>");
       $loader = $("<div class=\"loader\"><div style=\"width: 0\"></div><i class=\"icon-spinner icon-spin icon-large icon-fixed-width\"></i></div>");
-      $word.append(stroker.canvas).append($loader);
+      $word.append(stroker.canvas);
       $(element).append($word);
       data = WordStroker.utils.StrokeData({
         url: options.url,
         dataType: options.dataType
       });
+      pp = jQuery.Deferred();
       return {
+        promise: pp,
         load: function() {
-          var promise;
-          promise = jQuery.Deferred();
+          $word.append($loader);
           data.get(word.cp, function(json) {
             $loader.remove();
-            return promise.resolve({
+            return pp.resolve({
               drawBackground: function() {
                 return stroker.drawBackground();
               },
@@ -216,7 +217,7 @@
             });
           }, function() {
             $loader.remove();
-            return promise.resolve({
+            return pp.resolve({
               drawBackground: function() {
                 return stroker.drawBackground();
               },
@@ -236,9 +237,9 @@
             if (e.lengthComputable) {
               $loader.find("> div").css("width", e.loaded / e.total * 100 + "%");
             }
-            return promise.notifyWith(e, [e, word.text]);
+            return pp.notifyWith(e, [e, word.text]);
           });
-          return promise;
+          return pp;
         }
       };
     };

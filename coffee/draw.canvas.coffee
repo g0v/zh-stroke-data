@@ -183,20 +183,22 @@ $ ->
     stroker = new Word(options)
     $word = $("<div class=\"word\"></div>")
     $loader = $("<div class=\"loader\"><div style=\"width: 0\"></div><i class=\"icon-spinner icon-spin icon-large icon-fixed-width\"></i></div>")
-    $word.append(stroker.canvas).append($loader)
+    $word.append stroker.canvas
     $(element).append $word
     data = WordStroker.utils.StrokeData
       url: options.url
       dataType: options.dataType
+    pp = jQuery.Deferred()
     return {
+      promise: pp
       load: () ->
-        promise = jQuery.Deferred()
+        $word.append $loader
         data.get(
           word.cp,
           # success
           (json) ->
             $loader.remove()
-            promise.resolve {
+            pp.resolve {
               drawBackground: ->
                 do stroker.drawBackground
               draw: ->
@@ -207,7 +209,7 @@ $ ->
           # fail
           , ->
             $loader.remove()
-            promise.resolve {
+            pp.resolve {
               drawBackground: ->
                 do stroker.drawBackground
               draw: ->
@@ -220,9 +222,9 @@ $ ->
           , (e) ->
             if e.lengthComputable
               $loader.find("> div").css("width", e.loaded / e.total * 100 + "%")
-            promise.notifyWith e, [e, word.text]
+            pp.notifyWith e, [e, word.text]
         )
-        promise
+        pp
     }
 
   drawElementWithWords = (element, words, options) ->

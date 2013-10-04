@@ -15,58 +15,43 @@
       }
       options = $.extend({
         single: false,
-        sequential: false,
+        pool_size: 4,
         svg: !isCanvasSupported(),
         progress: null
       }, options);
       return this.each(function() {
-        var loaders, promises;
+        var index, load, loaded, loaders;
         if (options.svg) {
           return window.WordStroker.raphael.strokeWords(this, words);
         } else {
           loaders = window.WordStroker.canvas.drawElementWithWords(this, words, options);
-          if (!options.sequential) {
-            promises = loaders.map(function(loader) {
-              return loader.load().progress(options.progress);
-            });
-            if (!options.single) {
-              promises.forEach(function(p) {
-                return p.then(function(word) {
-                  return word.drawBackground();
+          index = 0;
+          loaded = 0;
+          (load = function() {
+            var _results;
+            _results = [];
+            while (index < loaders.length && loaded < options.pool_size) {
+              ++loaded;
+              _results.push(loaders[index++].load().progress(options.progress).then(function(word) {
+                return word.drawBackground();
+              }));
+            }
+            return _results;
+          })();
+          return loaders.reduceRight(function(next, current) {
+            return function() {
+              return current.promise.then(function(word) {
+                return word.draw().then(function() {
+                  --loaded;
+                  load();
+                  if (options.single) {
+                    word.remove();
+                  }
+                  return typeof next === "function" ? next() : void 0;
                 });
               });
-              return promises.reduceRight(function(next, current) {
-                return function() {
-                  return current.then(function(word) {
-                    return word.draw().then(next);
-                  });
-                };
-              }, null)();
-            } else {
-              return promises.reduceRight(function(next, current) {
-                return function() {
-                  return current.then(function(word) {
-                    word.drawBackground();
-                    return word.draw().then(function() {
-                      if (next) {
-                        word.remove();
-                        return next();
-                      }
-                    });
-                  });
-                };
-              }, null)();
-            }
-          } else {
-            return loaders.reduceRight(function(next, current) {
-              return function() {
-                return current.load().progress(options.progress).then(function(word) {
-                  word.drawBackground();
-                  return word.draw().then(next);
-                });
-              };
-            }, null)();
-          }
+            };
+          }, null)();
         }
       }).data("strokeWords", {
         play: null
