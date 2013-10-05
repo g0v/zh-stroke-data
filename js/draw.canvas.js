@@ -186,7 +186,7 @@
       return _results;
     };
     drawElementWithWord = function(element, word, options) {
-      var $loader, $word, data, pp, stroker;
+      var $loader, $word, data, stroker;
       options || (options = {});
       stroker = new Word(options);
       $word = $("<div class=\"word\"></div>");
@@ -197,14 +197,14 @@
         url: options.url,
         dataType: options.dataType
       });
-      pp = jQuery.Deferred();
       return {
-        promise: pp,
-        load: function() {
+        load: function(p) {
+          var promise;
+          promise = p || $.Deferred();
           $word.append($loader);
           data.get(word.cp, function(json) {
             $loader.remove();
-            return pp.resolve({
+            return promise.resolve({
               drawBackground: function() {
                 return stroker.drawBackground();
               },
@@ -217,12 +217,11 @@
             });
           }, function() {
             $loader.remove();
-            return pp.resolve({
+            return primose.resolve({
               drawBackground: function() {
                 return stroker.drawBackground();
               },
               draw: function() {
-                var p;
                 p = jQuery.Deferred();
                 $(stroker.canvas).fadeTo("fast", 0.5, function() {
                   return p.resolve();
@@ -237,9 +236,9 @@
             if (e.lengthComputable) {
               $loader.find("> div").css("width", e.loaded / e.total * 100 + "%");
             }
-            return pp.notifyWith(e, [e, word.text]);
+            return promise.notifyWith(e, [e, word.text]);
           });
-          return pp;
+          return promise;
         }
       };
     };

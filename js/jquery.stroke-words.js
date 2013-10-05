@@ -20,11 +20,14 @@
         progress: null
       }, options);
       return this.each(function() {
-        var index, load, loaded, loaders;
+        var index, load, loaded, loaders, promises;
         if (options.svg) {
           return window.WordStroker.raphael.strokeWords(this, words);
         } else {
           loaders = window.WordStroker.canvas.drawElementWithWords(this, words, options);
+          promises = loaders.map(function() {
+            return $.Deferred();
+          });
           index = 0;
           loaded = 0;
           (load = function() {
@@ -32,15 +35,15 @@
             _results = [];
             while (index < loaders.length && loaded < options.pool_size) {
               ++loaded;
-              _results.push(loaders[index++].load().progress(options.progress).then(function(word) {
+              _results.push(loaders[index].load(promises[index++]).progress(options.progress).then(function(word) {
                 return word.drawBackground();
               }));
             }
             return _results;
           })();
-          return loaders.reduceRight(function(next, current) {
+          return promises.reduceRight(function(next, current) {
             return function() {
-              return current.promise.then(function(word) {
+              return current.then(function(word) {
                 return word.draw().then(function() {
                   --loaded;
                   load();

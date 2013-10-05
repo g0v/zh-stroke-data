@@ -19,17 +19,18 @@ $.fn.extend
         window.WordStroker.raphael.strokeWords this, words
       else
         loaders = window.WordStroker.canvas.drawElementWithWords(this, words, options)
+        promises = loaders.map -> $.Deferred()
         index = 0
         loaded = 0
         do load = ->
           while index < loaders.length and loaded < options.pool_size
             ++loaded
-            loaders[index++].load()
+            loaders[index].load(promises[index++])
               .progress(options.progress)
               .then (word) ->
                 word.drawBackground()
-        do loaders.reduceRight (next, current) ->
-          -> current.promise.then (word) ->
+        do promises.reduceRight (next, current) ->
+          -> current.then (word) ->
             word.draw().then ->
               --loaded
               load()

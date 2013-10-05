@@ -188,17 +188,16 @@ $ ->
     data = WordStroker.utils.StrokeData
       url: options.url
       dataType: options.dataType
-    pp = jQuery.Deferred()
     return {
-      promise: pp
-      load: () ->
+      load: (p) ->
+        promise = p or $.Deferred()
         $word.append $loader
         data.get(
           word.cp,
           # success
           (json) ->
             $loader.remove()
-            pp.resolve {
+            promise.resolve {
               drawBackground: ->
                 do stroker.drawBackground
               draw: ->
@@ -209,7 +208,7 @@ $ ->
           # fail
           , ->
             $loader.remove()
-            pp.resolve {
+            primose.resolve {
               drawBackground: ->
                 do stroker.drawBackground
               draw: ->
@@ -222,9 +221,9 @@ $ ->
           , (e) ->
             if e.lengthComputable
               $loader.find("> div").css("width", e.loaded / e.total * 100 + "%")
-            pp.notifyWith e, [e, word.text]
+            promise.notifyWith e, [e, word.text]
         )
-        pp
+        promise
     }
 
   drawElementWithWords = (element, words, options) ->
