@@ -1,37 +1,40 @@
 (function() {
   $(function() {
-    var $canvas, $holder, $word, Stroke, Track, Word, canvas, data, matrix, options, words;
+    var $canvas, $holder, $word, Stroke, Track, Word, canvas, data, options, words;
     options = {
       dim: 2150,
       scales: {
         fill: 0.4,
         style: 0.25
       },
-      trackWidth: 150
+      delays: {
+        stroke: 0.25,
+        word: 0.5
+      }
     };
-    matrix = [options.scales.fill, 0, 0, options.scales.fill, 0, 0];
     $holder = $("#holder");
     $word = $("#word");
     $canvas = $("<canvas></canvas>");
-    $canvas.css("width", options.dim * options.scales.style + "pt");
-    $canvas.css("height", options.dim * options.scales.style + "pt");
+    $canvas.css("width", options.dim * options.scales.fill * options.scales.style + "pt");
+    $canvas.css("height", options.dim * options.scales.fill * options.scales.style + "pt");
     canvas = $canvas.get()[0];
-    canvas.width = options.dim;
-    canvas.height = options.dim;
+    canvas.width = options.dim * options.scales.fill;
+    canvas.height = options.dim * options.scales.fill;
     $holder.append($canvas);
     data = WordStroker.utils.StrokeData({
       url: "./json/",
       dataType: "json"
     });
     Track = (function() {
-      function Track(data) {
+      function Track(data, options) {
         this.data = data;
+        this.options = options;
         this.length = Math.sqrt(this.data.vector.x * this.data.vector.x + this.data.vector.y * this.data.vector.y);
       }
 
       Track.prototype.render = function(canvas, percent) {
         var ctx, size;
-        size = this.data.size || options.trackWidth;
+        size = this.data.size || this.options.trackWidth;
         ctx = canvas.getContext("2d");
         ctx.beginPath();
         ctx.strokeStyle = "#000";
@@ -47,8 +50,9 @@
 
     })();
     Stroke = (function() {
-      function Stroke(data) {
+      function Stroke(data, options) {
         var current, i, prev, _i, _ref;
+        this.options = options;
         this.outline = data.outline;
         this.tracks = [];
         for (i = _i = 1, _ref = data.track.length; 1 <= _ref ? _i < _ref : _i > _ref; i = 1 <= _ref ? ++_i : --_i) {
@@ -62,7 +66,7 @@
               y: current.y - prev.y
             },
             size: prev.size
-          }));
+          }, this.options));
         }
         this.length = this.tracks.reduce(function(prev, current) {
           return prev + current.length;
@@ -117,11 +121,16 @@
 
     })();
     Word = (function() {
-      function Word(data) {
+      function Word(data, options) {
         var _this = this;
+        this.options = $.extend({
+          scale: 0.4,
+          trackWidth: 150
+        }, options);
+        this.matrix = [this.options.scale, 0, 0, this.options.scale, 0, 0];
         this.strokes = [];
         data.map(function(strokeData) {
-          return _this.strokes.push(new Stroke(strokeData));
+          return _this.strokes.push(new Stroke(strokeData, _this.options));
         });
         this.length = this.strokes.reduce(function(prev, current) {
           return prev + current.length;
@@ -131,7 +140,7 @@
       Word.prototype.render = function(canvas, percent) {
         var ctx, len, stroke, _i, _len, _ref, _results;
         ctx = canvas.getContext("2d");
-        ctx.setTransform.apply(ctx, matrix);
+        ctx.setTransform.apply(ctx, this.matrix);
         len = this.length * percent;
         _ref = this.strokes;
         _results = [];
@@ -153,7 +162,9 @@
     words = WordStroker.utils.sortSurrogates($word.val());
     return data.get(words[0].cp, function(json) {
       var pixel_per_second, step, time, update, word;
-      word = new Word(json);
+      word = new Word(json, {
+        scale: options.scales.fill
+      });
       pixel_per_second = 2000;
       step = word.length / pixel_per_second * 60;
       time = 0;
