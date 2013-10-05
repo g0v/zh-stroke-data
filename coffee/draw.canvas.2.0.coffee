@@ -116,6 +116,10 @@ $ ->
       @length = @strokes.reduce (prev, current) ->
         prev + current.length
       , 0
+      @strokeGaps = @strokes.reduce (results, current) =>
+        results.concat [results[results.length - 1] + current.length / @length]
+      , [0]
+      @strokeGaps.shift()
     render: (canvas, percent) ->
       ctx = canvas.getContext "2d"
       ctx.setTransform.apply ctx, @matrix
@@ -132,14 +136,46 @@ $ ->
     (json) ->
       word = new Word json,
         scale: options.scales.fill
+      # normal animation
+      ###
       pixel_per_second = 2000
       step = word.length / pixel_per_second * 60
-      time = 0
+      i = 0
+      before = time = 0
       update = ->
         word.render canvas, time
+        before = time
         time += 1 / step
         if time < 1.0
-          requestAnimationFrame update
+          if before < word.strokeGaps[i] and word.strokeGaps[i] < time
+            setTimeout ->
+              ++i
+              requestAnimationFrame update
+            , 500
+          else
+            requestAnimationFrame update
+      requestAnimationFrame update
+      ###
+      # interactive animation
+      inc = false
+      dec = false
+      $(document)
+        .keydown (e) ->
+          dec = true if e.which is 37
+          inc = true if e.which is 39
+        .keyup (e) ->
+          dec = false if e.which is 37
+          inc = false if e.which is 39
+      time = 0
+      step = 0.0025
+      update = ->
+        canvas.width = canvas.width # clear rect
+        word.render canvas, time
+        time += step if inc
+        time = 1.0 if time > 1.0
+        time -= step if dec
+        time = 0 if time < 0
+        requestAnimationFrame update
       requestAnimationFrame update
     (err) ->
       console.log "failed"

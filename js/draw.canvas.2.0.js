@@ -135,6 +135,10 @@
         this.length = this.strokes.reduce(function(prev, current) {
           return prev + current.length;
         }, 0);
+        this.strokeGaps = this.strokes.reduce(function(results, current) {
+          return results.concat([results[results.length - 1] + current.length / _this.length]);
+        }, [0]);
+        this.strokeGaps.shift();
       }
 
       Word.prototype.render = function(canvas, percent) {
@@ -161,19 +165,65 @@
     })();
     words = WordStroker.utils.sortSurrogates($word.val());
     return data.get(words[0].cp, function(json) {
-      var pixel_per_second, step, time, update, word;
+      var dec, inc, step, time, update, word;
       word = new Word(json, {
         scale: options.scales.fill
       });
-      pixel_per_second = 2000;
-      step = word.length / pixel_per_second * 60;
-      time = 0;
-      update = function() {
-        word.render(canvas, time);
-        time += 1 / step;
-        if (time < 1.0) {
-          return requestAnimationFrame(update);
+      /* normal animation
+      pixel_per_second = 2000
+      step = word.length / pixel_per_second * 60
+      i = 0
+      before = time = 0
+      update = ->
+        word.render canvas, time
+        before = time
+        time += 1 / step
+        if time < 1.0
+          if before < word.strokeGaps[i] and word.strokeGaps[i] < time
+            setTimeout ->
+              ++i
+              requestAnimationFrame update
+            , 500
+          else
+            requestAnimationFrame update
+      requestAnimationFrame update
+      */
+
+      inc = false;
+      dec = false;
+      $(document).keydown(function(e) {
+        if (e.which === 37) {
+          dec = true;
         }
+        if (e.which === 39) {
+          return inc = true;
+        }
+      }).keyup(function(e) {
+        if (e.which === 37) {
+          dec = false;
+        }
+        if (e.which === 39) {
+          return inc = false;
+        }
+      });
+      time = 0;
+      step = 0.0025;
+      update = function() {
+        canvas.width = canvas.width;
+        word.render(canvas, time);
+        if (inc) {
+          time += step;
+        }
+        if (time > 1.0) {
+          time = 1.0;
+        }
+        if (dec) {
+          time -= step;
+        }
+        if (time < 0) {
+          time = 0;
+        }
+        return requestAnimationFrame(update);
       };
       return requestAnimationFrame(update);
     }, function(err) {
