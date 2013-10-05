@@ -166,11 +166,13 @@ $ ->
         .keyup (e) ->
           dec = false if e.which is 37
           inc = false if e.which is 39
-      time = 0
+      prev = time = 0
       step = 0.0025
       update = ->
-        canvas.width = canvas.width # clear rect
-        word.render canvas, time
+        if prev isnt time
+          canvas.width = canvas.width # clear rect
+          word.render canvas, time
+        prev = time
         time += step if inc
         time = 1.0 if time > 1.0
         time -= step if dec

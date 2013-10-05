@@ -165,11 +165,11 @@
     })();
     words = WordStroker.utils.sortSurrogates($word.val());
     return data.get(words[0].cp, function(json) {
-      var dec, inc, step, time, update, word;
+      var dec, inc, prev, step, time, update, word;
       word = new Word(json, {
         scale: options.scales.fill
       });
-      /* normal animation
+      /*
       pixel_per_second = 2000
       step = word.length / pixel_per_second * 60
       i = 0
@@ -206,11 +206,14 @@
           return inc = false;
         }
       });
-      time = 0;
+      prev = time = 0;
       step = 0.0025;
       update = function() {
-        canvas.width = canvas.width;
-        word.render(canvas, time);
+        if (prev !== time) {
+          canvas.width = canvas.width;
+          word.render(canvas, time);
+        }
+        prev = time;
         if (inc) {
           time += step;
         }
