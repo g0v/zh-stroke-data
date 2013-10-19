@@ -11,7 +11,10 @@ process.argv.forEach (path, index) ->
       cp[0],
       (json) ->
         part = WordStroker.utils.StrokeData.transform json, source.matrix
-        result = result.concat source.indices.map (val) -> part[val]
+        if source.indices
+          result = result.concat source.indices.map (val) -> part[val]
+        else
+          result = result.concat part
         console.log JSON.stringify result, null, "  " if i is rule.strokes.length - 1
       , () ->
         console.log
