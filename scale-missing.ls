@@ -56,16 +56,16 @@ for char in Chars
       y2048 = y / S*T
 #      const S = 256
 #      const T = 2048
+      console.log "new:(w,h): (#w-new, #h-new)"
+      console.log "old:(w,h): (#w-old, #h-old)"
       console.log "W Ratio: #w-ratio = (#w-new / #w-old)"
+      console.log "H Ratio: #h-ratio = (#h-new / #h-old)"
 #      console.log "H Ratio: #h-ratio = (#h-new / #h-old)"
-      console.log "Min X: #min-x"
+      console.log "Min (X,Y): (#min-x, #min-y)"
 #      console.log "Min Y: #min-y"
-      console.log "x2048: #x2048"
-      x-ratio = x2048
-      y-ratio = y2048
-      if c is \日
-        x-ratio -= 512
-        y-ratio -= 15
+      console.log "(x2048, y2048): (#x2048, #y2048)"
+      x-ratio = - min-x * w-ratio + x2048
+      y-ratio = - min-y * h-ratio + y2048
 
       strokes.push { val: c, matrix: [
         #        w-ratio, 0, 0, h-ratio, -(x*w-ratio) + (min-x) , -(y*h-ratio) + (min-y)
