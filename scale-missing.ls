@@ -44,20 +44,20 @@ for char in Chars
 
 
 
-      w-old = w / S
-      h-old = h / S
-      w-new = (max-x - min-x) / T
-      h-new = (max-y - min-y) / T
-      w-ratio = w-old / w-new
-      h-ratio = h-old / h-new
+      w-new = w / S
+      h-new = h / S
+      w-old = (max-x - min-x) / T
+      h-old = (max-y - min-y) / T
+      w-ratio = w-new / w-old
+      h-ratio = h-new / h-old
       # W Ratio: 1.146417445482866
       # H Ratio: 0.47232472324723246
       x2048 = x / S*T
       y2048 = y / S*T
 #      const S = 256
 #      const T = 2048
-      console.log "W Ratio: #w-ratio = (#w-old / #w-new)"
-#      console.log "H Ratio: #h-ratio = (#h-old / #h-new)"
+      console.log "W Ratio: #w-ratio = (#w-new / #w-old)"
+#      console.log "H Ratio: #h-ratio = (#h-new / #h-old)"
       console.log "Min X: #min-x"
 #      console.log "Min Y: #min-y"
       console.log "x2048: #x2048"
