@@ -32,10 +32,10 @@ for char in Chars
       ref = \草
       stroke-offset = 0
       stroke-length = 4
+      console.log char
     ref-hex = ref.codePointAt!toString 16
     if fs.exists-sync "json/#ref-hex.json"
       ss = require "./json/#ref-hex.json"
-      console.log \x
       ss = ss[stroke-offset to stroke-offset + stroke-length - 1] if stroke-offset?
       for {outline} in ss => for s in outline
         if s.x
