@@ -11,21 +11,67 @@ require! fs
 const S = 256
 const T = 2048
 const CharComp = require \./char_comp.json
-const Chars = require \./chars.json
+Chars = require \./chars.json
+Chars = [ "\u6607" ]
 
 for char in Chars
-  console.log char
   out = "#{ char.codePointAt!toString 16}.json"
-  continue if fs.exists-sync "json/#out"
+  #continue if fs.exists-sync "json/#out"
   comp = CharComp[char]
   continue unless comp
   strokes = []
+  min-x = min-y = Infinity
+  max-x = max-y = -Infinity
+  console.log comp
   for {c, x, y, w, h} in comp
     if fs.exists-sync "json/#{ c.codePointAt!toString 16}.json"
+      ss = require "./json/#{ c.codePointAt!toString 16}.json"
+      for {outline} in ss => for s in outline
+        if s.x
+          min-x <?= s.x; min-y <?= s.y
+          max-x >?= s.x; max-y >?= s.y
+        else if s.end
+          min-x <?= s.begin.x; min-y <?= s.begin.y
+          max-x >?= s.begin.x; max-y >?= s.begin.y
+          min-x <?= s.end.x; min-y <?= s.end.y
+          max-x >?= s.end.x; max-y >?= s.end.y
       # TODO: Instead of just writing out missing, we should compose right here.
       # This allows us detect the boundaries of the component instead of
       # assuming a maxed-out configuration, which fails spectacularly on e.g. 日.
-      strokes.push { val: c, matrix: [w/S, 0, 0, h/S, x/S*T, y/S*T] }
+#      console.log min-x; console.log min-y
+#      console.log max-x; console.log max-y
+#      console.log h/S
+
+
+
+      w-old = w / S
+      h-old = h / S
+      w-new = (max-x - min-x) / T
+      h-new = (max-y - min-y) / T
+      w-ratio = w-old / w-new
+      h-ratio = h-old / h-new
+      # W Ratio: 1.146417445482866
+      # H Ratio: 0.47232472324723246
+      x2048 = x / S*T
+      y2048 = y / S*T
+#      const S = 256
+#      const T = 2048
+      console.log "W Ratio: #w-ratio = (#w-old / #w-new)"
+#      console.log "H Ratio: #h-ratio = (#h-old / #h-new)"
+      console.log "Min X: #min-x"
+#      console.log "Min Y: #min-y"
+      console.log "x2048: #x2048"
+      x-ratio = x2048
+      y-ratio = y2048
+      if c is \日
+        x-ratio -= 512
+        y-ratio -= 15
+
+      strokes.push { val: c, matrix: [
+        #        w-ratio, 0, 0, h-ratio, -(x*w-ratio) + (min-x) , -(y*h-ratio) + (min-y)
+        #        w-ratio, 0, 0, h-ratio, x2048, y2048
+        w-ratio, 0, 0, h-ratio, x-ratio, y-ratio
+      ] }
     else
       console.log "Missing char: #c"
       strokes = null
