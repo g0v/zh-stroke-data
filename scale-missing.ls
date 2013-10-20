@@ -18,13 +18,25 @@ for char in Chars
   continue if fs.exists-sync "json/#out"
   comp = CharComp[char]
   continue unless comp
+  console.log char
   strokes = []
   min-x = min-y = Infinity
   max-x = max-y = -Infinity
   console.log comp
   for {c, x, y, w, h} in comp
-    if fs.exists-sync "json/#{ c.codePointAt!toString 16}.json"
-      ss = require "./json/#{ c.codePointAt!toString 16}.json"
+    #console.log "HIT: #char" if c is \亻
+    console.log c
+    ref = c
+    stroke-offset = null
+    if ref is \艹
+      ref = \草
+      stroke-offset = 0
+      stroke-length = 4
+    ref-hex = ref.codePointAt!toString 16
+    if fs.exists-sync "json/#ref-hex.json"
+      ss = require "./json/#ref-hex.json"
+      console.log \x
+      ss = ss[stroke-offset to stroke-offset + stroke-length - 1] if stroke-offset?
       for {outline} in ss => for s in outline
         if s.x
           min-x <?= s.x; min-y <?= s.y
@@ -34,43 +46,25 @@ for char in Chars
           max-x >?= s.begin.x; max-y >?= s.begin.y
           min-x <?= s.end.x; min-y <?= s.end.y
           max-x >?= s.end.x; max-y >?= s.end.y
-      # TODO: Instead of just writing out missing, we should compose right here.
-      # This allows us detect the boundaries of the component instead of
-      # assuming a maxed-out configuration, which fails spectacularly on e.g. 日.
-#      console.log min-x; console.log min-y
-#      console.log max-x; console.log max-y
-#      console.log h/S
-
-
-
       w-new = w / S
       h-new = h / S
       w-old = (max-x - min-x) / T
       h-old = (max-y - min-y) / T
       w-ratio = w-new / w-old
       h-ratio = h-new / h-old
-      # W Ratio: 1.146417445482866
-      # H Ratio: 0.47232472324723246
       x2048 = x / S*T
       y2048 = y / S*T
-#      const S = 256
-#      const T = 2048
       console.log "new:(w,h): (#w-new, #h-new)"
       console.log "old:(w,h): (#w-old, #h-old)"
       console.log "W Ratio: #w-ratio = (#w-new / #w-old)"
       console.log "H Ratio: #h-ratio = (#h-new / #h-old)"
-#      console.log "H Ratio: #h-ratio = (#h-new / #h-old)"
       console.log "Min (X,Y): (#min-x, #min-y)"
-#      console.log "Min Y: #min-y"
       console.log "(x2048, y2048): (#x2048, #y2048)"
       x-ratio = - min-x * w-ratio + x2048
       y-ratio = - min-y * h-ratio + y2048
-
-      strokes.push { val: c, matrix: [
-        #        w-ratio, 0, 0, h-ratio, -(x*w-ratio) + (min-x) , -(y*h-ratio) + (min-y)
-        #        w-ratio, 0, 0, h-ratio, x2048, y2048
-        w-ratio, 0, 0, h-ratio, x-ratio, y-ratio
-      ] }
+      part = { val: ref, matrix: [ w-ratio, 0, 0, h-ratio, x-ratio, y-ratio ] }
+      part.indices = [stroke-offset to stroke-offset + stroke-length - 1] if stroke-offset?
+      strokes.push part
     else
       console.log "Missing char: #c"
       strokes = null
