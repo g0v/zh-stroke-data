@@ -12,11 +12,10 @@ const S = 256
 const T = 2048
 const CharComp = require \./char_comp.json
 Chars = require \./chars.json
-Chars = [ "\u6607" ]
 
 for char in Chars
   out = "#{ char.codePointAt!toString 16}.json"
-  #continue if fs.exists-sync "json/#out"
+  continue if fs.exists-sync "json/#out"
   comp = CharComp[char]
   continue unless comp
   strokes = []
