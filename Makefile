@@ -7,4 +7,4 @@ comp ::
 	sh compose.sh
 try ::
 	lsc scale-missing.ls
-	node compose.js ./missing/6607.json >! json/6607.json
+	node compose.js ./missing/6607.json > json/6607.json
