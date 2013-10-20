@@ -18,21 +18,16 @@ for char in Chars
   continue if fs.exists-sync "json/#out"
   comp = CharComp[char]
   continue unless comp
-  console.log char
   strokes = []
   min-x = min-y = Infinity
   max-x = max-y = -Infinity
-  console.log comp
   for {c, x, y, w, h} in comp
-    #console.log "HIT: #char" if c is \亻
-    console.log c
     ref = c
     stroke-offset = null
     if ref is \艹
       ref = \草
       stroke-offset = 0
       stroke-length = 4
-      console.log char
     ref-hex = ref.codePointAt!toString 16
     if fs.exists-sync "json/#ref-hex.json"
       ss = require "./json/#ref-hex.json"
@@ -54,21 +49,39 @@ for char in Chars
       h-ratio = h-new / h-old
       x2048 = x / S*T
       y2048 = y / S*T
+      /*
       console.log "new:(w,h): (#w-new, #h-new)"
       console.log "old:(w,h): (#w-old, #h-old)"
       console.log "W Ratio: #w-ratio = (#w-new / #w-old)"
       console.log "H Ratio: #h-ratio = (#h-new / #h-old)"
       console.log "Min (X,Y): (#min-x, #min-y)"
       console.log "(x2048, y2048): (#x2048, #y2048)"
+      */
       x-ratio = - min-x * w-ratio + x2048
       y-ratio = - min-y * h-ratio + y2048
       part = { val: ref, matrix: [ w-ratio, 0, 0, h-ratio, x-ratio, y-ratio ] }
       part.indices = [stroke-offset to stroke-offset + stroke-length - 1] if stroke-offset?
       strokes.push part
     else
-      console.log "Missing char: #c"
+      #console.log "Missing char: #c"
       strokes = null
       break
-  if strokes
-    console.log "Writing #out"
-    fs.write-file-sync "missing/#out" JSON.stringify { strokes, val: char }
+  continue unless strokes
+  rule = { strokes, val: char }
+  fs.write-file-sync "missing/#out" JSON.stringify rule
+  result = []
+  failed = false
+  WordStroker = require "./js/utils.stroke-words"
+  source, i <- rule.strokes.forEach
+  cp = WordStroker.utils.sortSurrogates source.val
+  data = fs.read-file-sync "./json/#{ cp.0 }.json"
+  if data
+    json = JSON.parse(data)
+    part = WordStroker.utils.StrokeData.transform(json, source.matrix);
+    if source.indices
+      result.=concat source.indices.map (part.)
+    else
+      result.=concat part
+    if i is rule.strokes.length - 1 and not failed
+      console.log "Writing json/#out"
+      fs.write-file-sync("json/#out", JSON.stringify(result, null, "  "));
