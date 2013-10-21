@@ -5,6 +5,6 @@ comp ::
 	wget -c https://raw.github.com/miaout17/moedict-component-testbed/master/single.fnt/char_comp.json
 	lsc scale-missing.ls
 	sh compose.sh
+
 try ::
 	lsc scale-missing.ls
-	node compose.js ./missing/6607.json > json/6607.json

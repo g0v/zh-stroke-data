@@ -18,7 +18,7 @@
       }).done(success).fail(fail);
     } else {
       fs = require("fs");
-      return fs.readFile(path, {
+      return fs.readFileSync(path, {
         encoding: "utf8"
       }, function(err, data) {
         if (err) {
@@ -41,7 +41,7 @@
       }).done(success).fail(fail);
     } else {
       fs = require("fs");
-      return fs.readFile(path, {
+      return fs.readFileSync(path, {
         encoding: "utf8"
       }, function(err, data) {
         if (err) {
