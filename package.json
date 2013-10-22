@@ -19,6 +19,7 @@
     "coffee-script": "~1.6.3",
     "grunt-contrib-coffee": "~0.7.0",
     "sax": "~0.5.4",
+    "q": "~0.9.7",
     "grunt-contrib-uglify": "~0.2.2"
   }
 }

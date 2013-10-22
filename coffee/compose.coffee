@@ -7,8 +7,9 @@ process.argv.forEach (path, index) ->
   rule = require path
   rule.strokes.forEach (source, i) ->
     cp = WordStroker.utils.sortSurrogates source.val
-    WordStroker.utils.StrokeData.get(
-      cp[0],
+    data = WordStroker.utils.StrokeData()
+    data.get(
+      cp[0].cp,
       (json) ->
         part = WordStroker.utils.StrokeData.transform json, source.matrix
         if source.indices
