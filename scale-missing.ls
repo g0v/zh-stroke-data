@@ -74,7 +74,7 @@ for char in Chars
   WordStroker = require "./js/utils.stroke-words"
   source, i <- rule.strokes.forEach
   cp = WordStroker.utils.sortSurrogates source.val
-  data = fs.read-file-sync "./json/#{ cp.0 }.json"
+  data = fs.read-file-sync "./json/#{ cp.0.cp }.json"
   if data
     json = JSON.parse(data)
     part = WordStroker.utils.StrokeData.transform(json, source.matrix);

@@ -18,7 +18,7 @@
       }).done(success).fail(fail);
     } else {
       fs = require("fs");
-      return fs.readFileSync(path, {
+      return fs.readFile(path, {
         encoding: "utf8"
       }, function(err, data) {
         if (err) {
@@ -41,7 +41,7 @@
       }).done(success).fail(fail);
     } else {
       fs = require("fs");
-      return fs.readFileSync(path, {
+      return fs.readFile(path, {
         encoding: "utf8"
       }, function(err, data) {
         if (err) {
@@ -506,18 +506,18 @@
   jsonCache = CacheJSON();
 
   StrokeData = function(options) {
-    var ret;
     options = $.extend({
       url: "./json/",
       dataType: "json"
     }, options);
-    return ret = {
-      transform: transformWithMatrix,
+    return {
       get: function(cp, success, fail, progress) {
         return jsonCache.get(cp, options.url, options.dataType).done(success).fail(fail).progress(progress);
       }
     };
   };
+
+  StrokeData.transform = transformWithMatrix;
 
   if (root.window) {
     window.WordStroker || (window.WordStroker = {});
@@ -542,7 +542,3 @@
   }
 
 }).call(this);
-
-/*
-//@ sourceMappingURL=utils.stroke-words.js.map
-*/

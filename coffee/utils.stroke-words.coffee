@@ -386,13 +386,13 @@ StrokeData = (options) ->
     dataType: "json"
   , options)
 
-  ret =
-    transform: transformWithMatrix
-    get: (cp, success, fail, progress) ->
-      jsonCache.get(cp, options.url, options.dataType).
-        done(success).
-        fail(fail).
-        progress(progress)
+  get: (cp, success, fail, progress) ->
+    jsonCache.get(cp, options.url, options.dataType).
+      done(success).
+      fail(fail).
+      progress(progress)
+
+StrokeData.transform = transformWithMatrix
 
 if root.window #web
   window.WordStroker or= {}
