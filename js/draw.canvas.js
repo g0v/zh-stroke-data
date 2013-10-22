@@ -217,7 +217,7 @@
             });
           }, function() {
             $loader.remove();
-            return primose.resolve({
+            return promise.resolve({
               drawBackground: function() {
                 return stroker.drawBackground();
               },
@@ -255,7 +255,3 @@
   });
 
 }).call(this);
-
-/*
-//@ sourceMappingURL=draw.canvas.js.map
-*/

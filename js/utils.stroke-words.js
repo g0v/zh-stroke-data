@@ -349,7 +349,7 @@
     var file_id;
     if (root.window) {
       file_id = parseInt(path.substr(6, path.length - 12), 16);
-      return binaryCache.get(path).done(function(data) {
+      return binaryCache.get(path).then(function(data) {
         return jsonFromBinary(data, file_id, success, fail);
       }).fail(fail).progress(progress);
     } else {

@@ -100,7 +100,3 @@
   });
 
 }).call(this);
-
-/*
-//@ sourceMappingURL=draw.js.map
-*/

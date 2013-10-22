@@ -208,7 +208,7 @@ $ ->
           # fail
           , ->
             $loader.remove()
-            primose.resolve {
+            promise.resolve {
               drawBackground: ->
                 do stroker.drawBackground
               draw: ->

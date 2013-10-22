@@ -262,7 +262,7 @@ fetchStrokeJSONFromBinary = (path, success, fail, progress) ->
   if root.window
     file_id = parseInt path.substr(6, path.length - 12), 16
     binaryCache.get(path).
-      done((data) -> jsonFromBinary(data, file_id, success, fail)).
+      then((data) -> jsonFromBinary(data, file_id, success, fail)).
       fail(fail).
       progress(progress)
   else

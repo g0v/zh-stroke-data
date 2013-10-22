@@ -63,7 +63,3 @@
   });
 
 }).call(this);
-
-/*
-//@ sourceMappingURL=jquery.stroke-words.js.map
-*/
