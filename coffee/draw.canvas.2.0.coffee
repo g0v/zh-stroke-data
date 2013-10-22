@@ -27,9 +27,41 @@ $ ->
     url: "./json/"
     dataType: "json"
 
+  class AABB
+    constructor: (min, max = min) ->
+      @min =
+        x: Math.min(min.x, max.x)
+        y: Math.min(min.y, max.y)
+      @max =
+        x: Math.max(min.x, max.x)
+        y: Math.max(min.y, max.y)
+      Object.defineProperty @, "width",
+        get: -> @max.x - @min.x
+      Object.defineProperty @, "height",
+        get: -> @max.y - @min.y
+      Object.defineProperty @, "size",
+        get: -> @width * @height
+    clone: ->
+      new AABB(@min, @max)
+    addPoint: (pt) ->
+      @min.x = pt.x if pt.x < @min.x
+      @min.y = pt.y if pt.y < @min.y
+      @max.x = pt.x if pt.x > @max.x
+      @max.y = pt.y if pt.y > @max.y
+    delta: (box) ->
+      new AABB(@min, box.min).size + new AABB(@max, box.max).size
+    render: (canvas) ->
+      ctx = canvas.getContext "2d"
+      ctx.strokeStyle = "#F00"
+      ctx.lineWidth = 10
+      ctx.beginPath()
+      ctx.rect @min.x, @min.y, @width, @height
+      ctx.stroke()
+
   class Track
     constructor: (@data, @options) ->
       @length = Math.sqrt @data.vector.x * @data.vector.x + @data.vector.y * @data.vector.y
+      @aabb = null
     render: (canvas, percent) ->
       size = @data.size or @options.trackWidth
       ctx = canvas.getContext "2d"
@@ -63,6 +95,17 @@ $ ->
       @length = @tracks.reduce (prev, current) ->
         prev + current.length
       , 0
+      # assert track 0 is inside the outline
+      @aabb = new AABB(data.track[0])
+      for path in @outline
+        if "x" of path
+          console.log @aabb
+          @aabb.addPoint path
+        if "begin" of path
+          @aabb.addPoint path.begin
+          @aabb.addPoint path.end
+        if "mid" of path
+          @aabb.addPoint path.mid
     pathOutline: (ctx, outline) ->
       for path in outline
         switch path.type
@@ -111,8 +154,15 @@ $ ->
                      0,              0
       ]
       @strokes = []
+      @aabb = null
       data.map (strokeData) =>
-        @strokes.push new Stroke strokeData, @options
+        stroke = new Stroke strokeData, @options
+        @strokes.push stroke
+        if not @aabb
+          @aabb = stroke.aabb.clone()
+        else
+          @aabb.addPoint stroke.aabb.min
+          @aabb.addPoint stroke.aabb.max
       @length = @strokes.reduce (prev, current) ->
         prev + current.length
       , 0
@@ -127,7 +177,9 @@ $ ->
       for stroke in @strokes
         if len > 0
           stroke.render canvas, Math.min(stroke.length, len) / stroke.length
+          stroke.aabb.render canvas
           len -= stroke.length
+      @aabb.render canvas
 
   words = WordStroker.utils.sortSurrogates($word.val())
 

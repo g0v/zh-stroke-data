@@ -1,6 +1,6 @@
 (function() {
   $(function() {
-    var $canvas, $holder, $word, Stroke, Track, Word, canvas, data, options, words;
+    var $canvas, $holder, $word, AABB, Stroke, Track, Word, canvas, data, options, words;
     options = {
       dim: 2150,
       scales: {
@@ -25,11 +25,78 @@
       url: "./json/",
       dataType: "json"
     });
+    AABB = (function() {
+      function AABB(min, max) {
+        if (max == null) {
+          max = min;
+        }
+        this.min = {
+          x: Math.min(min.x, max.x),
+          y: Math.min(min.y, max.y)
+        };
+        this.max = {
+          x: Math.max(min.x, max.x),
+          y: Math.max(min.y, max.y)
+        };
+        Object.defineProperty(this, "width", {
+          get: function() {
+            return this.max.x - this.min.x;
+          }
+        });
+        Object.defineProperty(this, "height", {
+          get: function() {
+            return this.max.y - this.min.y;
+          }
+        });
+        Object.defineProperty(this, "size", {
+          get: function() {
+            return this.width * this.height;
+          }
+        });
+      }
+
+      AABB.prototype.clone = function() {
+        return new AABB(this.min, this.max);
+      };
+
+      AABB.prototype.addPoint = function(pt) {
+        if (pt.x < this.min.x) {
+          this.min.x = pt.x;
+        }
+        if (pt.y < this.min.y) {
+          this.min.y = pt.y;
+        }
+        if (pt.x > this.max.x) {
+          this.max.x = pt.x;
+        }
+        if (pt.y > this.max.y) {
+          return this.max.y = pt.y;
+        }
+      };
+
+      AABB.prototype.delta = function(box) {
+        return new AABB(this.min, box.min).size + new AABB(this.max, box.max).size;
+      };
+
+      AABB.prototype.render = function(canvas) {
+        var ctx;
+        ctx = canvas.getContext("2d");
+        ctx.strokeStyle = "#F00";
+        ctx.lineWidth = 10;
+        ctx.beginPath();
+        ctx.rect(this.min.x, this.min.y, this.width, this.height);
+        return ctx.stroke();
+      };
+
+      return AABB;
+
+    })();
     Track = (function() {
       function Track(data, options) {
         this.data = data;
         this.options = options;
         this.length = Math.sqrt(this.data.vector.x * this.data.vector.x + this.data.vector.y * this.data.vector.y);
+        this.aabb = null;
       }
 
       Track.prototype.render = function(canvas, percent) {
@@ -51,7 +118,7 @@
     })();
     Stroke = (function() {
       function Stroke(data, options) {
-        var current, i, prev, _i, _ref;
+        var current, i, path, prev, _i, _j, _len, _ref, _ref1;
         this.options = options;
         this.outline = data.outline;
         this.tracks = [];
@@ -71,6 +138,22 @@
         this.length = this.tracks.reduce(function(prev, current) {
           return prev + current.length;
         }, 0);
+        this.aabb = new AABB(data.track[0]);
+        _ref1 = this.outline;
+        for (_j = 0, _len = _ref1.length; _j < _len; _j++) {
+          path = _ref1[_j];
+          if ("x" in path) {
+            console.log(this.aabb);
+            this.aabb.addPoint(path);
+          }
+          if ("begin" in path) {
+            this.aabb.addPoint(path.begin);
+            this.aabb.addPoint(path.end);
+          }
+          if ("mid" in path) {
+            this.aabb.addPoint(path.mid);
+          }
+        }
       }
 
       Stroke.prototype.pathOutline = function(ctx, outline) {
@@ -129,8 +212,17 @@
         }, options);
         this.matrix = [this.options.scale, 0, 0, this.options.scale, 0, 0];
         this.strokes = [];
+        this.aabb = null;
         data.map(function(strokeData) {
-          return _this.strokes.push(new Stroke(strokeData, _this.options));
+          var stroke;
+          stroke = new Stroke(strokeData, _this.options);
+          _this.strokes.push(stroke);
+          if (!_this.aabb) {
+            return _this.aabb = stroke.aabb.clone();
+          } else {
+            _this.aabb.addPoint(stroke.aabb.min);
+            return _this.aabb.addPoint(stroke.aabb.max);
+          }
         });
         this.length = this.strokes.reduce(function(prev, current) {
           return prev + current.length;
@@ -142,22 +234,20 @@
       }
 
       Word.prototype.render = function(canvas, percent) {
-        var ctx, len, stroke, _i, _len, _ref, _results;
+        var ctx, len, stroke, _i, _len, _ref;
         ctx = canvas.getContext("2d");
         ctx.setTransform.apply(ctx, this.matrix);
         len = this.length * percent;
         _ref = this.strokes;
-        _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           stroke = _ref[_i];
           if (len > 0) {
             stroke.render(canvas, Math.min(stroke.length, len) / stroke.length);
-            _results.push(len -= stroke.length);
-          } else {
-            _results.push(void 0);
+            stroke.aabb.render(canvas);
+            len -= stroke.length;
           }
         }
-        return _results;
+        return this.aabb.render(canvas);
       };
 
       return Word;
@@ -235,7 +325,3 @@
   });
 
 }).call(this);
-
-/*
-//@ sourceMappingURL=draw.canvas.2.0.js.map
-*/
