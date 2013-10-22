@@ -4,7 +4,7 @@ module.exports = function(grunt) {
     coffee: {
       compile: {
         options: {
-          sourceMap: true
+          sourceMap: false
         },
         files: {
           /* both */
