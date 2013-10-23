@@ -1,5 +1,10 @@
-# Usage: "createdb strokes; perl hausdorff_distance.pl | psql strokes"
-# Tested on PostgreSQL 9.3 using http://postgresapp.com/
+# Usage:
+#   createdb strokes
+#   perl hausdorff_distance.pl | psql strokes
+#   cd sql && xargs -P 8 -n 1 -- psql strokes -f
+#
+# Adjust "-P 8" above for concurrent CPU cores.
+# Tested on PostgreSQL 9.3 using http://postgresapp.com/.
 use 5.12.0;
 use File::Slurp;
 use JSON::XS;
@@ -21,16 +26,18 @@ for (<json/*.json>) {
     say "INSERT INTO strokes VALUES ('$char', ST_GeomFromText('MULTILINESTRING(@{[ join ', ', map { qq[($_)] } map { join ', ', @$_ } @mls ]})'));";
     push @chars, $char;
 }
-say 'COMMIT;BEGIN;';
-my $count = 0;
+say 'COMMIT;';
+mkdir 'sql';
 for (@chars) {
-say qq[
+    open FH, ">sql/".ord($_).".sql";
+    print FH qq[
     INSERT INTO distance (
-        SELECT '$_' ch1, ch ch2, ST_HausdorffDistance(
+        SELECT '$_' ch1, ch ch2, 
+        ST_HausdorffDistance(
             (SELECT track FROM strokes WHERE ch = '$_'), track
-        )::int distance FROM strokes ORDER BY distance LIMIT 10
+        )::int distance FROM strokes where ST_HausdorffDistance(
+            (SELECT track FROM strokes WHERE ch = '$_'), track
+        )::int BETWEEN 1 AND 150
     );
 ];
-say 'COMMIT;BEGIN;' unless $count++ % 100;
 };
-say 'COMMIT;';
