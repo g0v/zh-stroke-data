@@ -1,7 +1,7 @@
 # Usage:
 #   createdb strokes
 #   perl hausdorff_distance.pl | psql strokes
-#   cd sql && xargs -P 8 -n 1 -- psql strokes -f
+#   cd sql; ls | xargs -P 8 -n 1 -- psql strokes -f
 #
 # Adjust "-P 8" above for concurrent CPU cores.
 # Tested on PostgreSQL 9.3 using http://postgresapp.com/.
@@ -30,6 +30,7 @@ say 'COMMIT;';
 mkdir 'sql';
 for (@chars) {
     open FH, ">sql/".ord($_).".sql";
+    binmode FH, ':utf8';
     print FH qq[
     INSERT INTO distance (
         SELECT '$_' ch1, ch ch2, 
@@ -37,7 +38,7 @@ for (@chars) {
             (SELECT track FROM strokes WHERE ch = '$_'), track
         )::int distance FROM strokes where ST_HausdorffDistance(
             (SELECT track FROM strokes WHERE ch = '$_'), track
-        )::int BETWEEN 1 AND 150
+        )::int BETWEEN 1 AND 199
     );
 ];
 };
