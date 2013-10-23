@@ -43,11 +43,11 @@ for (@chars) {
     binmode FH, ':utf8';
     print FH qq[
     INSERT INTO overlap (
-        SELECT '$_' ch1, ch ch2, ((ST_AREA(ST_INTERSECTION(
+        SELECT '$_' ch1, ch ch2, (ST_AREA(ST_intersection(
             (SELECT outline FROM outlines WHERE ch = '$_'), outline
-        )) / ST_AREA(
-            ST_COLLECT( (SELECT outline FROM outlines WHERE ch = '$_'), outline)
-        )) * 100)::int overlap FROM outlines WHERE '$_' < outlines.ch
+        )) / st_area(
+            st_union( (SELECT outline FROM outlines WHERE ch = '$_'), outline)
+        ) * 100)::int overlap FROM outlines WHERE '$_' < outlines.ch
     );
 ];
 };
