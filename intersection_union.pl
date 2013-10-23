@@ -29,7 +29,7 @@ for (<json/*.json>) {
             ) : "$_->{x} $_->{y}"
         } @{  $part->{outline} } ];
     }
-    say "INSERT INTO strokes VALUES ('$char', ST_MakeValid(ST_SimplifyPreserveTopology(ST_GeomFromText('MULTIPOLYGON(@{[ join ', ', map { qq[(($_))] } map { join ', ', @$_ } @mls ]})'), 32)));";
+    say "INSERT INTO outlines VALUES ('$char', ST_MakeValid(ST_SimplifyPreserveTopology(ST_GeomFromText('MULTIPOLYGON(@{[ join ', ', map { qq[(($_))] } map { join ', ', @$_ } @mls ]})'), 32)));";
     push @chars, $char;
 }
 mkdir 'sql2';
@@ -39,9 +39,9 @@ for (@chars) {
     print FH qq[
     INSERT INTO overlap (
         SELECT '$_' ch1, ch ch2, (ST_AREA(ST_intersection(
-            (SELECT track FROM strokes WHERE ch = '$_'), track
+            (SELECT track FROM outlines WHERE ch = '$_'), track
         )) / st_area(
-            st_union( (SELECT track FROM strokes WHERE ch = '$_'), track)
+            st_union( (SELECT track FROM outlines WHERE ch = '$_'), track)
         ) * 100)::int overlap FROM outlines WHERE '$_' < outlines.ch
     );
 ];
