@@ -39,9 +39,9 @@ for (@chars) {
     print FH qq[
     INSERT INTO overlap (
         SELECT '$_' ch1, ch ch2, (ST_AREA(ST_intersection(
-            (SELECT track FROM outlines WHERE ch = '$_'), track
+            (SELECT outline FROM outlines WHERE ch = '$_'), outline
         )) / st_area(
-            st_union( (SELECT track FROM outlines WHERE ch = '$_'), track)
+            st_union( (SELECT outline FROM outlines WHERE ch = '$_'), outline)
         ) * 100)::int overlap FROM outlines WHERE '$_' < outlines.ch
     );
 ];
