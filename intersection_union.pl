@@ -12,8 +12,10 @@ binmode STDOUT, ':utf8';
 say 'CREATE EXTENSION IF NOT EXISTS postgis;';
 say 'CREATE TABLE IF NOT EXISTS outlines ( ch text NOT NULL, outline geometry );';
 say 'CREATE TABLE IF NOT EXISTS overlap ( ch1 text NOT NULL, ch2 text NOT NULL, overlap int );';
+say 'CREATE TABLE IF NOT EXISTS distance ( ch1 text NOT NULL, ch2 text NOT NULL, distance int );';
 say 'CREATE INDEX idx_overlap on overlap (overlap);';
-say 'DELETE FROM outlines; DELETE FROM overlap;';
+say 'CREATE INDEX idx_distance on distance (distance);';
+say 'DELETE FROM outlines; DELETE FROM overlap; DELETE FROM distance;';
 my @chars;
 for (<json/*.json>) {
     my $char = $_;
@@ -29,7 +31,10 @@ for (<json/*.json>) {
             ) : "$_->{x} $_->{y}"
         } @{  $part->{outline} } ];
     }
-    say "INSERT INTO outlines VALUES ('$char', ST_MakeValid(ST_SimplifyPreserveTopology(ST_GeomFromText('MULTIPOLYGON(@{[ join ', ', map { qq[(($_))] } map { join ', ', @$_ } @mls ]})'), 32)));";
+    #ST_GeomFromText('MULTIPOLYGON(@{[ join ', ', map { qq[(($_))] } map { join ', ', @$_ } @mls ]})')
+    say "INSERT INTO outlines VALUES ('$char', ST_MakeValid(ST_Simplify(ST_Collect(ARRAY[
+        @{[ join ', ', map { qq[ST_ConcaveHull(ST_GeomFromText('POLYGON(($_))'), 0.8)] } map { join ', ', @$_ } @mls ]}
+    ]), 32)));";
     push @chars, $char;
 }
 mkdir 'sql2';
@@ -38,11 +43,11 @@ for (@chars) {
     binmode FH, ':utf8';
     print FH qq[
     INSERT INTO overlap (
-        SELECT '$_' ch1, ch ch2, (ST_AREA(ST_intersection(
+        SELECT '$_' ch1, ch ch2, ROUND(ST_AREA(ST_INTERSECTION(
             (SELECT outline FROM outlines WHERE ch = '$_'), outline
-        )) / st_area(
-            st_union( (SELECT outline FROM outlines WHERE ch = '$_'), outline)
-        ) * 100)::int overlap FROM outlines WHERE '$_' < outlines.ch
+        )) / ST_AREA(
+            ST_UNION( (SELECT outline FROM outlines WHERE ch = '$_'), outline)
+        ) * 100) overlap FROM outlines WHERE '$_' < outlines.ch
     );
 ];
 };
