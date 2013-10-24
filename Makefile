@@ -15,9 +15,18 @@ comp ::
 	lsc scale-missing.ls
 
 try ::
-	lsc scale-missing.ls
+	lsc scale-missing.ls > scale-missing.log
 
 old :: $(STROKES_COMPOSED)
 
 clean ::
 	rm -f $(STROKES_COMPOSED)
+
+total-strokes ::
+	lsc ./total-strokes.ls < ./Unihan/Unihan_DictionaryLikeData.txt > ./total-strokes.json
+
+components ::
+	lsc ./components.ls > ./components.json
+
+computed-missing ::
+	lsc ./computed-missing.ls < missing-components.csv > ./computed-missing.csv

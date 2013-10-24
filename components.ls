@@ -31,6 +31,6 @@ for own char, comps of CharComp
       missing-csv += "\"#{comp.c}\",\"\"\n"
     strokes += comp-strokes
 
-console.log out.comps
+console.log JSON.stringify out.comps
 fs.write-file-sync \missing-strokes.csv, missing-csv
 
