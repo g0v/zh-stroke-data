@@ -63,7 +63,7 @@ for char in Chars
       part.indices = [stroke-offset to stroke-offset + stroke-length - 1] if stroke-offset?
       strokes.push part
     else
-      #console.log "Missing char: #c"
+      console.log "Missing char: #char"
       strokes = null
       break
   continue unless strokes
