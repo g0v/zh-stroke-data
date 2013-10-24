@@ -13,7 +13,8 @@ const T = 2048
 const CharComp = require \./char_comp.json
 Chars = require \./chars.json
 
-missing = []
+missing = {}
+found = {}
 
 for char in Chars
   out = "#{ char.codePointAt!toString 16}.json"
@@ -61,12 +62,13 @@ for char in Chars
       */
       x-ratio = - min-x * w-ratio + x2048
       y-ratio = - min-y * h-ratio + y2048
+      found[ref] = true
       part = { val: ref, matrix: [ w-ratio, 0, 0, h-ratio, x-ratio, y-ratio ] }
       part.indices = [stroke-offset to stroke-offset + stroke-length - 1] if stroke-offset?
       strokes.push part
     else
       console.log "Missing char: #char"
-      missing.push char
+      missing[char] = true
       strokes = null
       break
   continue unless strokes
@@ -88,4 +90,5 @@ for char in Chars
     if i is rule.strokes.length - 1 and not failed
       console.log "Writing json/#out"
       fs.write-file-sync("json/#out", JSON.stringify(result, null, "  "));
-fs.write-file-sync "./scale-missing.json", JSON.stringify missing
+fs.write-file-sync "./scale-missing.json", JSON.stringify Object.keys missing
+fs.write-file-sync "./scale-found.json", JSON.stringify Object.keys found
