@@ -1,6 +1,9 @@
 # Usage:
 #   createdb chars
 #   perl orig-chars.pl | psql chars
+#
+# Generate GeoJSON for e.g. Gist:
+#   psql chars -P t -c "select st_asgeojson(st_rotate(ST_FlipCoordinates(st_translate(st_scale(st_collect(outlines), 0.001, 0.001), 24.4416976, 121.4509512)),pi()/2*3,121.4509512,24.4416976)) from strokes where ch ='萌';" > moe.geojson
 use 5.12.0;
 use File::Slurp;
 use JSON::XS;
