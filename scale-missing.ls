@@ -13,6 +13,8 @@ const T = 2048
 const CharComp = require \./char_comp.json
 Chars = require \./chars.json
 
+missing = []
+
 for char in Chars
   out = "#{ char.codePointAt!toString 16}.json"
   continue if fs.exists-sync "json/#out"
@@ -64,6 +66,7 @@ for char in Chars
       strokes.push part
     else
       console.log "Missing char: #char"
+      missing.push char
       strokes = null
       break
   continue unless strokes
@@ -85,3 +88,4 @@ for char in Chars
     if i is rule.strokes.length - 1 and not failed
       console.log "Writing json/#out"
       fs.write-file-sync("json/#out", JSON.stringify(result, null, "  "));
+fs.write-file-sync "./scale-missing.json", JSON.stringify missing

@@ -7,18 +7,18 @@ String::codePointAt ?= (pos=0) ->
       return ((code - 0xD800) * 0x400) + (next - 0xDC00) + 0x10000
   return code;
 
-require! readline
+const CharComp = require \./char_comp.json
 const Comp = require \./components.json
 const TotalStrokes = require \./total-strokes.json
+const ScaleMissing = require \./scale-missing.json
 
-the-missing-comp = /",*"*/
+out = {}
 
-rl = readline.createInterface process.stdin, process.stdout
-
-line <- rl.on \line
-if line.match the-missing-comp
-  char = line.split the-missing-comp .1
-  out = "\"#{char}\",\"#{TotalStrokes[char.codePointAt(0)]}\","
-  for whole, start of Comp[char]
-    out += "\"#{whole}\",\"#{start}\"," if start
-  console.log out.substring(0, out.length - 1)
+for char in ScaleMissing
+  for {c} in CharComp[char]
+    out[c] = true if not out[c]
+for comp of out
+  result = "\"#comp\",\"#{TotalStrokes[comp.codePointAt(0)]}\","
+  for whole, start of Comp[comp]
+    result += "\"#whole\",\"#start\"," if start
+  console.log result.substring(0, result.length - 1)

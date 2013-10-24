@@ -15,7 +15,7 @@ comp ::
 	lsc scale-missing.ls
 
 try ::
-	lsc scale-missing.ls > scale-missing.log
+	lsc scale-missing.ls
 
 old :: $(STROKES_COMPOSED)
 
@@ -29,4 +29,4 @@ components ::
 	lsc ./components.ls > ./components.json
 
 computed-missing ::
-	lsc ./computed-missing.ls < missing-components.csv > ./computed-missing.csv
+	lsc ./computed-missing.ls > ./computed-missing.csv
