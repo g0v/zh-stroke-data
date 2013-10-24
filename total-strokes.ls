@@ -7,7 +7,7 @@ rl = readline.createInterface process.stdin, process.stdout
 out = {}
 
 
-rl.on \close, -> console.log out
+rl.on \close, -> console.log JSON.stringify out
 line <- rl.on \line
 if not line.match the-comment and line.match the-total-strokes
   data = line.split the-total-strokes
