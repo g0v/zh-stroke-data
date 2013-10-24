@@ -13,7 +13,7 @@ const TotalStrokes = require \./total-strokes.json
 
 out =
   comps:
-    strokes-unknown: []
+    strokes-unknown: {}
   get: (char) ->
     if not @comps[char]
       @comps[char] = {}
@@ -25,7 +25,7 @@ for own char, comps of CharComp
     lookup = out.get comp.c
     lookup[char] = strokes
     comp-strokes = TotalStrokes[comp.c.codePointAt(0)]
-    out.comps.strokes-unknown.push comp.c if not comp-strokes
+    out.comps.strokes-unknown[comp.c] = \? if not comp-strokes and not out.comps.strokes-unknown[comp.c]
     strokes += comp-strokes
 
 console.log out.comps
