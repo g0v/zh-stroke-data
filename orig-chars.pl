@@ -4,6 +4,7 @@
 #
 # Generate GeoJSON for e.g. Gist:
 #   psql chars -P t -f geojson-demo.sql > moe.geojson
+use utf8;
 use 5.12.0;
 use File::Slurp;
 use JSON::XS;
@@ -15,7 +16,7 @@ say 'DELETE FROM strokes;';
 my $orig = File::Slurp::read_file('orig-chars.json', { binmode => ':utf8' });
 my @chars;
 for my $char (split //, $orig) {
-    next if $char eq '"';
+    next if $char eq '"' or $char eq "\x0a";
     my $file = sprintf("json/%x.json", ord $char);
     my (@mls, @tracks);
     for my $part (@{ JSON::XS::decode_json(File::Slurp::read_file($file)) }) {
