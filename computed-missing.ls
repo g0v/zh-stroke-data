@@ -9,6 +9,7 @@ String::codePointAt ?= (pos=0) ->
 
 const CharComp = require \./char_comp.json
 const Comp = require \./components.json
+const RevisedStrokes = require \./revised-strokes.json
 const TotalStrokes = require \./total-strokes.json
 const ScaleMissing = require \./scale-missing.json
 const ScaleFound = require \./scale-found.json
@@ -21,7 +22,7 @@ for comp in ScaleFound => out[comp] = true
 result = {}
 for comp of out
   result[comp] =
-    len: TotalStrokes[comp.codePointAt(0)]
+    len: RevisedStrokes[comp.codePointAt(0)] || TotalStrokes[comp.codePointAt(0)]
     src: { [k, v] for k, v of Comp[comp] | v? and ~OrigChars.indexOf k }
 
 console.log JSON.stringify(result,,2)

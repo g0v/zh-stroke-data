@@ -9,6 +9,7 @@ String::codePointAt ?= (pos=0) ->
 
 require! fs
 const CharComp = require \./char_comp.json
+const RevisedStrokes = require \./revised-strokes.json
 const TotalStrokes = require \./total-strokes.json
 
 missing = {}
@@ -25,7 +26,7 @@ for own char, comps of CharComp
   for comp in comps
     lookup = out.get comp.c
     lookup[char] = strokes
-    comp-strokes = TotalStrokes[comp.c.codePointAt(0)]
+    comp-strokes = RevisedStrokes[comp.c.codePointAt(0)] || TotalStrokes[comp.c.codePointAt(0)]
     if not comp-strokes and not missing[comp.c]
       missing[comp.c] = \?
       missing-csv += "\"#{comp.c}\",\"\"\n"
