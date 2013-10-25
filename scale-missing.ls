@@ -28,7 +28,7 @@ for char in Chars
     ref = c
     comp-chars = Missing[c]
     stroke-offset = Infinity
-    if comp-chars?
+    if comp-chars?len
       for whole, offset of comp-chars.src
         if Math.abs(offset - start) < Math.abs(stroke-offset - start)
           ref = whole
