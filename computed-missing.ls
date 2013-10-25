@@ -9,6 +9,7 @@ String::codePointAt ?= (pos=0) ->
 
 const CharComp = require \./char_comp.json
 const Comp = require \./components.json
+const RevisedStrokes = require \./revised-strokes.json
 const TotalStrokes = require \./total-strokes.json
 const ScaleMissing = require \./scale-missing.json
 const ScaleFound = require \./scale-found.json
