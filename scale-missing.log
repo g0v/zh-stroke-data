@@ -15,8 +15,7 @@ Writing json/4036.json
 Use 目 of 盯(76ef) for 䁾, start from 0, length 5
 Use 蔑 of 襪(896a) for 䁾, start from 5, length 14
 Writing json/407e.json
-Use  of 竺(7afa) for 䉛, start from 0, length undefined
-Writing json/425b.json
+Missing comp: 
 Use 糹 of 糾(7cfe) for 䋃, start from 0, length 6
 Use 毛 of 耗(8017) for 䋃, start from 6, length 4
 Writing json/42c3.json
@@ -55,8 +54,7 @@ Missing comp: 丌
 Use 亠 of 交(4ea4) for 亢, start from 0, length 2
 Use 几 of 冗(5197) for 亢, start from 2, length 2
 Writing json/4ea2.json
-Use  of 亭(4ead) for 亳, start from 0, length undefined
-Missing comp: 乇
+Missing comp: 
 Use 亻 of 什(4ec0) for 仉, start from 0, length 2
 Use 几 of 冗(5197) for 仉, start from 2, length 2
 Writing json/4ec9.json
@@ -71,8 +69,7 @@ Writing json/4f0e.json
 Use 亻 of 什(4ec0) for 佈, start from 0, length 2
 Use 布 of 希(5e0c) for 佈, start from 2, length 5
 Writing json/4f48.json
-Use  of 介(4ecb) for 佘, start from 0, length undefined
-Writing json/4f58.json
+Missing comp: 
 Use 亻 of 什(4ec0) for 佚, start from 0, length 2
 Use 失 of 迭(8fed) for 佚, start from 3, length 5
 Writing json/4f5a.json
@@ -147,16 +144,14 @@ Use 也 of 他(4ed6) for 匜, start from 2, length 3
 Writing json/531c.json
 Use 匚 of 匝(531d) for 匭, start from 0, length 2
 Writing json/532d.json
-Use  of 兜(515c) for 卬, start from 0, length undefined
-Missing comp: 卩
+Missing comp: 
 Use 厂 of 仄(4ec4) for 厘, start from 0, length 2
 Use 里 of 俚(4fda) for 厘, start from 2, length 7
 Writing json/5398.json
 Use 厶 of 允(5141) for 叄, start from 0, length 2
 Use 厶 of 云(4e91) for 叄, start from 2, length 2
 Use 厶 of 參(53c3) for 叄, start from 4, length 2
-Use  of 介(4ecb) for 叄, start from 0, length undefined
-Writing json/53c4.json
+Missing comp: 
 Use 口 of 兄(5144) for 叶, start from 0, length 3
 Use 十 of 汁(6c41) for 叶, start from 3, length 2
 Writing json/53f6.json
@@ -208,8 +203,7 @@ Use 口 of 兄(5144) for 唏, start from 0, length 3
 Use 希 of 稀(7a00) for 唏, start from 5, length 7
 Writing json/550f.json
 Use 口 of 兄(5144) for 唚, start from 0, length 3
-Use  of 浸(6d78) for 唚, start from 3, length undefined
-Writing json/551a.json
+Missing comp: 
 Use 口 of 兄(5144) for 唵, start from 0, length 3
 Use 奄 of 庵(5eb5) for 唵, start from 3, length 8
 Writing json/5535.json
@@ -238,8 +232,7 @@ Use 口 of 兄(5144) for 嗝, start from 0, length 3
 Use 鬲 of 隔(9694) for 嗝, start from 2, length 10
 Writing json/55dd.json
 Use 口 of 兄(5144) for 嗩, start from 0, length 3
-Use  of 瑣(7463) for 嗩, start from 4, length undefined
-Writing json/55e9.json
+Missing comp: 
 Use 口 of 兄(5144) for 嗶, start from 0, length 3
 Writing json/55f6.json
 Use 口 of 兄(5144) for 噁, start from 0, length 3
@@ -310,8 +303,7 @@ Writing json/5848.json
 Use 土 of 去(53bb) for 墩, start from 0, length 3
 Use 敦 of 燉(71c9) for 墩, start from 4, length 12
 Writing json/58a9.json
-Use  of 擊(64ca) for 墼, start from 0, length undefined
-Writing json/58bc.json
+Missing comp: 
 Use 殿 of 臀(81c0) for 壂, start from 0, length 13
 Use 土 of 墾(58be) for 壂, start from 13, length 3
 Writing json/58c2.json
@@ -347,8 +339,7 @@ Use 女 of 奴(5974) for 媧, start from 0, length 3
 Use 咼 of 渦(6e26) for 媧, start from 3, length 8
 Writing json/5aa7.json
 Use 月 of 勝(52dd) for 媵, start from 0, length 4
-Use  of 謄(8b04) for 媵, start from 4, length undefined
-Writing json/5ab5.json
+Missing comp: 
 Use 女 of 奴(5974) for 嫋, start from 0, length 3
 Use 弱 of 溺(6eba) for 嫋, start from 3, length 10
 Writing json/5acb.json
@@ -364,10 +355,8 @@ Writing json/5b17.json
 Use 女 of 奴(5974) for 嬡, start from 0, length 3
 Use 愛 of 噯(566f) for 嬡, start from 3, length 13
 Writing json/5b21.json
-Use  of 孿(5b7f) for 孌, start from 0, length undefined
-Writing json/5b4c.json
-Use  of 索(7d22) for 孛, start from 0, length undefined
-Writing json/5b5b.json
+Missing comp: 
+Missing comp: 
 Use 子 of 孔(5b54) for 孢, start from 0, length 3
 Use 包 of 咆(5486) for 孢, start from 3, length 5
 Writing json/5b62.json
@@ -468,8 +457,7 @@ Writing json/5ee5.json
 Use 广 of 唐(5510) for 廩, start from 0, length 3
 Use 稟 of 懍(61cd) for 廩, start from 3, length 13
 Writing json/5ee9.json
-Use  of 轂(8f42) for 彀, start from 0, length undefined
-Missing comp: 殳
+Missing comp: 
 Use 彑 of 彙(5f59) for 彘, start from 0, length 3
 Use 匕 of 叱(53f1) for 彘, start from 3, length 2
 Use 矢 of 疾(75be) for 彘, start from 5, length 5
@@ -619,8 +607,7 @@ Use 扌 of 扎(624e) for 捅, start from 0, length 3
 Use 甬 of 通(901a) for 捅, start from 3, length 7
 Writing json/6345.json
 Use 扌 of 扎(624e) for 捋, start from 0, length 3
-Use  of 妥(59a5) for 捋, start from 0, length undefined
-Writing json/634b.json
+Missing comp: 
 Use 扌 of 扎(624e) for 捌, start from 0, length 3
 Writing json/634c.json
 Use 扌 of 扎(624e) for 捍, start from 0, length 3
@@ -673,8 +660,7 @@ Writing json/6426.json
 Use 扌 of 扎(624e) for 搧, start from 0, length 3
 Use 扇 of 煽(717d) for 搧, start from 4, length 10
 Writing json/6427.json
-Use  of 塞(585e) for 搴, start from 0, length undefined
-Writing json/6434.json
+Missing comp: 
 Use 扌 of 扎(624e) for 摀, start from 0, length 3
 Use 烏 of 嗚(55da) for 摀, start from 3, length 10
 Writing json/6440.json
@@ -682,8 +668,7 @@ Use 扌 of 扎(624e) for 摓, start from 0, length 3
 Use 逢 of 蓬(84ec) for 摓, start from 3, length 10
 Writing json/6453.json
 Use 扌 of 扎(624e) for 摠, start from 0, length 3
-Use  of 蔥(8525) for 摠, start from 3, length undefined
-Writing json/6460.json
+Missing comp: 
 Use 扌 of 扎(624e) for 摭, start from 0, length 3
 Use 庶 of 蔗(8517) for 摭, start from 3, length 11
 Writing json/646d.json
@@ -720,8 +705,7 @@ Writing json/64f7.json
 Use 扌 of 扎(624e) for 攢, start from 0, length 3
 Use 贊 of 讚(8b9a) for 攢, start from 7, length 19
 Writing json/6522.json
-Use  of 候(5019) for 攸, start from 0, length undefined
-Missing comp: 攵
+Missing comp: 
 Use 米 of 料(6599) for 敉, start from 0, length 6
 Use 攵 of 效(6548) for 敉, start from 6, length 4
 Writing json/6549.json
@@ -732,11 +716,9 @@ Use 文 of 吝(541d) for 斕, start from 0, length 4
 Use 闌 of 欄(6b04) for 斕, start from 4, length 17
 Writing json/6595.json
 Use 方 of 放(653e) for 旃, start from 0, length 4
-Use  of 旌(65cc) for 旃, start from 4, length undefined
-Writing json/65c3.json
+Missing comp: 
 Use 方 of 放(653e) for 旄, start from 0, length 4
-Use  of 旌(65cc) for 旄, start from 4, length undefined
-Writing json/65c4.json
+Missing comp: 
 Use 九 of 旭(65ed) for 旮, start from 0, length 2
 Use 日 of 冥(51a5) for 旮, start from 2, length 4
 Writing json/65ee.json
@@ -858,8 +840,7 @@ Use 木 of 彬(5f6c) for 栖, start from 0, length 4
 Use 西 of 晒(6652) for 栖, start from 4, length 6
 Writing json/6816.json
 Use 木 of 彬(5f6c) for 栝, start from 0, length 4
-Use  of 括(62ec) for 栝, start from 3, length undefined
-Writing json/681d.json
+Missing comp: 
 Use 木 of 彬(5f6c) for 栱, start from 0, length 4
 Use 共 of 暴(66b4) for 栱, start from 4, length 6
 Writing json/6831.json
@@ -908,8 +889,7 @@ Writing json/6942.json
 Use 木 of 彬(5f6c) for 楣, start from 0, length 4
 Use 眉 of 媚(5a9a) for 楣, start from 3, length 9
 Writing json/6963.json
-Use  of 乾(4e7e) for 榦, start from 0, length undefined
-Missing comp: 
+Missing comp: 
 Use 木 of 彬(5f6c) for 榱, start from 0, length 4
 Writing json/69b1.json
 Use 木 of 彬(5f6c) for 榹, start from 0, length 4
@@ -940,8 +920,7 @@ Missing comp: 雩
 Use 木 of 彬(5f6c) for 樨, start from 0, length 4
 Use 犀 of 墀(5880) for 樨, start from 3, length 12
 Writing json/6a28.json
-Use  of 囊(56ca) for 橐, start from 0, length undefined
-Missing comp: 冖
+Missing comp: 
 Use 木 of 彬(5f6c) for 橑, start from 0, length 4
 Use 尞 of 燎(71ce) for 橑, start from 4, length 12
 Writing json/6a51.json
@@ -1014,8 +993,7 @@ Writing json/6bd6.json
 Use 毛 of 毯(6bef) for 毬, start from 0, length 4
 Use 求 of 球(7403) for 毬, start from 4, length 7
 Writing json/6bec.json
-Use  of 犛(729b) for 氂, start from 0, length undefined
-Writing json/6c02.json
+Missing comp: 
 Use 敞 of 廠(5ee0) for 氅, start from 3, length 12
 Use 毛 of 麾(9ebe) for 氅, start from 11, length 4
 Writing json/6c05.json
@@ -1142,11 +1120,9 @@ Missing comp: 圂
 Use 氵 of 氾(6c3e) for 溽, start from 0, length 3
 Use 辱 of 褥(8925) for 溽, start from 5, length 10
 Writing json/6ebd.json
-Use  of 勞(52de) for 滎, start from 0, length undefined
-Writing json/6ece.json
+Missing comp: 
 Use 肉 of 肋(808b) for 滕, start from 0, length 6
-Use  of 謄(8b04) for 滕, start from 4, length undefined
-Missing comp: 氺
+Missing comp: 
 Use 氵 of 氾(6c3e) for 滫, start from 0, length 3
 Writing json/6eeb.json
 Use 氵 of 氾(6c3e) for 滷, start from 0, length 3
@@ -1200,8 +1176,7 @@ Writing json/70f7.json
 Use 火 of 灶(7076) for 焜, start from 0, length 4
 Use 昆 of 棍(68cd) for 焜, start from 4, length 8
 Writing json/711c.json
-Use  of 勞(52de) for 煢, start from 0, length undefined
-Missing comp: 卂
+Missing comp: 
 Use 火 of 灶(7076) for 煨, start from 0, length 4
 Use 畏 of 喂(5582) for 煨, start from 3, length 9
 Writing json/7168.json
@@ -1211,8 +1186,7 @@ Writing json/7172.json
 Use 火 of 灶(7076) for 煸, start from 0, length 4
 Use 扁 of 遍(904d) for 煸, start from 3, length 9
 Writing json/7178.json
-Use  of 勞(52de) for 熒, start from 0, length undefined
-Writing json/7192.json
+Missing comp: 
 Use 火 of 灶(7076) for 熠, start from 0, length 4
 Use 習 of 摺(647a) for 熠, start from 3, length 11
 Writing json/71a0.json
@@ -1236,8 +1210,7 @@ Use 爿 of 壯(58ef) for 牂, start from 0, length 4
 Use 羊 of 氧(6c27) for 牂, start from 4, length 6
 Writing json/7242.json
 Use 牜 of 牝(725d) for 牬, start from 0, length 4
-Use  of 姊(59ca) for 牬, start from 3, length undefined
-Writing json/726c.json
+Missing comp: 
 Use 牜 of 牝(725d) for 犗, start from 0, length 4
 Use 害 of 瞎(778e) for 犗, start from 5, length 10
 Writing json/7297.json
@@ -1315,8 +1288,7 @@ Writing json/74ab.json
 Use 王 of 噩(5669) for 璵, start from 0, length 4
 Use 與 of 嶼(5dbc) for 璵, start from 3, length 13
 Writing json/74b5.json
-Use  of 爨(7228) for 璺, start from 0, length undefined
-Writing json/74ba.json
+Missing comp: 
 Use 工 of 功(529f) for 瓨, start from 0, length 3
 Use 瓦 of 瓶(74f6) for 瓨, start from 6, length 4
 Writing json/74e8.json
@@ -1357,8 +1329,7 @@ Writing json/755b.json
 Use 田 of 思(601d) for 畷, start from 0, length 5
 Use 叕 of 綴(7db4) for 畷, start from 6, length 8
 Writing json/7577.json
-Use  of 幾(5e7e) for 畿, start from 0, length undefined
-Writing json/757f.json
+Missing comp: 
 Use 疒 of 疙(7599) for 疕, start from 0, length 5
 Use 匕 of 此(6b64) for 疕, start from 4, length 2
 Writing json/7595.json
@@ -1545,8 +1516,7 @@ Use 禾 of 乘(4e58) for 秫, start from 0, length 5
 Use 朮 of 術(8853) for 秫, start from 6, length 5
 Writing json/79eb.json
 Use 禾 of 乘(4e58) for 秭, start from 0, length 5
-Use  of 姊(59ca) for 秭, start from 3, length undefined
-Writing json/79ed.json
+Missing comp: 
 Use 禾 of 乘(4e58) for 稗, start from 0, length 5
 Use 卑 of 痺(75fa) for 稗, start from 5, length 8
 Writing json/7a17.json
@@ -1571,88 +1541,47 @@ Writing json/7abf.json
 Use 立 of 妾(59be) for 竦, start from 0, length 5
 Use 束 of 悚(609a) for 竦, start from 3, length 7
 Writing json/7ae6.json
-Use  of 竺(7afa) for 笄, start from 0, length undefined
-Missing comp: 开
-Use  of 竺(7afa) for 笈, start from 0, length undefined
-Writing json/7b08.json
-Use  of 竺(7afa) for 笏, start from 0, length undefined
-Writing json/7b0f.json
-Use  of 竺(7afa) for 笥, start from 0, length undefined
-Writing json/7b25.json
-Use  of 竺(7afa) for 笫, start from 0, length undefined
-Missing comp: 
-Use  of 竺(7afa) for 笭, start from 0, length undefined
-Writing json/7b2d.json
-Use  of 竺(7afa) for 笳, start from 0, length undefined
-Writing json/7b33.json
-Use  of 竺(7afa) for 筊, start from 0, length undefined
-Writing json/7b4a.json
-Use  of 竺(7afa) for 筌, start from 0, length undefined
-Writing json/7b4c.json
-Use  of 竺(7afa) for 筑, start from 0, length undefined
-Missing comp: 
-Use  of 竺(7afa) for 筥, start from 0, length undefined
-Writing json/7b65.json
-Use  of 竺(7afa) for 筧, start from 0, length undefined
-Writing json/7b67.json
-Use  of 竺(7afa) for 筩, start from 0, length undefined
-Writing json/7b69.json
-Use  of 竺(7afa) for 筭, start from 0, length undefined
-Writing json/7b6d.json
-Use  of 竺(7afa) for 筮, start from 0, length undefined
-Writing json/7b6e.json
-Use  of 竺(7afa) for 筲, start from 0, length undefined
-Writing json/7b72.json
-Use  of 竺(7afa) for 箄, start from 0, length undefined
-Writing json/7b84.json
-Use  of 竺(7afa) for 箅, start from 0, length undefined
-Missing comp: 畀
-Use  of 竺(7afa) for 箍, start from 0, length undefined
-Missing comp: 扌
-Use  of 竺(7afa) for 箛, start from 0, length undefined
-Writing json/7b9b.json
-Use  of 竺(7afa) for 箜, start from 0, length undefined
-Writing json/7b9c.json
-Use  of 竺(7afa) for 箠, start from 0, length undefined
-Writing json/7ba0.json
-Use  of 竺(7afa) for 箯, start from 0, length undefined
-Writing json/7baf.json
-Use  of 竺(7afa) for 箸, start from 0, length undefined
-Writing json/7bb8.json
-Use  of 竺(7afa) for 篅, start from 0, length undefined
-Missing comp: 耑
-Use  of 竺(7afa) for 篋, start from 0, length undefined
-Missing comp: 匚
-Use  of 竺(7afa) for 篌, start from 0, length undefined
-Writing json/7bcc.json
-Use  of 竺(7afa) for 篍, start from 0, length undefined
-Writing json/7bcd.json
-Use  of 竺(7afa) for 篝, start from 0, length undefined
-Missing comp: 冓
-Use  of 竺(7afa) for 篦, start from 0, length undefined
-Missing comp: 囟
-Use  of 竺(7afa) for 篨, start from 0, length undefined
-Writing json/7be8.json
-Use  of 竺(7afa) for 篳, start from 0, length undefined
-Writing json/7bf3.json
-Use  of 竺(7afa) for 簀, start from 0, length undefined
-Writing json/7c00.json
-Use  of 竺(7afa) for 簁, start from 0, length undefined
-Writing json/7c01.json
-Use  of 竺(7afa) for 簋, start from 0, length undefined
-Writing json/7c0b.json
-Use  of 竺(7afa) for 簌, start from 0, length undefined
-Missing comp: 欶
-Use  of 竺(7afa) for 簟, start from 0, length undefined
-Writing json/7c1f.json
-Use  of 竺(7afa) for 簦, start from 0, length undefined
-Writing json/7c26.json
-Use  of 竺(7afa) for 籧, start from 0, length undefined
-Writing json/7c67.json
-Use  of 竺(7afa) for 籫, start from 0, length undefined
-Writing json/7c6b.json
-Use  of 竺(7afa) for 籲, start from 0, length undefined
-Missing comp: 龠
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
 Use 米 of 料(6599) for 籽, start from 0, length 6
 Use 子 of 季(5b63) for 籽, start from 5, length 3
 Writing json/7c7d.json
@@ -1665,8 +1594,7 @@ Writing json/7c95.json
 Use 米 of 料(6599) for 粘, start from 0, length 6
 Use 占 of 砧(7827) for 粘, start from 5, length 5
 Writing json/7c98.json
-Use  of 餐(9910) for 粲, start from 0, length undefined
-Writing json/7cb2.json
+Missing comp: 
 Use 粦 of 鄰(9130) for 粼, start from 0, length 12
 Missing comp: 巜
 Use 米 of 料(6599) for 粿, start from 0, length 6
@@ -1718,8 +1646,7 @@ Use 糹 of 糾(7cfe) for 紺, start from 0, length 6
 Use 甘 of 甜(751c) for 紺, start from 6, length 5
 Writing json/7d3a.json
 Use 糹 of 糾(7cfe) for 絁, start from 0, length 6
-Use  of 施(65bd) for 絁, start from 4, length undefined
-Writing json/7d41.json
+Missing comp: 
 Use 攸 of 修(4fee) for 絛, start from 0, length 7
 Use 糸 of 辮(8fae) for 絛, start from 7, length 6
 Writing json/7d5b.json
@@ -1775,16 +1702,14 @@ Use 糹 of 糾(7cfe) for 縐, start from 0, length 6
 Use 芻 of 趨(8da8) for 縐, start from 7, length 10
 Writing json/7e10.json
 Use 糹 of 糾(7cfe) for 縕, start from 0, length 6
-Use  of 瘟(761f) for 縕, start from 5, length undefined
-Writing json/7e15.json
+Missing comp: 
 Use 糹 of 糾(7cfe) for 縝, start from 0, length 6
 Use 真 of 鎮(93ae) for 縝, start from 8, length 10
 Writing json/7e1d.json
 Use 糹 of 糾(7cfe) for 縟, start from 0, length 6
 Use 辱 of 褥(8925) for 縟, start from 5, length 10
 Writing json/7e1f.json
-Use  of 轂(8f42) for 縠, start from 0, length undefined
-Writing json/7e20.json
+Missing comp: 
 Use 糹 of 糾(7cfe) for 縳, start from 0, length 6
 Use 專 of 磚(78da) for 縳, start from 5, length 11
 Writing json/7e33.json
@@ -1796,8 +1721,7 @@ Writing json/7e35.json
 Use 糹 of 糾(7cfe) for 縹, start from 0, length 6
 Use 票 of 瞟(779f) for 縹, start from 5, length 11
 Writing json/7e39.json
-Use  of 鷂(9dc2) for 繇, start from 0, length undefined
-Writing json/7e47.json
+Missing comp: 
 Use 糹 of 糾(7cfe) for 繎, start from 0, length 6
 Use 然 of 燃(71c3) for 繎, start from 4, length 12
 Writing json/7e4e.json
@@ -1827,20 +1751,16 @@ Use 盧 of 臚(81da) for 纑, start from 6, length 16
 Writing json/7e91.json
 Use 縣 of 懸(61f8) for 纛, start from 0, length 16
 Writing json/7e9b.json
-Use  of 勞(52de) for 罃, start from 0, length undefined
-Writing json/7f43.json
+Missing comp: 
 Use 雍 of 壅(58c5) for 罋, start from 0, length 13
 Use 缶 of 罄(7f44) for 罋, start from 11, length 6
 Writing json/7f4b.json
 Use 賏 of 嬰(5b30) for 罌, start from 0, length 14
 Use 缶 of 罄(7f44) for 罌, start from 11, length 6
 Writing json/7f4c.json
-Use  of 眾(773e) for 罡, start from 0, length undefined
-Writing json/7f61.json
-Use  of 眾(773e) for 罣, start from 0, length undefined
-Writing json/7f63.json
-Use  of 善(5584) for 羑, start from 0, length undefined
-Writing json/7f91.json
+Missing comp: 
+Missing comp: 
+Missing comp: 
 Use 羊 of 羚(7f9a) for 羖, start from 0, length 6
 Use 殳 of 股(80a1) for 羖, start from 6, length 4
 Writing json/7f96.json
@@ -1877,8 +1797,7 @@ Use 大 of 夸(5938) for 耷, start from 0, length 3
 Use 耳 of 弭(5f2d) for 耷, start from 3, length 6
 Writing json/8037.json
 Use 耳 of 取(53d6) for 聒, start from 0, length 6
-Use  of 話(8a71) for 聒, start from 7, length undefined
-Writing json/8052.json
+Missing comp: 
 Use 耳 of 取(53d6) for 聵, start from 0, length 6
 Use 貴 of 潰(6f70) for 聵, start from 3, length 12
 Writing json/8075.json
@@ -1906,8 +1825,7 @@ Writing json/80fa.json
 Use 肉 of 肋(808b) for 胼, start from 0, length 6
 Use 并 of 餅(9905) for 胼, start from 8, length 6
 Writing json/80fc.json
-Use  of 哉(54c9) for 胾, start from 0, length undefined
-Writing json/80fe.json
+Missing comp: 
 Use 肉 of 肋(808b) for 脛, start from 0, length 6
 Use 巠 of 經(7d93) for 脛, start from 6, length 7
 Writing json/811b.json
@@ -1944,8 +1862,7 @@ Writing json/81b9.json
 Use 肉 of 肋(808b) for 臊, start from 0, length 6
 Use 喿 of 燥(71e5) for 臊, start from 4, length 13
 Writing json/81ca.json
-Use  of 孿(5b7f) for 臠, start from 0, length undefined
-Writing json/81e0.json
+Missing comp: 
 Use 肉 of 肋(808b) for 臢, start from 0, length 6
 Use 贊 of 讚(8b9a) for 臢, start from 7, length 19
 Writing json/81e2.json
@@ -2158,8 +2075,7 @@ Use 歹 of 列(5217) for 薤, start from 0, length 4
 Writing json/85a4.json
 Use 艹 of 艾(827e) for 薦, start from 0, length 3
 Missing comp: 廌
-Use  of 夢(5922) for 薨, start from 0, length undefined
-Writing json/85a8.json
+Missing comp: 
 Use 艹 of 艾(827e) for 薴, start from 0, length 3
 Use 寧 of 嚀(5680) for 薴, start from 3, length 14
 Writing json/85b4.json
@@ -2202,8 +2118,7 @@ Use 虫 of 虹(8679) for 蛐, start from 0, length 6
 Use 曲 of 農(8fb2) for 蛐, start from 0, length 6
 Writing json/86d0.json
 Use 虫 of 虹(8679) for 蛞, start from 0, length 6
-Use  of 話(8a71) for 蛞, start from 7, length undefined
-Writing json/86de.json
+Missing comp: 
 Use 虫 of 虹(8679) for 蜆, start from 0, length 6
 Use 見 of 硯(786f) for 蜆, start from 5, length 7
 Writing json/8706.json
@@ -2263,8 +2178,7 @@ Use 執 of 墊(588a) for 蟄, start from 0, length 11
 Use 虫 of 螫(87ab) for 蟄, start from 11, length 6
 Writing json/87c4.json
 Use 虫 of 虹(8679) for 蟎, start from 0, length 6
-Use  of 瞞(779e) for 蟎, start from 5, length undefined
-Writing json/87ce.json
+Missing comp: 
 Use 虫 of 虹(8679) for 蟠, start from 0, length 6
 Use 番 of 審(5be9) for 蟠, start from 3, length 12
 Writing json/87e0.json
@@ -2351,8 +2265,7 @@ Writing json/8a07.json
 Use 訁 of 訂(8a02) for 訑, start from 0, length 7
 Use 也 of 牠(7260) for 訑, start from 4, length 3
 Writing json/8a11.json
-Use  of 眾(773e) for 詈, start from 0, length undefined
-Writing json/8a48.json
+Missing comp: 
 Use 訁 of 訂(8a02) for 詎, start from 0, length 7
 Use 巨 of 矩(77e9) for 詎, start from 5, length 4
 Writing json/8a4e.json
@@ -2458,8 +2371,7 @@ Writing json/8cba.json
 Use 貝 of 則(5247) for 賕, start from 0, length 7
 Use 求 of 球(7403) for 賕, start from 4, length 7
 Writing json/8cd5.json
-Use  of 熙(7199) for 賾, start from 0, length undefined
-Writing json/8cfe.json
+Missing comp: 
 Use 執 of 墊(588a) for 贄, start from 0, length 11
 Use 貝 of 贅(8d05) for 贄, start from 10, length 7
 Writing json/8d04.json
@@ -2474,59 +2386,34 @@ Writing json/8d91.json
 Use 走 of 赳(8d73) for 趖, start from 0, length 7
 Use 坐 of 銼(92bc) for 趖, start from 8, length 7
 Writing json/8d96.json
-Use  of 趴(8db4) for 趺, start from 0, length undefined
-Writing json/8dba.json
-Use  of 趴(8db4) for 跗, start from 0, length undefined
-Writing json/8dd7.json
-Use  of 趴(8db4) for 跤, start from 0, length undefined
-Writing json/8de4.json
-Use  of 趴(8db4) for 跬, start from 0, length undefined
-Writing json/8dec.json
-Use  of 趴(8db4) for 踉, start from 0, length undefined
-Writing json/8e09.json
-Use  of 趴(8db4) for 踊, start from 0, length undefined
-Writing json/8e0a.json
-Use  of 趴(8db4) for 踞, start from 0, length undefined
-Writing json/8e1e.json
-Use  of 趴(8db4) for 踮, start from 0, length undefined
-Writing json/8e2e.json
-Use  of 趴(8db4) for 踰, start from 0, length undefined
-Writing json/8e30.json
-Use  of 趴(8db4) for 踽, start from 0, length undefined
-Writing json/8e3d.json
-Use  of 塞(585e) for 蹇, start from 0, length undefined
-Writing json/8e47.json
-Use  of 趴(8db4) for 蹌, start from 0, length undefined
-Writing json/8e4c.json
-Use  of 趴(8db4) for 蹓, start from 0, length undefined
-Writing json/8e53.json
-Use  of 趴(8db4) for 蹕, start from 0, length undefined
-Writing json/8e55.json
-Use  of 趴(8db4) for 蹚, start from 0, length undefined
-Writing json/8e5a.json
-Use  of 趴(8db4) for 蹟, start from 0, length undefined
-Writing json/8e5f.json
-Use  of 趴(8db4) for 蹧, start from 0, length undefined
-Writing json/8e67.json
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
 Use 敝 of 幣(5e63) for 蹩, start from 0, length 11
 Use 足 of 蹙(8e59) for 蹩, start from 11, length 7
 Writing json/8e69.json
-Use  of 趴(8db4) for 蹭, start from 0, length undefined
-Writing json/8e6d.json
-Use  of 趴(8db4) for 蹴, start from 0, length undefined
-Writing json/8e74.json
-Use  of 趴(8db4) for 躊, start from 0, length undefined
-Writing json/8e8a.json
-Use  of 趴(8db4) for 躋, start from 0, length undefined
-Writing json/8e8b.json
-Use  of 趴(8db4) for 躍, start from 0, length undefined
-Writing json/8e8d.json
-Use  of 趴(8db4) for 躐, start from 0, length undefined
-Missing comp: 巤
-Use  of 趴(8db4) for 躓, start from 0, length undefined
-Writing json/8e93.json
-Use  of 趴(8db4) for 躕, start from 0, length undefined
-Writing json/8e95.json
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
+Missing comp: 
 Use 車 of 斬(65ac) for 軜, start from 0, length 7
 Use 內 of 訥(8a25) for 軜, start from 7, length 4
 Writing json/8edc.json
@@ -2574,8 +2461,7 @@ Use 言 of 誓(8a93) for 辯, start from 7, length 7
 Use 辛 of 辯(8faf) for 辯, start from 14, length 7
 Missing comp: 辛
 Use 彡 of 須(9808) for 辵, start from 0, length 3
-Use  of 走(8d70) for 辵, start from 3, length undefined
-Writing json/8fb5.json
+Missing comp: 
 Use 辶 of 巡(5de1) for 迍, start from 0, length 3
 Use 屯 of 囤(56e4) for 迍, start from 3, length 4
 Writing json/8fcd.json
@@ -2583,8 +2469,7 @@ Use 辶 of 巡(5de1) for 迸, start from 0, length 3
 Use 并 of 屏(5c4f) for 迸, start from 3, length 6
 Writing json/8ff8.json
 Use 辶 of 巡(5de1) for 适, start from 0, length 3
-Use  of 括(62ec) for 适, start from 3, length undefined
-Writing json/9002.json
+Missing comp: 
 Use 辶 of 巡(5de1) for 逑, start from 0, length 3
 Use 求 of 球(7403) for 逑, start from 4, length 7
 Writing json/9011.json
@@ -2595,8 +2480,7 @@ Use 辶 of 巡(5de1) for 遛, start from 0, length 3
 Use 留 of 溜(6e9c) for 遛, start from 3, length 10
 Writing json/905b.json
 Use 辶 of 巡(5de1) for 遢, start from 0, length 3
-Use  of 塌(584c) for 遢, start from 3, length undefined
-Writing json/9062.json
+Missing comp: 
 Use 辶 of 巡(5de1) for 遯, start from 0, length 3
 Writing json/906f.json
 Use 辶 of 巡(5de1) for 遶, start from 0, length 3
@@ -2604,8 +2488,7 @@ Use 堯 of 撓(6493) for 遶, start from 3, length 12
 Writing json/9076.json
 Use 辶 of 巡(5de1) for 邃, start from 0, length 3
 Use 穴 of 帘(5e18) for 邃, start from 0, length 5
-Use  of 遂(9042) for 邃, start from 3, length undefined
-Writing json/9083.json
+Missing comp: 
 Use 辶 of 巡(5de1) for 邅, start from 0, length 3
 Use 亶 of 壇(58c7) for 邅, start from 3, length 13
 Writing json/9085.json
@@ -2676,8 +2559,7 @@ Use 酉 of 酊(914a) for 醮, start from 0, length 7
 Use 焦 of 瞧(77a7) for 醮, start from 5, length 12
 Writing json/91ae.json
 Use 酉 of 酊(914a) for 醯, start from 0, length 7
-Use  of 毓(6bd3) for 醯, start from 7, length undefined
-Writing json/91af.json
+Missing comp: 
 Use 酉 of 酊(914a) for 醱, start from 0, length 7
 Use 發 of 廢(5ee2) for 醱, start from 3, length 12
 Writing json/91b1.json
@@ -2880,8 +2762,7 @@ Use 阝 of 阡(9621) for 隤, start from 0, length 2
 Use 貴 of 匱(5331) for 隤, start from 2, length 12
 Writing json/96a4.json
 Use 阝 of 阡(9621) for 隰, start from 0, length 2
-Use  of 顯(986f) for 隰, start from 0, length undefined
-Writing json/96b0.json
+Missing comp: 
 Use 隹 of 售(552e) for 隼, start from 0, length 8
 Use 十 of 針(91dd) for 隼, start from 8, length 2
 Writing json/96bc.json
@@ -2929,8 +2810,7 @@ Use 革 of 勒(52d2) for 鞮, start from 0, length 9
 Use 是 of 堤(5824) for 鞮, start from 3, length 9
 Writing json/97ae.json
 Use 革 of 勒(52d2) for 韅, start from 0, length 9
-Use  of 顯(986f) for 韅, start from 0, length undefined
-Writing json/97c5.json
+Missing comp: 
 Use 是 of 匙(5319) for 韙, start from 0, length 9
 Use 韋 of 闈(95c8) for 韙, start from 8, length 9
 Writing json/97d9.json
@@ -2949,8 +2829,8 @@ Writing json/981c.json
 Use 安 of 案(6848) for 頞, start from 0, length 6
 Use 頁 of 囂(56c2) for 頞, start from 6, length 9
 Writing json/981e.json
-Use  of 滿(6eff) for 顢, start from 3, length undefined
-Writing json/9862.json
+Missing comp: 
+Use 頁 of 題(984c) for 顧, start from 9, length 9
 Writing json/9867.json
 Use 雚 of 勸(52f8) for 顴, start from 0, length 17
 Use 頁 of 顱(9871) for 顴, start from 16, length 9
@@ -3118,8 +2998,7 @@ Use 尊 of 樽(6a3d) for 鱒, start from 4, length 12
 Writing json/9c52.json
 Use 魚 of 穌(7a4c) for 鱘, start from 0, length 11
 Writing json/9c58.json
-Use  of 學(5b78) for 鱟, start from 0, length undefined
-Writing json/9c5f.json
+Missing comp: 
 Use 魚 of 穌(7a4c) for 鱣, start from 0, length 11
 Use 亶 of 羶(7fb6) for 鱣, start from 6, length 13
 Writing json/9c63.json
@@ -3136,8 +3015,7 @@ Writing json/9d1e.json
 Use 氐 of 邸(90b8) for 鴟, start from 0, length 5
 Use 鳥 of 鴒(9d12) for 鴟, start from 5, length 11
 Writing json/9d1f.json
-Use  of 刮(522e) for 鴰, start from 0, length undefined
-Writing json/9d30.json
+Missing comp: 
 Use 安 of 案(6848) for 鴳, start from 0, length 6
 Use 鳥 of 鴻(9d3b) for 鴳, start from 6, length 11
 Writing json/9d33.json
@@ -3199,16 +3077,14 @@ Writing json/9f4e.json
 Use 齒 of 齜(9f5c) for 齔, start from 0, length 15
 Use 匕 of 匙(5319) for 齔, start from 9, length 2
 Writing json/9f54.json
-Use  of 契(5951) for 齧, start from 0, length undefined
-Writing json/9f67.json
+Missing comp: 
 Use 齒 of 齜(9f5c) for 齶, start from 0, length 15
 Use 咢 of 愕(6115) for 齶, start from 3, length 9
 Writing json/9f76.json
 Use 合 of 拿(62ff) for 龕, start from 0, length 6
 Use 龍 of 矓(77d3) for 龕, start from 5, length 16
 Writing json/9f95.json
-Use  of 竺(7afa) for 𥫱, start from 0, length undefined
-Writing json/25af1.json
+Missing comp: 
 Use 釒 of 欽(6b3d) for 𨬍, start from 0, length 8
 Use 隋 of 橢(6a62) for 𨬍, start from 4, length 11
 Writing json/28b0d.json

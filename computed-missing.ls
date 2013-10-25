@@ -12,16 +12,12 @@ const Comp = require \./components.json
 const TotalStrokes = require \./total-strokes.json
 const ScaleMissing = require \./scale-missing.json
 const ScaleFound = require \./scale-found.json
-const OrigChars = require \./orig-chars.json
 
 out = {}
 for char in ScaleMissing => for {c} in CharComp[char] => out[c] = true
 for comp in ScaleFound => out[comp] = true
 
 result = {}
-for comp of out
-  result[comp] =
-    len: TotalStrokes[comp.codePointAt(0)]
-    src: { [k, v] for k, v of Comp[comp] | v? and ~OrigChars.indexOf k }
+for comp of out => result[comp] = Comp[comp]
 
 console.log JSON.stringify(result,,2)

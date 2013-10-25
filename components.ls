@@ -10,27 +10,33 @@ String::codePointAt ?= (pos=0) ->
 require! fs
 const CharComp = require \./char_comp.json
 const TotalStrokes = require \./total-strokes.json
+const OrigChars = require \./orig-chars.json
 
 missing = {}
-missing-csv = ""
+missing-json = []
 out =
   comps: {}
   get: (char) ->
     if not @comps[char]
-      @comps[char] = {}
+      @comps[char] =
+        len: null
+        src: {}
     @comps[char]
 
 for own char, comps of CharComp
   strokes = 0
   for comp in comps
-    lookup = out.get comp.c
-    lookup[char] = strokes
     comp-strokes = TotalStrokes[comp.c.codePointAt(0)]
-    if not comp-strokes and not missing[comp.c]
-      missing[comp.c] = \?
-      missing-csv += "\"#{comp.c}\",\"\"\n"
+    if not comp-strokes
+      if not missing[comp.c]
+        missing[comp.c] = true
+        missing-json.push comp.c
+    else if not isNaN strokes and ~OrigChars.indexOf char
+      lookup = out.get comp.c
+      lookup.len ?= comp-strokes
+      lookup.src[char] = strokes
     strokes += comp-strokes
 
 console.log JSON.stringify out.comps
-fs.write-file-sync \missing-strokes.csv, missing-csv
+fs.write-file-sync \missing-strokes.json, JSON.stringify missing-json
 

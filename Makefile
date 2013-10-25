@@ -29,4 +29,4 @@ components ::
 	lsc ./components.ls > ./components.json
 
 computed-missing ::
-	lsc ./computed-missing.ls > ./computed-missing.csv
+	lsc ./computed-missing.ls > ./computed-missing.json
