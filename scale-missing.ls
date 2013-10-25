@@ -24,8 +24,6 @@ for char in Chars
   start = 0
   continue unless comp
   strokes = []
-  min-x = min-y = Infinity
-  max-x = max-y = -Infinity
   for {c, x, y, w, h} in comp
     ref = c
     if ref is \艹
@@ -40,13 +38,15 @@ for char in Chars
           ref = whole
           stroke-offset = offset
           stroke-length = comp-chars.len
-    if stroke-offset isnt Infinity
-      console.log "Use #c of #ref for #char, start from #stroke-offset, length #stroke-length"
     start += stroke-length
     ref-hex = ref.codePointAt!toString 16
+    if stroke-offset isnt Infinity
+      console.log "Use #c of #ref(#ref-hex) for #char, start from #stroke-offset, length #stroke-length"
     if fs.exists-sync "json/#ref-hex.json"
       ss = require "./json/#ref-hex.json"
       ss = ss[stroke-offset to stroke-offset + stroke-length - 1] if stroke-offset isnt Infinity
+      min-x = min-y = Infinity
+      max-x = max-y = -Infinity
       for {outline} in ss => for s in outline
         if s.x
           min-x <?= s.x; min-y <?= s.y
@@ -64,12 +64,14 @@ for char in Chars
       h-ratio = h-new / h-old
       x2048 = x / S*T
       y2048 = y / S*T
+      /*
       console.log "new:(w,h): (#w-new, #h-new)"
       console.log "old:(w,h): (#w-old, #h-old)"
       console.log "W Ratio: #w-ratio = (#w-new / #w-old)"
       console.log "H Ratio: #h-ratio = (#h-new / #h-old)"
       console.log "Min (X,Y): (#min-x, #min-y)"
       console.log "(x2048, y2048): (#x2048, #y2048)"
+      */
       x-ratio = - min-x * w-ratio + x2048
       y-ratio = - min-y * h-ratio + y2048
       found[ref] = true
