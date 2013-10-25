@@ -11,7 +11,8 @@ require! fs
 const S = 256
 const T = 2048
 const CharComp = require \./char_comp.json
-Chars = require \./chars.json
+const Missing = require \./computed-missing.json
+const Chars = require \./chars.json
 
 missing = {}
 found = {}
@@ -20,21 +21,32 @@ for char in Chars
   out = "#{ char.codePointAt!toString 16}.json"
   continue if fs.exists-sync "json/#out"
   comp = CharComp[char]
+  start = 0
   continue unless comp
   strokes = []
   min-x = min-y = Infinity
   max-x = max-y = -Infinity
   for {c, x, y, w, h} in comp
     ref = c
-    stroke-offset = null
     if ref is \艹
       ref = \草
       stroke-offset = 0
       stroke-length = 4
+    comp-chars = Missing[c]
+    stroke-offset = Infinity
+    if comp-chars?
+      for whole, offset of comp-chars.src
+        if Math.abs(offset - start) < Math.abs(stroke-offset - start)
+          ref = whole
+          stroke-offset = offset
+          stroke-length = comp-chars.len
+    if stroke-offset isnt Infinity
+      console.log "Use #c of #ref for #char, start from #stroke-offset, length #stroke-length"
+    start += stroke-length
     ref-hex = ref.codePointAt!toString 16
     if fs.exists-sync "json/#ref-hex.json"
       ss = require "./json/#ref-hex.json"
-      ss = ss[stroke-offset to stroke-offset + stroke-length - 1] if stroke-offset?
+      ss = ss[stroke-offset to stroke-offset + stroke-length - 1] if stroke-offset isnt Infinity
       for {outline} in ss => for s in outline
         if s.x
           min-x <?= s.x; min-y <?= s.y
@@ -52,22 +64,20 @@ for char in Chars
       h-ratio = h-new / h-old
       x2048 = x / S*T
       y2048 = y / S*T
-      /*
       console.log "new:(w,h): (#w-new, #h-new)"
       console.log "old:(w,h): (#w-old, #h-old)"
       console.log "W Ratio: #w-ratio = (#w-new / #w-old)"
       console.log "H Ratio: #h-ratio = (#h-new / #h-old)"
       console.log "Min (X,Y): (#min-x, #min-y)"
       console.log "(x2048, y2048): (#x2048, #y2048)"
-      */
       x-ratio = - min-x * w-ratio + x2048
       y-ratio = - min-y * h-ratio + y2048
       found[ref] = true
       part = { val: ref, matrix: [ w-ratio, 0, 0, h-ratio, x-ratio, y-ratio ] }
-      part.indices = [stroke-offset to stroke-offset + stroke-length - 1] if stroke-offset?
+      part.indices = [stroke-offset to stroke-offset + stroke-length - 1] if stroke-offset isnt Infinity
       strokes.push part
     else
-      console.log "Missing char: #char"
+      console.log "Missing comp: #c"
       missing[char] = true
       strokes = null
       break
@@ -90,5 +100,5 @@ for char in Chars
     if i is rule.strokes.length - 1 and not failed
       console.log "Writing json/#out"
       fs.write-file-sync("json/#out", JSON.stringify(result, null, "  "));
-fs.write-file-sync "./scale-missing.json", JSON.stringify Object.keys missing
-fs.write-file-sync "./scale-found.json", JSON.stringify Object.keys found
+#fs.write-file-sync "./scale-missing.json", JSON.stringify Object.keys missing
+#fs.write-file-sync "./scale-found.json", JSON.stringify Object.keys found
