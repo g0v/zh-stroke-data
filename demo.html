@@ -20,7 +20,8 @@
             var $word, options;
 
             options = {
-              updatesPerStep: 1000
+              updatesPerStep: Infinity,
+              delays: { stroke: 0, word: 0 },
             };
 
             $word = $("#word");
@@ -32,7 +33,8 @@
         </script>
     </head>
     <body>
-        <input type="text" id="word" value="昇" style="font-size: 30px"/>
+        <input type="text" id="word" value="尪䐞佚勺匜囡廕徠忒璨"
+        style="font-size: 50px; position: fixed; z-index: 999; font-family: BiauKai, sans-serif "/>
         <div id="holder"></div>
         <p id="copyright">常用國字標準字體筆劃</p>
     </body>
