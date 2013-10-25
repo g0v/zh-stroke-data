@@ -19,19 +19,13 @@ found = {}
 
 for char in Chars
   out = "#{ char.codePointAt!toString 16}.json"
-  continue if fs.exists-sync "json/#out"
+  continue if fs.exists-sync "json/#out" and not fs.exists-sync "missing/#out"
   comp = CharComp[char]
   start = 0
   continue unless comp
   strokes = []
-  min-x = min-y = Infinity
-  max-x = max-y = -Infinity
   for {c, x, y, w, h} in comp
     ref = c
-    if ref is \艹
-      ref = \草
-      stroke-offset = 0
-      stroke-length = 4
     comp-chars = Missing[c]
     stroke-offset = Infinity
     if comp-chars?
@@ -45,6 +39,8 @@ for char in Chars
     start += stroke-length
     ref-hex = ref.codePointAt!toString 16
     if fs.exists-sync "json/#ref-hex.json"
+      min-x = min-y = Infinity
+      max-x = max-y = -Infinity
       ss = require "./json/#ref-hex.json"
       ss = ss[stroke-offset to stroke-offset + stroke-length - 1] if stroke-offset isnt Infinity
       for {outline} in ss => for s in outline
