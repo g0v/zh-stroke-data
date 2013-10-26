@@ -75,7 +75,7 @@ rl.on \close, ->
         guessing[c].push unknown.len
 
   console.log "Creating debug-computed.json...."
-  fs.write-file-sync \./debug-computed.json, computed
+  fs.write-file-sync \./debug-computed.json, JSON.stringify computed,,2
 
 
   console.log "Finding the most likely total strokes...."
@@ -99,8 +99,8 @@ rl.on \close, ->
     TotalStrokes[k.codePointAt!] = result.len
 
   console.log "Creating debug-maybe.json...."
-  fs.write-file-sync \./debug-maybe.json, guessing
+  fs.write-file-sync \./debug-maybe.json, JSON.stringify guessing,,2
   console.log "Creating debug-guessing.json...."
-  fs.write-file-sync "./debug-guessing.json", strokes
+  fs.write-file-sync "./debug-guessing.json", JSON.stringify strokes,,2
   console.log "Creating total-strokes.json...."
   fs.write-file-sync "./total-strokes.json", minify TotalStrokes
