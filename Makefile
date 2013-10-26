@@ -22,9 +22,6 @@ old :: $(STROKES_COMPOSED)
 clean ::
 	rm -f $(STROKES_COMPOSED)
 
-total-strokes ::
-	lsc ./total-strokes.ls < ./Unihan/Unihan_DictionaryLikeData.txt > ./total-strokes.json
-
 components ::
 	lsc ./components.ls > ./components.json
 
