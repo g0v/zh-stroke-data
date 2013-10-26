@@ -5,11 +5,10 @@ function ref (id)
   return scale whole, idx, len, x, y, w, h
 
 $ ->
-  results = '';
+  results = 0
   for {id} in plv8.execute "select id from refs order by id"
-    results += """
-UPDATE refs SET outlines = #{ ref id } WHERE id = #id AND outlines IS NULL;
-"""
+    plv8.execute "UPDATE refs SET outlines = #{ ref id } WHERE id = #id AND outlines IS NULL"
+    results++
   return results
 
 function $ (cb)
