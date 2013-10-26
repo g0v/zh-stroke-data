@@ -10,8 +10,9 @@ String::codePointAt ?= (pos=0) ->
 require! fs
 const CharComp = require \./char_comp.json
 const RevisedStrokes = require \./revised-strokes.json
-const TotalStrokes = require \./total-strokes.json
+const TotalStrokes = require \./total-strokes/total-strokes.json
 const OrigChars = require \./orig-chars.json
+const SpecialStrokes = { 艹: 4 }
 
 missing = {}
 missing-json = []
@@ -27,7 +28,7 @@ out =
 for own char, comps of CharComp
   strokes = 0
   for comp in comps
-    comp-strokes = TotalStrokes[comp.c.codePointAt(0)]
+    comp-strokes = SpecialStrokes[comp.c] || RevisedStrokes[comp.c.codePointAt(0)] || TotalStrokes[comp.c.codePointAt(0)]
     if not comp-strokes
       if not missing[comp.c]
         missing[comp.c] = true
