@@ -29,6 +29,7 @@ for own char, comps of CharComp
   strokes = 0
   for comp in comps
     comp-strokes = SpecialStrokes[comp.c] || RevisedStrokes[comp.c.codePointAt(0)] || TotalStrokes[comp.c.codePointAt(0)]
+    comp-strokes = 4 if comp.c is \肉 and comp.w < (comp.h/2)
     if not comp-strokes
       if not missing[comp.c]
         missing[comp.c] = true
@@ -39,6 +40,6 @@ for own char, comps of CharComp
       lookup.src[char] = strokes
     strokes += comp-strokes
 
-console.log JSON.stringify out.comps
-fs.write-file-sync \missing-strokes.json, JSON.stringify missing-json
+console.log JSON.stringify out.comps,,2
+fs.write-file-sync \missing-strokes.json, JSON.stringify missing-json,,2
 
