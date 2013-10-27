@@ -27,3 +27,15 @@ components ::
 
 computed-missing ::
 	lsc ./computed-missing.ls > ./computed-missing.json
+
+
+# tiebreak ::
+## total-strokes/total-strokes.pl
+## components.ls
+## computed-missing.ls
+## gen-refs.ls
+## boxes.sql
+## plv8x-outlines.ls
+## sql-diff/*
+## tiebreak.ls
+## scale-missing.ls
