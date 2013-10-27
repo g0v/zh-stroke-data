@@ -32,8 +32,9 @@ rl.on \line, (line) ->
     data = line.split the-total-strokes
     TotalStrokes[parseInt data[0].substr(2), 16] = parseInt data[1], 10
 rl.on \close, ->
-  console.log "Creating total-unihan.json...."
-  fs.write-file-sync "./total-unihan.json", minify TotalStrokes
+  filename = \total-unihan.json
+  console.log "Creating #filename...."
+  fs.write-file-sync "./#filename", minify TotalStrokes
 
 
   console.log "Reading total strokes from orginal chars."
@@ -46,11 +47,12 @@ rl.on \close, ->
     if fs.exists-sync "../json/#out"
       len = require "../json/#out" .length
       if len isnt TotalStrokes[cp]
-        console.log "#char.totalStrokes is #len, not #{TotalStrokes[cp]}."
+        #console.log "#char.totalStrokes is #len, not #{TotalStrokes[cp]}."
         TotalStrokes[cp] = len
 
-  console.log "Creating total-origin.json...."
-  fs.write-file-sync "./total-origin.json", minify TotalStrokes
+  filename = \total-origin.json
+  console.log "Creating #filename...."
+  fs.write-file-sync "./#filename", minify TotalStrokes
 
 
   console.log "Guessing total strokes of comps."
@@ -58,49 +60,69 @@ rl.on \close, ->
   CharComp = require \../char_comp.json
 
   computed = []
-  guessing = {}
   for own char, comps of CharComp
     total = TotalStrokes[char.codePointAt!]
-    if total?
-      unknown =
-        comps: []
-        len: total
-      for {c} in comps
+    continue if not total?
+    unknown =
+      comps: []
+      len: total
+    for {c} in comps
+      unknown.comps.push c
+    computed.push unknown
+
+  attempt = 0
+  do
+    strokes-found = 0
+    new-computed = []
+    guessing = {}
+    for unknown in computed
+      new-comps = []
+      total = unknown.len
+      for c in unknown.comps
         part = TotalStrokes[c.codePointAt!]
-        if not part? then unknown.comps.push c else unknown.len -= part
-      computed.push unknown if unknown.len
+        if not part? then new-comps.push c else total -= part
+      continue if new-comps.length is 0
+      unknown.comps = new-comps
+      unknown.len = total
+      new-computed.push unknown
       if unknown.comps.length is 1 and unknown.len > 0
         c = unknown.comps.0
-        guessing[c] = [] if not guessing[c]
-        guessing[c].push unknown.len
+        guessing[c] = {} if not guessing[c]
+        guessing[c][unknown.len] ?= 0
+        guessing[c][unknown.len]++
+    computed = new-computed
 
-  console.log "Creating debug-computed.json...."
-  fs.write-file-sync \./debug-computed.json, JSON.stringify computed,,2
+    console.log "Finding the most likely total strokes...."
 
+    strokes = {}
+    for own k, feqs of guessing
+      max = 0
+      result = 0
+      for own len, feq of feqs
+        if feq > max
+          max = feq
+          result = parseInt len, 10
+      strokes-found++
+      strokes[k] = result
+      TotalStrokes[k.codePointAt!] = result
 
-  console.log "Finding the most likely total strokes...."
+    console.log "Found #strokes-found comps"
 
-  strokes = {}
-  for own k, v of guessing
-    v.sort!
-    result =
-      len: 0
-      feq: 0
-    feq = 0
-    prev = 0
-    for current in v
-      feq = 0 if prev isnt current
-      feq++
-      if feq > result.feq
-        result.len = current
-        result.feq = feq
-      prev = current
-    strokes[k] = result.len
-    TotalStrokes[k.codePointAt!] = result.len
+    if strokes-found isnt 0
+      filename = "maybe.#attempt.json"
+      console.log "Creating #filename...."
+      fs.write-file-sync "./log/#filename", JSON.stringify guessing,,2
+      filename = "guessing.#attempt.json"
+      console.log "Creating #filename...."
+      fs.write-file-sync "./log/#filename", JSON.stringify strokes,,2
 
-  console.log "Creating debug-maybe.json...."
-  fs.write-file-sync \./debug-maybe.json, JSON.stringify guessing,,2
-  console.log "Creating debug-guessing.json...."
-  fs.write-file-sync "./debug-guessing.json", JSON.stringify strokes,,2
-  console.log "Creating total-strokes.json...."
-  fs.write-file-sync "./total-strokes.json", minify TotalStrokes
+    attempt++
+  while strokes-found isnt 0
+
+  filename = "left.json"
+  console.log "Creating #filename...."
+  fs.write-file-sync "./log/#filename", JSON.stringify computed,,2
+
+  filename = \total-strokes.json
+  console.log "Creating #filename...."
+  fs.write-file-sync "./#filename", minify TotalStrokes
