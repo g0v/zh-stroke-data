@@ -121,6 +121,7 @@ $ ->
       delay = @options.delays.stroke
     # did word stroked
     if @currentStroke >= @strokes.length
+      return @promise.resolve() unless @options.delays.word
       setTimeout =>
         @promise.resolve()
       , @options.delays.word * 1000
@@ -130,7 +131,7 @@ $ ->
           requestAnimationFrame => @update()
         , delay * 1000
       else
-        requestAnimationFrame => @update()
+        @update()
 
   drawBackground = (ctx, dim) ->
     ctx.strokeStyle = "#A33"
@@ -208,7 +209,7 @@ $ ->
           # fail
           , ->
             $loader.remove()
-            primose.resolve {
+            promise.resolve {
               drawBackground: ->
                 do stroker.drawBackground
               draw: ->

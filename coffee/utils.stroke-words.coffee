@@ -2,6 +2,7 @@ root = this
 
 sax = root.sax or require "sax"
 glMatrix = root.glMatrix or require "./gl-matrix-min"
+Q = root.Q or require "q"
 
 # jquery ajax progress by @englercj
 # https://github.com/englercj/jquery-ajax-progress
@@ -245,14 +246,14 @@ CacheBinary = ->
     packed = path.substr(path.length - 6, 2)
     packed_path = "#{path.substr(0, 6)}#{packed}.bin"
     if cache[packed] is undefined
-      p = jQuery.Deferred()
+      d = Q.defer()
       getBinary(
         packed_path
-        (data) -> p.resolve data
-        (err) -> p.reject err
-        (event) -> p.notify event
+        (data) -> d.resolve data
+        (err) -> d.reject err
+        (event) -> d.notify event
       )
-      cache[packed] = p
+      cache[packed] = d.promise
     cache[packed]
 
 binaryCache = CacheBinary()
@@ -261,7 +262,7 @@ fetchStrokeJSONFromBinary = (path, success, fail, progress) ->
   if root.window
     file_id = parseInt path.substr(6, path.length - 12), 16
     binaryCache.get(path).
-      done((data) -> jsonFromBinary(data, file_id, success, fail)).
+      then((data) -> jsonFromBinary(data, file_id, success, fail)).
       fail(fail).
       progress(progress)
   else
@@ -368,31 +369,30 @@ CacheJSON = ->
   cache = {}
   get: (cp, url, type) ->
     if cache[cp] is undefined
-      p = jQuery.Deferred()
+      d = Q.defer()
       fetchers[type](
         "#{url}#{cp}.#{type}"
-        (json) -> p.resolve json
-        (err) -> p.reject err
-        (event) -> p.notify event
+        (json) -> d.resolve json
+        (err) -> d.reject err
+        (event) -> d.notify event
       )
-      cache[cp] = p
+      cache[cp] = d.promise
     cache[cp]
 
 jsonCache = CacheJSON()
 
 StrokeData = (options) ->
-  options = $.extend(
-    url: "./json/"
-    dataType: "json"
-  , options)
+  options or= {}
+  options.url or= "./json/"
+  options.dataType or= "json"
 
-  ret =
-    transform: transformWithMatrix
-    get: (cp, success, fail, progress) ->
-      jsonCache.get(cp, options.url, options.dataType).
-        done(success).
-        fail(fail).
-        progress(progress)
+  get: (cp, success, fail, progress) ->
+    jsonCache.get(cp, options.url, options.dataType).
+      then(success).
+      fail(fail).
+      progress(progress)
+
+StrokeData.transform = transformWithMatrix
 
 if root.window #web
   window.WordStroker or= {}

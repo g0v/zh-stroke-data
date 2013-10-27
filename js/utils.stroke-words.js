@@ -1,11 +1,13 @@
 (function() {
-  var CacheBinary, CacheJSON, StrokeData, WordStroker, binaryCache, fetchStrokeJSON, fetchStrokeJSONFromBinary, fetchStrokeJSONFromXml, fetchStrokeXml, fetchers, forEach, getBinary, glMatrix, jsonCache, jsonFromBinary, jsonFromXml, root, sax, scale, sortSurrogates, transform, transformWithMatrix, undelta, undeltaR;
+  var CacheBinary, CacheJSON, Q, StrokeData, WordStroker, binaryCache, fetchStrokeJSON, fetchStrokeJSONFromBinary, fetchStrokeJSONFromXml, fetchStrokeXml, fetchers, forEach, getBinary, glMatrix, jsonCache, jsonFromBinary, jsonFromXml, root, sax, scale, sortSurrogates, transform, transformWithMatrix, undelta, undeltaR;
 
   root = this;
 
   sax = root.sax || require("sax");
 
   glMatrix = root.glMatrix || require("./gl-matrix-min");
+
+  Q = root.Q || require("q");
 
   fetchStrokeXml = function(path, success, fail, progress) {
     var fs;
@@ -322,19 +324,19 @@
     cache = {};
     return {
       get: function(path) {
-        var p, packed, packed_path;
+        var d, packed, packed_path;
         packed = path.substr(path.length - 6, 2);
         packed_path = "" + (path.substr(0, 6)) + packed + ".bin";
         if (cache[packed] === void 0) {
-          p = jQuery.Deferred();
+          d = Q.defer();
           getBinary(packed_path, function(data) {
-            return p.resolve(data);
+            return d.resolve(data);
           }, function(err) {
-            return p.reject(err);
+            return d.reject(err);
           }, function(event) {
-            return p.notify(event);
+            return d.notify(event);
           });
-          cache[packed] = p;
+          cache[packed] = d.promise;
         }
         return cache[packed];
       }
@@ -347,7 +349,7 @@
     var file_id;
     if (root.window) {
       file_id = parseInt(path.substr(6, path.length - 12), 16);
-      return binaryCache.get(path).done(function(data) {
+      return binaryCache.get(path).then(function(data) {
         return jsonFromBinary(data, file_id, success, fail);
       }).fail(fail).progress(progress);
     } else {
@@ -486,17 +488,17 @@
     cache = {};
     return {
       get: function(cp, url, type) {
-        var p;
+        var d;
         if (cache[cp] === void 0) {
-          p = jQuery.Deferred();
+          d = Q.defer();
           fetchers[type]("" + url + cp + "." + type, function(json) {
-            return p.resolve(json);
+            return d.resolve(json);
           }, function(err) {
-            return p.reject(err);
+            return d.reject(err);
           }, function(event) {
-            return p.notify(event);
+            return d.notify(event);
           });
-          cache[cp] = p;
+          cache[cp] = d.promise;
         }
         return cache[cp];
       }
@@ -506,18 +508,17 @@
   jsonCache = CacheJSON();
 
   StrokeData = function(options) {
-    var ret;
-    options = $.extend({
-      url: "./json/",
-      dataType: "json"
-    }, options);
-    return ret = {
-      transform: transformWithMatrix,
+    options || (options = {});
+    options.url || (options.url = "./json/");
+    options.dataType || (options.dataType = "json");
+    return {
       get: function(cp, success, fail, progress) {
-        return jsonCache.get(cp, options.url, options.dataType).done(success).fail(fail).progress(progress);
+        return jsonCache.get(cp, options.url, options.dataType).then(success).fail(fail).progress(progress);
       }
     };
   };
+
+  StrokeData.transform = transformWithMatrix;
 
   if (root.window) {
     window.WordStroker || (window.WordStroker = {});
@@ -542,7 +543,3 @@
   }
 
 }).call(this);
-
-/*
-//@ sourceMappingURL=utils.stroke-words.js.map
-*/
