@@ -1,16 +1,19 @@
+for (0..1023) {
+  open FH, ">", "out/$_.ls";
+  print FH << ".";
 #!/usr/bin/env plv8x -d chars -r
 # This is run in plv8x context.
 function ref (id)
   {whole, idx, len, x, y, w, h} = plv8.execute("select * from refs where id = '#id';").0
   return scale whole, idx, len, x, y, w, h
 
-$ ->
+\$ ->
   results = ''
-  for {id} in plv8.execute "select id from refs order by id"
-    results += "UPDATE refs SET outlines = #{ ref id } WHERE id = #id AND outlines IS NULL"
-  return result
+  for {id} in plv8.execute "select id from refs where (id % 1024) = $_ order by id"
+    results += "UPDATE refs SET outlines = #{ ref id } WHERE id = #id AND outlines IS NULL;\\n"
+  return results
 
-function $ (cb)
+function \$ (cb)
   return try cb! catch e => e.toString!
 
 function sel (...sql)
@@ -36,11 +39,11 @@ function geo (...sql)
 function scale (ch, idx, len, x, y, w, h)
   const S = 256
   const T = 2048
-  field = \strokes
-  field = \outlines
+  field = \\strokes
+  field = \\outlines
   slice = if Number(len) then "#field[#{idx+1}:#{idx+len}]" else "#field"
   mo = try plv8.execute """
-    select st_xmin(box) xx, st_ymin(box) yy, w ww, h hh from boxes where ch = '#ch';
+    select minx xx, miny yy, w ww, h hh from boxes where ch = '#ch';
   """ .0
   return null unless mo
   {ww, hh, xx: min-x, yy: min-y} = mo
@@ -65,3 +68,5 @@ function scale (ch, idx, len, x, y, w, h)
     )
     FROM strokes WHERE ch = '#ch'
   )"""
+.
+  }

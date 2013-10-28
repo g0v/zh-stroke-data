@@ -30,8 +30,16 @@ for my $char (split //, $orig) {
         push @tracks, [ map { "$_->{x} $_->{y}" } @{  $part->{track} } ];
     }
     say "INSERT INTO strokes VALUES ('$char', ARRAY[
-        @{[ join ', ', map { qq[ST_GeomFromText('POLYGON(($_))')] } map { join ', ', @$_ } @mls ]}
+        @{[ join ', ', map { $_ = poly($_); qq[ST_GeomFromText('POLYGON(($_))')] } map { join ', ', @$_ } @mls ]}
     ], ARRAY[
         @{[ join ', ', map { qq[ST_GeomFromText('LINESTRING($_)')] } map { join ', ', @$_ } @tracks ]}
     ]);"
+}
+
+sub poly {
+    my $x = shift;
+    $x =~ /^([-.\d]+ [-.\d]+)/ or die $x;
+    my $begin = $1;
+    $x .= ", $begin" unless $x =~ /$begin$/;
+    return $x;
 }
