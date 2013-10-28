@@ -31,7 +31,15 @@ for char in Chars
       min-x = min-y = Infinity
       max-x = max-y = -Infinity
       ss = require "./json/#ref-hex.json"
-      ss = ss[stroke-offset to stroke-offset + stroke-length - 1] if stroke-offset isnt Infinity
+      stroke-offset = Infinity if stroke-length is 0
+      stroke-length = 4 if c is \肉 and ref isnt \瘸
+      stroke-length = 3 if c is \阝
+      stroke-offset = 0 if ref in <[ 迴 遐 ]>
+      stroke-offset = 3 if ref in <[ 育 ]>
+      if stroke-offset isnt Infinity
+        last = stroke-offset + stroke-length - 1
+        last <?= ss.length - 1
+        ss = ss[stroke-offset to last]
       min-x = min-y = Infinity
       max-x = max-y = -Infinity
       for part in ss | part => for s in part.outline
@@ -63,7 +71,7 @@ for char in Chars
       y-ratio = - min-y * h-ratio + y2048
       found[ref] = true
       part = { val: ref, matrix: [ w-ratio, 0, 0, h-ratio, x-ratio, y-ratio ] }
-      part.indices = [stroke-offset to stroke-offset + stroke-length - 1] if stroke-offset isnt Infinity
+      part.indices = [stroke-offset to last] if stroke-offset isnt Infinity
       strokes.push part if part
     else
       console.log "Missing comp: #c"
