@@ -28,13 +28,10 @@ $ ->
     dataType: "json"
 
   class AABB
-    constructor: (min, max = min) ->
-      @min =
-        x: Math.min(min.x, max.x)
-        y: Math.min(min.y, max.y)
-      @max =
-        x: Math.max(min.x, max.x)
-        y: Math.max(min.y, max.y)
+    constructor: (
+      @min = {x: Infinity, y: Infinity}
+      @max = {x: -Infinity, y: -Infinity}
+    ) ->
       Object.defineProperty @, "width",
         get: -> @max.x - @min.x
       Object.defineProperty @, "height",
@@ -58,10 +55,41 @@ $ ->
       ctx.rect @min.x, @min.y, @width, @height
       ctx.stroke()
 
+  class Comp
+    constructor: (@children = [], @aabb) ->
+      if not @aabb
+        @aabb = new AABB
+        @children.forEach (child) =>
+          @aabb.addPoint child.aabb.min
+          @aabb.addPoint child.aabb.max
+      @length = @children.reduce (prev, current) ->
+        prev + current.length
+      , 0
+      @gaps = @children.reduce (results, current) =>
+        results.concat [results[results.length - 1] + current.length / @length]
+      , [0]
+      @gaps.shift()
+    render: (
+      canvas,
+      percent,
+      matrix = [
+        0.4,   0,
+          0, 0.4,
+          0,   0
+      ]
+    ) ->
+      ctx = canvas.getContext "2d"
+      ctx.setTransform.apply ctx, matrix
+      len = @length * percent
+      for child in @children
+        if len > 0
+          child.render canvas, Math.min(child.length, len) / child.length
+          len -= child.length
+
   class Track
-    constructor: (@data, @options) ->
+    constructor: (@data, @options = {}) ->
+      @options.trackWidth or= 150
       @length = Math.sqrt @data.vector.x * @data.vector.x + @data.vector.y * @data.vector.y
-      @aabb = null
     render: (canvas, percent) ->
       size = @data.size or @options.trackWidth
       ctx = canvas.getContext "2d"
@@ -77,37 +105,32 @@ $ ->
       )
       ctx.stroke()
 
-  class Stroke
-    constructor: (data, @options) ->
-      @outline = data.outline
-      @tracks = []
+  class Stroke extends Comp
+    constructor: (data) ->
+      children = []
       for i in [1...data.track.length]
         prev = data.track[i-1]
         current = data.track[i]
-        @tracks.push new Track
+        children.push new Track
           x: prev.x
           y: prev.y
           vector:
             x: current.x - prev.x
             y: current.y - prev.y
           size: prev.size
-        , @options
-      @length = @tracks.reduce (prev, current) ->
-        prev + current.length
-      , 0
-      # assert track 0 is inside the outline
-      @aabb = new AABB(data.track[0])
+      @outline = data.outline
+      aabb = new AABB
       for path in @outline
         if "x" of path
-          console.log @aabb
-          @aabb.addPoint path
-        if "begin" of path
-          @aabb.addPoint path.begin
-          @aabb.addPoint path.end
+          aabb.addPoint path
+        if "end" of path
+          aabb.addPoint path.begin
+          aabb.addPoint path.end
         if "mid" of path
-          @aabb.addPoint path.mid
-    pathOutline: (ctx, outline) ->
-      for path in outline
+          aabb.addPoint path.mid
+      super children, aabb
+    pathOutline: (ctx) ->
+      for path in @outline
         switch path.type
           when "M"
             ctx.moveTo path.x, path.y
@@ -133,61 +156,20 @@ $ ->
       ctx = canvas.getContext "2d"
       ctx.save()
       ctx.beginPath()
-      @pathOutline ctx, @outline
+      @pathOutline ctx
       ctx.clip()
-      len = @length * percent
-      for track in @tracks
-        if len > 0
-          track.render canvas, Math.min(track.length, len) / track.length
-          len -= track.length
+      super canvas, percent
       ctx.restore()
-
-  class Word
-    constructor: (data, options) ->
-      @options = $.extend(
-        scale: 0.4
-        trackWidth: 150
-      , options)
-      @matrix = [
-        @options.scale,              0,
-                     0, @options.scale,
-                     0,              0
-      ]
-      @strokes = []
-      @aabb = null
-      data.map (strokeData) =>
-        stroke = new Stroke strokeData, @options
-        @strokes.push stroke
-        if not @aabb
-          @aabb = stroke.aabb.clone()
-        else
-          @aabb.addPoint stroke.aabb.min
-          @aabb.addPoint stroke.aabb.max
-      @length = @strokes.reduce (prev, current) ->
-        prev + current.length
-      , 0
-      @strokeGaps = @strokes.reduce (results, current) =>
-        results.concat [results[results.length - 1] + current.length / @length]
-      , [0]
-      @strokeGaps.shift()
-    render: (canvas, percent) ->
-      ctx = canvas.getContext "2d"
-      ctx.setTransform.apply ctx, @matrix
-      len = @length * percent
-      for stroke in @strokes
-        if len > 0
-          stroke.render canvas, Math.min(stroke.length, len) / stroke.length
-          stroke.aabb.render canvas
-          len -= stroke.length
-      @aabb.render canvas
 
   words = WordStroker.utils.sortSurrogates($word.val())
 
   data.get(
     words[0].cp
     (json) ->
-      word = new Word json,
-        scale: options.scales.fill
+      strokes = json.map (strokeData) ->
+        new Stroke strokeData
+      word = new Comp strokes
+      word.render canvas, 1
       # normal animation
       ###
       pixel_per_second = 2000
@@ -209,6 +191,7 @@ $ ->
       requestAnimationFrame update
       ###
       # interactive animation
+      ###
       inc = false
       dec = false
       $(document)
@@ -231,6 +214,7 @@ $ ->
         time = 0 if time < 0
         requestAnimationFrame update
       requestAnimationFrame update
+      ###
     (err) ->
       console.log "failed"
     null
