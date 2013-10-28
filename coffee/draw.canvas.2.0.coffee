@@ -3,7 +3,7 @@ $ ->
     dim: 2150
     scales:
       fill: 0.4
-      style: 0.25
+      style: 0.5
     ##
     # TODO
     ##
@@ -16,11 +16,11 @@ $ ->
   $holder = $ "#holder"
   $word = $ "#word"
   $canvas = $ "<canvas></canvas>"
-  $canvas.css "width", options.dim * options.scales.fill * options.scales.style + "pt"
-  $canvas.css "height", options.dim * options.scales.fill * options.scales.style + "pt"
+  $canvas.css "width", options.dim * options.scales.fill * options.scales.style + "px"
+  $canvas.css "height", options.dim * options.scales.fill * options.scales.style + "px"
   canvas = $canvas.get()[0]
-  canvas.width = options.dim * options.scales.fill
-  canvas.height = options.dim * options.scales.fill
+  canvas.width = canvas.offsetWidth = options.dim * options.scales.fill
+  canvas.height = canvas.offsetHieght = options.dim * options.scales.fill
   $holder.append $canvas
 
   data = WordStroker.utils.StrokeData
@@ -45,6 +45,11 @@ $ ->
       @min.y = pt.y if pt.y < @min.y
       @max.x = pt.x if pt.x > @max.x
       @max.y = pt.y if pt.y > @max.y
+    containPoint: (pt) ->
+      pt.x > @min.x and
+      pt.y > @min.y and
+      pt.x < @max.x and
+      pt.y < @max.y
     delta: (box) ->
       new AABB(@min, box.min).size + new AABB(@max, box.max).size
     render: (canvas) ->
@@ -69,27 +74,34 @@ $ ->
         results.concat [results[results.length - 1] + current.length / @length]
       , [0]
       @gaps.shift()
-    render: (
-      canvas,
-      percent,
-      matrix = [
-        0.4,   0,
-          0, 0.4,
-          0,   0
-      ]
-    ) ->
+    breakUp: (strokeNums = []) ->
+      comps = []
+      strokeNums.reduce (start, len) =>
+        end = start + len
+        comps.push new Comp @children.slice(start, end)
+        end
+      , 0
+      new Comp comps
+    hitTest: (pt) ->
+      results = []
+      results.push @ if @aabb.containPoint pt
+      @children.reduce (prev, child) ->
+        prev.concat child.hitTest pt
+      , results
+    render: (canvas, percent, matrix = [1, 0, 0, 1, 0, 0]) ->
       ctx = canvas.getContext "2d"
       ctx.setTransform.apply ctx, matrix
       len = @length * percent
       for child in @children
         if len > 0
-          child.render canvas, Math.min(child.length, len) / child.length
+          child.render canvas, Math.min(child.length, len) / child.length, matrix
           len -= child.length
 
   class Track
     constructor: (@data, @options = {}) ->
       @options.trackWidth or= 150
       @length = Math.sqrt @data.vector.x * @data.vector.x + @data.vector.y * @data.vector.y
+      @aabb = new AABB
     render: (canvas, percent) ->
       size = @data.size or @options.trackWidth
       ctx = canvas.getContext "2d"
@@ -152,13 +164,15 @@ $ ->
               path.end.x,
               path.end.y
             )
-    render: (canvas, percent) ->
+    hitTest: (pt) ->
+      if @aabb.containPoint pt then [@] else []
+    render: (canvas, percent, matrix) ->
       ctx = canvas.getContext "2d"
       ctx.save()
       ctx.beginPath()
       @pathOutline ctx
       ctx.clip()
-      super canvas, percent
+      super canvas, percent, matrix
       ctx.restore()
 
   words = WordStroker.utils.sortSurrogates($word.val())
@@ -168,8 +182,34 @@ $ ->
     (json) ->
       strokes = json.map (strokeData) ->
         new Stroke strokeData
-      word = new Comp strokes
-      word.render canvas, 1
+      word = new Comp strokes, [
+      ]
+      word = word.breakUp [4, 4, 4]
+
+      hits = []
+      $(canvas).mousemove (e) ->
+        pos = $(@).offset()
+        mouse =
+          x: (e.pageX - pos.left) / options.scales.fill / options.scales.style
+          y: (e.pageY - pos.top) / options.scales.fill / options.scales.style
+        hits = word.hitTest mouse
+
+      update = ->
+        canvas.width = canvas.width # clear rect
+        word.render canvas, 1, [
+          options.scales.fill,                   0,
+                            0, options.scales.fill,
+                            0,                   0
+        ]
+        draw = (o, canvas) ->
+          if o.aabb
+            o.aabb.render canvas
+          else if Array.isArray o
+            for c in o
+              draw c, canvas
+        draw hits, canvas
+        requestAnimationFrame update
+      requestAnimationFrame update
       # normal animation
       ###
       pixel_per_second = 2000

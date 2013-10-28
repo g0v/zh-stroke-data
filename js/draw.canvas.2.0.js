@@ -8,7 +8,7 @@
       dim: 2150,
       scales: {
         fill: 0.4,
-        style: 0.25
+        style: 0.5
       },
       delays: {
         stroke: 0.25,
@@ -18,11 +18,11 @@
     $holder = $("#holder");
     $word = $("#word");
     $canvas = $("<canvas></canvas>");
-    $canvas.css("width", options.dim * options.scales.fill * options.scales.style + "pt");
-    $canvas.css("height", options.dim * options.scales.fill * options.scales.style + "pt");
+    $canvas.css("width", options.dim * options.scales.fill * options.scales.style + "px");
+    $canvas.css("height", options.dim * options.scales.fill * options.scales.style + "px");
     canvas = $canvas.get()[0];
-    canvas.width = options.dim * options.scales.fill;
-    canvas.height = options.dim * options.scales.fill;
+    canvas.width = canvas.offsetWidth = options.dim * options.scales.fill;
+    canvas.height = canvas.offsetHieght = options.dim * options.scales.fill;
     $holder.append($canvas);
     data = WordStroker.utils.StrokeData({
       url: "./json/",
@@ -74,6 +74,10 @@
         }
       };
 
+      AABB.prototype.containPoint = function(pt) {
+        return pt.x > this.min.x && pt.y > this.min.y && pt.x < this.max.x && pt.y < this.max.y;
+      };
+
       AABB.prototype.delta = function(box) {
         return new AABB(this.min, box.min).size + new AABB(this.max, box.max).size;
       };
@@ -112,10 +116,37 @@
         this.gaps.shift();
       }
 
+      Comp.prototype.breakUp = function(strokeNums) {
+        var comps,
+          _this = this;
+        if (strokeNums == null) {
+          strokeNums = [];
+        }
+        comps = [];
+        strokeNums.reduce(function(start, len) {
+          var end;
+          end = start + len;
+          comps.push(new Comp(_this.children.slice(start, end)));
+          return end;
+        }, 0);
+        return new Comp(comps);
+      };
+
+      Comp.prototype.hitTest = function(pt) {
+        var results;
+        results = [];
+        if (this.aabb.containPoint(pt)) {
+          results.push(this);
+        }
+        return this.children.reduce(function(prev, child) {
+          return prev.concat(child.hitTest(pt));
+        }, results);
+      };
+
       Comp.prototype.render = function(canvas, percent, matrix) {
         var child, ctx, len, _i, _len, _ref, _results;
         if (matrix == null) {
-          matrix = [0.4, 0, 0, 0.4, 0, 0];
+          matrix = [1, 0, 0, 1, 0, 0];
         }
         ctx = canvas.getContext("2d");
         ctx.setTransform.apply(ctx, matrix);
@@ -125,7 +156,7 @@
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           child = _ref[_i];
           if (len > 0) {
-            child.render(canvas, Math.min(child.length, len) / child.length);
+            child.render(canvas, Math.min(child.length, len) / child.length, matrix);
             _results.push(len -= child.length);
           } else {
             _results.push(void 0);
@@ -144,6 +175,7 @@
         this.options = options != null ? options : {};
         (_base = this.options).trackWidth || (_base.trackWidth = 150);
         this.length = Math.sqrt(this.data.vector.x * this.data.vector.x + this.data.vector.y * this.data.vector.y);
+        this.aabb = new AABB;
       }
 
       Track.prototype.render = function(canvas, percent) {
@@ -227,14 +259,22 @@
         return _results;
       };
 
-      Stroke.prototype.render = function(canvas, percent) {
+      Stroke.prototype.hitTest = function(pt) {
+        if (this.aabb.containPoint(pt)) {
+          return [this];
+        } else {
+          return [];
+        }
+      };
+
+      Stroke.prototype.render = function(canvas, percent, matrix) {
         var ctx;
         ctx = canvas.getContext("2d");
         ctx.save();
         ctx.beginPath();
         this.pathOutline(ctx);
         ctx.clip();
-        Stroke.__super__.render.call(this, canvas, percent);
+        Stroke.__super__.render.call(this, canvas, percent, matrix);
         return ctx.restore();
       };
 
@@ -243,12 +283,43 @@
     })(Comp);
     words = WordStroker.utils.sortSurrogates($word.val());
     return data.get(words[0].cp, function(json) {
-      var strokes, word;
+      var hits, strokes, update, word;
       strokes = json.map(function(strokeData) {
         return new Stroke(strokeData);
       });
-      word = new Comp(strokes);
-      return word.render(canvas, 1);
+      word = new Comp(strokes, []);
+      word = word.breakUp([4, 4, 4]);
+      hits = [];
+      $(canvas).mousemove(function(e) {
+        var mouse, pos;
+        pos = $(this).offset();
+        mouse = {
+          x: (e.pageX - pos.left) / options.scales.fill / options.scales.style,
+          y: (e.pageY - pos.top) / options.scales.fill / options.scales.style
+        };
+        return hits = word.hitTest(mouse);
+      });
+      update = function() {
+        var draw;
+        canvas.width = canvas.width;
+        word.render(canvas, 1, [options.scales.fill, 0, 0, options.scales.fill, 0, 0]);
+        draw = function(o, canvas) {
+          var c, _i, _len, _results;
+          if (o.aabb) {
+            return o.aabb.render(canvas);
+          } else if (Array.isArray(o)) {
+            _results = [];
+            for (_i = 0, _len = o.length; _i < _len; _i++) {
+              c = o[_i];
+              _results.push(draw(c, canvas));
+            }
+            return _results;
+          }
+        };
+        draw(hits, canvas);
+        return requestAnimationFrame(update);
+      };
+      return requestAnimationFrame(update);
       /*
       pixel_per_second = 2000
       step = word.length / pixel_per_second * 60
