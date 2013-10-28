@@ -28,6 +28,9 @@ components ::
 computed-missing ::
 	lsc ./computed-missing.ls > ./computed-missing.json
 
+scale ::
+	lsc tiebreak-results.ls > tiebreak-results.json
+	lsc scale-missing.ls
 
 # tiebreak ::
 ## total-strokes/total-strokes.pl
@@ -42,6 +45,7 @@ computed-missing ::
 ## bzcat ../ttf2gis/Kai.ttf.sql.bz2 | psql chars
 ## psql chars -f diff.sql
 ## cd sql-diff && ls *.sql | xargs -P 8 -n 1 -- psql chars -f && cd ..
-## psql chars -c 'select ch, json_agg(ids) from (select ch, json_agg(id) ids from refs group by ch, part) chs group by ch;' -P t > combinations.json
+## psql chars -f combinations.sql > combinations.json
 ## lsc tiebreak.ls
+## lsc tiebreak-results.ls > tiebreak-results.json
 ## lsc scale-missing.ls
