@@ -3,11 +3,11 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   $(function() {
-    var $canvas, $holder, $word, AABB, Comp, Stroke, Track, canvas, data, options, words;
+    var $body, $canvas, $holder, $word, AABB, Comp, Stroke, Track, canvas, char, data, i, options, w, width, words, ww, _results;
     options = {
       dim: 2150,
       scales: {
-        fill: 0.4,
+        fill: 0.025,
         style: 0.5
       },
       delays: {
@@ -15,15 +15,15 @@
         word: 0.5
       }
     };
+    $body = $("body");
     $holder = $("#holder");
     $word = $("#word");
     $canvas = $("<canvas></canvas>");
-    $canvas.css("width", options.dim * options.scales.fill * options.scales.style + "px");
-    $canvas.css("height", options.dim * options.scales.fill * options.scales.style + "px");
+    $canvas.css("width", $body.width() + "px").css("height", $body.height() + "px").css("position", "absolute").css("top", "0").css("left", "0");
     canvas = $canvas.get()[0];
-    canvas.width = canvas.offsetWidth = options.dim * options.scales.fill;
-    canvas.height = canvas.offsetHieght = options.dim * options.scales.fill;
-    $holder.append($canvas);
+    canvas.width = canvas.offsetWidth = $body.width() / options.scales.style;
+    canvas.height = canvas.offsetHieght = $body.height() / options.scales.style;
+    $body.append($canvas);
     data = WordStroker.utils.StrokeData({
       url: "./json/",
       dataType: "json"
@@ -103,6 +103,7 @@
         if (!this.aabb) {
           this.aabb = new AABB;
           this.children.forEach(function(child) {
+            child.parent = _this;
             _this.aabb.addPoint(child.aabb.min);
             return _this.aabb.addPoint(child.aabb.max);
           });
@@ -114,6 +115,10 @@
           return results.concat([results[results.length - 1] + current.length / _this.length]);
         }, [0]);
         this.gaps.shift();
+        this.time = 0.0;
+        this.x = this.y = 0;
+        this.scaleX = this.scaleY = 1.0;
+        this.parent = null;
       }
 
       Comp.prototype.breakUp = function(strokeNums) {
@@ -143,20 +148,30 @@
         }, results);
       };
 
-      Comp.prototype.render = function(canvas, percent, matrix) {
-        var child, ctx, len, _i, _len, _ref, _results;
-        if (matrix == null) {
-          matrix = [1, 0, 0, 1, 0, 0];
+      Comp.prototype.render = function(canvas) {
+        var child, ctx, len, p, scaleX, scaleY, x, y, _i, _len, _ref, _results;
+        x = this.x;
+        y = this.y;
+        scaleX = this.scaleX;
+        scaleY = this.scaleY;
+        p = this.parent;
+        while (p) {
+          x += p.x;
+          y += p.y;
+          scaleX *= p.scaleX;
+          scaleY *= p.scaleY;
+          p = p.parent;
         }
         ctx = canvas.getContext("2d");
-        ctx.setTransform.apply(ctx, matrix);
-        len = this.length * percent;
+        ctx.setTransform(scaleX, 0, 0, scaleY, x, y);
+        len = this.length * this.time;
         _ref = this.children;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           child = _ref[_i];
           if (len > 0) {
-            child.render(canvas, Math.min(child.length, len) / child.length, matrix);
+            child.time = Math.min(child.length, len) / child.length;
+            child.render(canvas);
             _results.push(len -= child.length);
           } else {
             _results.push(void 0);
@@ -168,17 +183,19 @@
       return Comp;
 
     })();
-    Track = (function() {
+    Track = (function(_super) {
+      __extends(Track, _super);
+
       function Track(data, options) {
         var _base;
         this.data = data;
         this.options = options != null ? options : {};
+        Track.__super__.constructor.call(this, null, new AABB);
         (_base = this.options).trackWidth || (_base.trackWidth = 150);
         this.length = Math.sqrt(this.data.vector.x * this.data.vector.x + this.data.vector.y * this.data.vector.y);
-        this.aabb = new AABB;
       }
 
-      Track.prototype.render = function(canvas, percent) {
+      Track.prototype.render = function(canvas) {
         var ctx, size;
         size = this.data.size || this.options.trackWidth;
         ctx = canvas.getContext("2d");
@@ -188,13 +205,13 @@
         ctx.lineWidth = 2 * size;
         ctx.lineCap = "round";
         ctx.moveTo(this.data.x, this.data.y);
-        ctx.lineTo(this.data.x + this.data.vector.x * percent, this.data.y + this.data.vector.y * percent);
+        ctx.lineTo(this.data.x + this.data.vector.x * this.time, this.data.y + this.data.vector.y * this.time);
         return ctx.stroke();
       };
 
       return Track;
 
-    })();
+    })(Comp);
     Stroke = (function(_super) {
       __extends(Stroke, _super);
 
@@ -267,14 +284,14 @@
         }
       };
 
-      Stroke.prototype.render = function(canvas, percent, matrix) {
+      Stroke.prototype.render = function(canvas) {
         var ctx;
         ctx = canvas.getContext("2d");
         ctx.save();
         ctx.beginPath();
         this.pathOutline(ctx);
         ctx.clip();
-        Stroke.__super__.render.call(this, canvas, percent, matrix);
+        Stroke.__super__.render.call(this, canvas);
         return ctx.restore();
       };
 
@@ -282,92 +299,100 @@
 
     })(Comp);
     words = WordStroker.utils.sortSurrogates($word.val());
-    return data.get(words[0].cp, function(json) {
-      var hits, strokes, update, word;
-      strokes = json.map(function(strokeData) {
-        return new Stroke(strokeData);
-      });
-      word = new Comp(strokes, []);
-      word = word.breakUp([4, 4, 4]);
-      hits = [];
-      $(canvas).mousemove(function(e) {
-        var mouse, pos;
-        pos = $(this).offset();
-        mouse = {
-          x: (e.pageX - pos.left) / options.scales.fill / options.scales.style,
-          y: (e.pageY - pos.top) / options.scales.fill / options.scales.style
-        };
-        return hits = word.hitTest(mouse);
-      });
-      update = function() {
-        var draw;
-        canvas.width = canvas.width;
-        word.render(canvas, 1, [options.scales.fill, 0, 0, options.scales.fill, 0, 0]);
-        draw = function(o, canvas) {
-          var c, _i, _len, _results;
-          if (o.aabb) {
-            return o.aabb.render(canvas);
-          } else if (Array.isArray(o)) {
-            _results = [];
-            for (_i = 0, _len = o.length; _i < _len; _i++) {
-              c = o[_i];
-              _results.push(draw(c, canvas));
-            }
-            return _results;
-          }
-        };
-        draw(hits, canvas);
-        return requestAnimationFrame(update);
-      };
-      return requestAnimationFrame(update);
-      /*
-      pixel_per_second = 2000
-      step = word.length / pixel_per_second * 60
-      i = 0
-      before = time = 0
-      update = ->
-        word.render canvas, time
-        before = time
-        time += 1 / step
-        if time < 1.0
-          if before < word.strokeGaps[i] and word.strokeGaps[i] < time
-            setTimeout ->
-              ++i
-              requestAnimationFrame update
-            , 500
-          else
-            requestAnimationFrame update
-      requestAnimationFrame update
-      */
-
-      /*
-      inc = false
-      dec = false
-      $(document)
-        .keydown (e) ->
-          dec = true if e.which is 37
-          inc = true if e.which is 39
-        .keyup (e) ->
-          dec = false if e.which is 37
-          inc = false if e.which is 39
-      prev = time = 0
-      step = 0.0025
-      update = ->
-        if prev isnt time
+    _results = [];
+    for (i in words) {
+      if (!__hasProp.call(words, i)) continue;
+      char = words[i];
+      w = options.dim * options.scales.fill;
+      ww = w * options.scales.style;
+      width = ~~($body.width() / ww);
+      _results.push((function(i) {
+        i = parseInt(i, 10);
+        return data.get(char.cp, function(json) {
+          var strokes, word;
+          strokes = json.map(function(strokeData) {
+            return new Stroke(strokeData);
+          });
+          word = new Comp(strokes);
+          word.x = w * ~~(i % width);
+          word.y = w * ~~(i / width);
+          word.scaleX = word.scaleY = options.scales.fill;
+          word.time = 1.0;
+          return word.render(canvas);
+        }, function(err) {
+          return console.log("failed");
+        }, null);
+        /*
+        hits = []
+        $(canvas).mousemove (e) ->
+          pos = $(@).offset()
+          mouse =
+            x: (e.pageX - pos.left) / options.scales.fill / options.scales.style
+            y: (e.pageY - pos.top) / options.scales.fill / options.scales.style
+          hits = word.hitTest mouse
+        
+        update = ->
           canvas.width = canvas.width # clear rect
-          word.render canvas, time
-        prev = time
-        time += step if inc
-        time = 1.0 if time > 1.0
-        time -= step if dec
-        time = 0 if time < 0
+          word.render canvas
+          draw = (o, canvas) ->
+            if o.aabb
+              o.aabb.render canvas
+            else if Array.isArray o
+              for c in o
+                draw c, canvas
+          draw hits, canvas
+          requestAnimationFrame update
         requestAnimationFrame update
-      requestAnimationFrame update
-      */
+        */
 
-    }, function(err) {
-      return console.log("failed");
-    }, null);
+        /*
+        pixel_per_second = 2000
+        step = word.length / pixel_per_second * 60
+        i = 0
+        before = time = 0
+        update = ->
+          word.render canvas, time
+          before = time
+          time += 1 / step
+          if time < 1.0
+            if before < word.strokeGaps[i] and word.strokeGaps[i] < time
+              setTimeout ->
+                ++i
+                requestAnimationFrame update
+              , 500
+            else
+              requestAnimationFrame update
+        requestAnimationFrame update
+        */
+
+        /*
+        inc = false
+        dec = false
+        $(document)
+          .keydown (e) ->
+            dec = true if e.which is 37
+            inc = true if e.which is 39
+          .keyup (e) ->
+            dec = false if e.which is 37
+            inc = false if e.which is 39
+        prev = time = 0
+        step = 0.0025
+        update = ->
+          if prev isnt time
+            canvas.width = canvas.width # clear rect
+            word.render canvas, time
+          prev = time
+          time += step if inc
+          time = 1.0 if time > 1.0
+          time -= step if dec
+          time = 0 if time < 0
+          requestAnimationFrame update
+        requestAnimationFrame update
+        */
+
+      })(i));
+    }
+    return _results;
   });
 
 }).call(this);

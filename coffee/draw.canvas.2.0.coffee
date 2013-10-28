@@ -2,7 +2,7 @@ $ ->
   options =
     dim: 2150
     scales:
-      fill: 0.4
+      fill: 0.025
       style: 0.5
     ##
     # TODO
@@ -13,15 +13,20 @@ $ ->
       stroke: 0.25
       word: 0.5
 
+  $body = $ "body"
   $holder = $ "#holder"
   $word = $ "#word"
   $canvas = $ "<canvas></canvas>"
-  $canvas.css "width", options.dim * options.scales.fill * options.scales.style + "px"
-  $canvas.css "height", options.dim * options.scales.fill * options.scales.style + "px"
+  $canvas
+    .css("width", $body.width() + "px")
+    .css("height", $body.height() + "px")
+    .css("position", "absolute")
+    .css("top", "0")
+    .css("left", "0")
   canvas = $canvas.get()[0]
-  canvas.width = canvas.offsetWidth = options.dim * options.scales.fill
-  canvas.height = canvas.offsetHieght = options.dim * options.scales.fill
-  $holder.append $canvas
+  canvas.width = canvas.offsetWidth = $body.width() / options.scales.style
+  canvas.height = canvas.offsetHieght = $body.height() / options.scales.style
+  $body.append $canvas
 
   data = WordStroker.utils.StrokeData
     url: "./json/"
@@ -65,6 +70,7 @@ $ ->
       if not @aabb
         @aabb = new AABB
         @children.forEach (child) =>
+          child.parent = @
           @aabb.addPoint child.aabb.min
           @aabb.addPoint child.aabb.max
       @length = @children.reduce (prev, current) ->
@@ -74,6 +80,10 @@ $ ->
         results.concat [results[results.length - 1] + current.length / @length]
       , [0]
       @gaps.shift()
+      @time = 0.0
+      @x = @y = 0
+      @scaleX = @scaleY = 1.0
+      @parent = null
     breakUp: (strokeNums = []) ->
       comps = []
       strokeNums.reduce (start, len) =>
@@ -88,21 +98,34 @@ $ ->
       @children.reduce (prev, child) ->
         prev.concat child.hitTest pt
       , results
-    render: (canvas, percent, matrix = [1, 0, 0, 1, 0, 0]) ->
+    render: (canvas) ->
+      # calculating scale and position
+      x = @x
+      y = @y
+      scaleX = @scaleX
+      scaleY = @scaleY
+      p = @parent
+      while p
+        x += p.x
+        y += p.y
+        scaleX *= p.scaleX
+        scaleY *= p.scaleY
+        p = p.parent
       ctx = canvas.getContext "2d"
-      ctx.setTransform.apply ctx, matrix
-      len = @length * percent
+      ctx.setTransform scaleX, 0, 0, scaleY, x, y
+      len = @length * @time
       for child in @children
         if len > 0
-          child.render canvas, Math.min(child.length, len) / child.length, matrix
+          child.time = Math.min(child.length, len) / child.length
+          child.render canvas
           len -= child.length
 
-  class Track
+  class Track extends Comp
     constructor: (@data, @options = {}) ->
+      super null, new AABB
       @options.trackWidth or= 150
       @length = Math.sqrt @data.vector.x * @data.vector.x + @data.vector.y * @data.vector.y
-      @aabb = new AABB
-    render: (canvas, percent) ->
+    render: (canvas) ->
       size = @data.size or @options.trackWidth
       ctx = canvas.getContext "2d"
       ctx.beginPath()
@@ -112,8 +135,8 @@ $ ->
       ctx.lineCap = "round"
       ctx.moveTo @data.x, @data.y
       ctx.lineTo(
-        @data.x + @data.vector.x * percent
-        @data.y + @data.vector.y * percent
+        @data.x + @data.vector.x * @time
+        @data.y + @data.vector.y * @time
       )
       ctx.stroke()
 
@@ -166,26 +189,41 @@ $ ->
             )
     hitTest: (pt) ->
       if @aabb.containPoint pt then [@] else []
-    render: (canvas, percent, matrix) ->
+    render: (canvas) ->
       ctx = canvas.getContext "2d"
       ctx.save()
       ctx.beginPath()
       @pathOutline ctx
       ctx.clip()
-      super canvas, percent, matrix
+      super canvas
       ctx.restore()
 
   words = WordStroker.utils.sortSurrogates($word.val())
 
-  data.get(
-    words[0].cp
-    (json) ->
-      strokes = json.map (strokeData) ->
-        new Stroke strokeData
-      word = new Comp strokes, [
-      ]
-      word = word.breakUp [4, 4, 4]
-
+  for own i, char of words
+    w = options.dim * options.scales.fill
+    ww = w * options.scales.style
+    width = ~~($body.width() / ww)
+    do (i) ->
+      i = parseInt i, 10
+      data.get(
+        char.cp
+        (json) ->
+          strokes = json.map (strokeData) ->
+            new Stroke strokeData
+          word = new Comp strokes
+          #word = word.breakUp [4, 4, 4]
+          word.x = w * ~~(i % width)
+          word.y = w * ~~(i / width)
+          word.scaleX = word.scaleY = options.scales.fill
+          word.time = 1.0
+          word.render canvas
+        (err) ->
+          console.log "failed"
+        null
+      )
+      # hit test
+      ###
       hits = []
       $(canvas).mousemove (e) ->
         pos = $(@).offset()
@@ -196,11 +234,7 @@ $ ->
 
       update = ->
         canvas.width = canvas.width # clear rect
-        word.render canvas, 1, [
-          options.scales.fill,                   0,
-                            0, options.scales.fill,
-                            0,                   0
-        ]
+        word.render canvas
         draw = (o, canvas) ->
           if o.aabb
             o.aabb.render canvas
@@ -210,6 +244,8 @@ $ ->
         draw hits, canvas
         requestAnimationFrame update
       requestAnimationFrame update
+      ###
+
       # normal animation
       ###
       pixel_per_second = 2000
@@ -230,6 +266,7 @@ $ ->
             requestAnimationFrame update
       requestAnimationFrame update
       ###
+
       # interactive animation
       ###
       inc = false
@@ -255,7 +292,3 @@ $ ->
         requestAnimationFrame update
       requestAnimationFrame update
       ###
-    (err) ->
-      console.log "failed"
-    null
-  )
