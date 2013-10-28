@@ -16,26 +16,36 @@ minify = (o) ->
 require! fs
 require! readline
 
-
-console.log "Reading kTotalStrokes from Unihan DB."
-
-BlackHole = fs.createWriteStream "/dev/null"
-DictionaryLikeData = fs.createReadStream "./Unihan/Unihan_DictionaryLikeData.txt", encoding: \utf8
 TotalStrokes = {}
 
-the-comment = /^\s*#/
-the-total-strokes = /\s*kTotalStrokes\s*/
+load-unihan = (strokes, next) ->
+  if fs.exists-sync \./total-unihan.json
+    strokes = require \./total-unihan.json
+    return next? strokes
 
-rl = readline.createInterface DictionaryLikeData, BlackHole
-rl.on \line, (line) ->
-  if not line.match the-comment and line.match the-total-strokes
-    data = line.split the-total-strokes
-    TotalStrokes[parseInt data[0].substr(2), 16] = parseInt data[1], 10
-rl.on \close, ->
-  filename = \total-unihan.json
-  console.log "Creating #filename...."
-  fs.write-file-sync "./#filename", minify TotalStrokes
+  console.log "Reading kTotalStrokes from Unihan DB."
 
+  BlackHole = fs.createWriteStream "/dev/null"
+  DictionaryLikeData = fs.createReadStream "./Unihan/Unihan_DictionaryLikeData.txt", encoding: \utf8
+
+  the-comment = /^\s*#/
+  the-total-strokes = /\s*kTotalStrokes\s*/
+
+  rl = readline.createInterface DictionaryLikeData, BlackHole
+  rl.on \line, (line) ->
+    if not line.match the-comment and line.match the-total-strokes
+      data = line.split the-total-strokes
+      strokes[parseInt data[0].substr(2), 16] = parseInt data[1], 10
+  rl.on \close, ->
+    filename = \total-unihan.json
+    console.log "Creating #filename...."
+    fs.write-file-sync "./#filename", minify strokes
+    next? strokes
+
+load-orig = (strokes, next) ->
+  if fs.exists-sync \./total-origin.json
+    strokes = require \./total-origin.json
+    return next? strokes
 
   console.log "Reading total strokes from orginal chars."
 
@@ -46,14 +56,18 @@ rl.on \close, ->
     out = "#{ cp.toString 16 }.json"
     if fs.exists-sync "../json/#out"
       len = require "../json/#out" .length
-      if len isnt TotalStrokes[cp]
-        #console.log "#char.totalStrokes is #len, not #{TotalStrokes[cp]}."
-        TotalStrokes[cp] = len
+      if len isnt strokes[cp]
+        strokes[cp] = len
 
   filename = \total-origin.json
   console.log "Creating #filename...."
-  fs.write-file-sync "./#filename", minify TotalStrokes
+  fs.write-file-sync "./#filename", minify strokes
+  next? strokes
 
+guess-strokes = (ts, next) ->
+  if fs.exists-sync \./total-strokes.json
+    ts = require \./total-strokes.json
+    return next? ts
 
   console.log "Guessing total strokes of comps."
 
@@ -61,7 +75,7 @@ rl.on \close, ->
 
   computed = []
   for own char, comps of CharComp
-    total = TotalStrokes[char.codePointAt!]
+    total = ts[char.codePointAt!]
     continue if not total?
     unknown =
       comps: []
@@ -79,7 +93,7 @@ rl.on \close, ->
       new-comps = []
       total = unknown.len
       for c in unknown.comps
-        part = TotalStrokes[c.codePointAt!]
+        part = ts[c.codePointAt!]
         if not part? then new-comps.push c else total -= part
       continue if new-comps.length is 0
       unknown.comps = new-comps
@@ -104,7 +118,7 @@ rl.on \close, ->
           result = parseInt len, 10
       strokes-found++
       strokes[k] = result
-      TotalStrokes[k.codePointAt!] = result
+      ts[k.codePointAt!] = result
 
     console.log "Found #strokes-found comps"
 
@@ -122,7 +136,26 @@ rl.on \close, ->
   filename = "left.json"
   console.log "Creating #filename...."
   fs.write-file-sync "./log/#filename", JSON.stringify computed,,2
-
   filename = \total-strokes.json
   console.log "Creating #filename...."
-  fs.write-file-sync "./#filename", minify TotalStrokes
+  fs.write-file-sync "./#filename", minify ts
+  next? ts
+
+write-modulated-strokes = (ts) ->
+  # lame code
+  ModTotalStrokes = {}
+  for own k, v of ts
+    cp = parseInt k, 10
+    mod = (cp % 0xFF).toString 16
+    mod = \0 + mod if mod.length is 1
+    ModTotalStrokes[mod] ?= {}
+    ModTotalStrokes[mod][k] = v
+  console.log "Creating total-strokes.*.json...."
+  for own k, v of ModTotalStrokes
+    fs.write-file-sync "./mod/total-strokes.#k.json", minify v
+
+ts <- load-unihan {}
+ts <- load-orig ts
+ts <- guess-strokes ts
+write-modulated-strokes ts
+
