@@ -33,9 +33,15 @@ computed-missing ::
 ## total-strokes/total-strokes.pl
 ## components.ls
 ## computed-missing.ls
-## gen-refs.ls
-## boxes.sql
-## plv8x-outlines.ls
-## sql-diff/*
-## tiebreak.ls
-## scale-missing.ls
+## perl orig-chars.pl | psql chars
+## lsc gen-refs.ls | psql chars
+## psql chars -f boxes.sql
+## perl plv8x-outlines.ls
+## cd out && ls *.ls | xargs -P 8 -n 1 -- perl runner.pl && cd ..
+## cd out && ls *.sql | xargs -P 8 -n 1 -- psql chars -f && cd ..
+## bzcat ../ttf2gis/Kai.ttf.sql.bz2 | psql chars
+## psql chars -f diff.sql
+## cd sql-diff && ls *.sql | xargs -P 8 -n 1 -- psql chars -f && cd ..
+## psql chars -c 'select ch, json_agg(ids) from (select ch, json_agg(id) ids from refs group by ch, part) chs group by ch;' -P t > combinations.json
+## lsc tiebreak.ls
+## lsc scale-missing.ls
