@@ -13,17 +13,20 @@ const T = 2048
 const CharComp = require \./char_comp.json
 const Missing = require \./computed-missing.json
 const Chars = require \./chars.json
+const OrigChars = require \./orig-chars.json
 
 missing = {}
 found = {}
 console.log """
 CREATE TABLE IF NOT EXISTS refs (id int, ch text, part int, comp text, whole text, idx int, len int, x int, y int, w int, h int, outlines geometry, strokes geometry);
+DELETE FROM refs;
 CREATE INDEX refs VALUES _ch on refs VALUES  (ch);
 CREATE INDEX refs VALUES _id on refs VALUES  (id);
 """
 
 id = -1
 for char in Chars
+  continue if char in OrigChars
   out = "#{ char.codePointAt!toString 16}.json"
   continue if fs.exists-sync "json/#out" and not fs.exists-sync "missing/#out"
   comp = CharComp[char]
