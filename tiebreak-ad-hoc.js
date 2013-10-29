@@ -30,7 +30,7 @@
     }, {
       test: {
         whole: (function(it){
-          return it === '迴' || it === '遐';
+          return in$(it, '迴遐');
         })
       },
       out: {
@@ -41,7 +41,7 @@
     }, {
       test: {
         whole: (function(it){
-          return in$(it, ['育']);
+          return in$(it, '育');
         })
       },
       out: {

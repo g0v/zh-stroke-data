@@ -9,11 +9,11 @@ rules =
     out:
       len: -> \3
   * test:
-      whole: (in <[ 迴 遐 ]>)
+      whole: (in \迴遐)
     out:
       idx: -> \0
   * test:
-      whole: (in <[ 育 ]>)
+      whole: (in \育)
     out:
       idx: -> \3
 
