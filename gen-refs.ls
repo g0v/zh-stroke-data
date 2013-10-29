@@ -20,8 +20,9 @@ found = {}
 console.log """
 CREATE TABLE IF NOT EXISTS refs (id int, ch text, part int, comp text, whole text, idx int, len int, x int, y int, w int, h int, outlines geometry, strokes geometry);
 DELETE FROM refs;
-CREATE INDEX refs VALUES _ch on refs VALUES  (ch);
-CREATE INDEX refs VALUES _id on refs VALUES  (id);
+CREATE INDEX _ch on refs (ch);
+CREATE INDEX _id on refs (id);
+CREATE INDEX _whole on refs (whole);
 """
 
 id = -1

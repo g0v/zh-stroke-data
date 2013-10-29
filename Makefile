@@ -36,7 +36,7 @@ scale :: polyfill.js tiebreak-ad-hoc.js
 	lsc scale-missing.ls
 
 # tiebreak ::
-## total-strokes/total-strokes.pl
+## total-strokes/total-strokes.ls
 ## components.ls
 ## computed-missing.ls
 ## perl orig-chars.pl | psql chars
@@ -48,7 +48,8 @@ scale :: polyfill.js tiebreak-ad-hoc.js
 ## bzcat ../ttf2gis/Kai.ttf.sql.bz2 | psql chars
 ## psql chars -f diff.sql
 ## cd sql-diff && ls *.sql | xargs -P 8 -n 1 -- psql chars -f && cd ..
-## psql chars -f combinations.sql > combinations.json
-## lsc tiebreak.ls
+## psql chars -P t -f combinations.sql | perl -pe 's/^ /"/; s/ . /":/; if ($. == 1) { s/^/{/ } else {s/^"/,"/ }; s/^$/}/' > combinations.json
+## lsc tiebreak.ls | psql chars
+## psql chars -c "\copy (select ch,part,comp,whole,idx,len,x,y,w,h from subsets order by id) to 'tiebreak-results.csv' with csv header"
 ## lsc tiebreak-results.ls > tiebreak-results.json
 ## lsc scale-missing.ls
