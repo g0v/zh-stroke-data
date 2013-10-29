@@ -4,12 +4,12 @@
   rules = [
     {
       test: {
-        comp: function(v){
-          return v === '肉';
-        },
-        whole: function(v){
-          return v !== '瘸';
-        }
+        comp: (function(it){
+          return it === '肉';
+        }),
+        whole: (function(it){
+          return it !== '瘸';
+        })
       },
       out: {
         len: function(){
@@ -18,9 +18,9 @@
       }
     }, {
       test: {
-        comp: function(v){
-          return v === '阝';
-        }
+        comp: (function(it){
+          return it === '阝';
+        })
       },
       out: {
         len: function(){
@@ -29,9 +29,9 @@
       }
     }, {
       test: {
-        whole: function(v){
-          return v === '迴' || v === '遐';
-        }
+        whole: (function(it){
+          return it === '迴' || it === '遐';
+        })
       },
       out: {
         idx: function(){
@@ -40,9 +40,9 @@
       }
     }, {
       test: {
-        whole: function(v){
-          return in$(v, ['育']);
-        }
+        whole: (function(it){
+          return in$(it, ['育']);
+        })
       },
       out: {
         idx: function(){

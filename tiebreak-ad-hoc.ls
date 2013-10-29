@@ -1,19 +1,19 @@
 rules =
   * test:
-      comp:  (v) -> v is \肉
-      whole: (v) -> v isnt \瘸
+      comp:  (is \肉)
+      whole: (isnt \瘸)
     out:
       len: -> \4
   * test:
-      comp: (v) -> v is \阝
+      comp: (is \阝)
     out:
       len: -> \3
   * test:
-      whole: (v) -> v in <[ 迴 遐 ]>
+      whole: (in <[ 迴 遐 ]>)
     out:
       idx: -> \0
   * test:
-      whole: (v) -> v in <[ 育 ]>
+      whole: (in <[ 育 ]>)
     out:
       idx: -> \3
 
