@@ -155,7 +155,3 @@
   });
 
 }).call(this);
-
-/*
-//@ sourceMappingURL=pack.js.map
-*/

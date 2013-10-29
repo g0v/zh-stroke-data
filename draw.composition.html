@@ -8,7 +8,9 @@
         <script src="./js/raf.min.js"></script>
         <script src="./js/raphael.js"></script>
         <script src="./js/jquery-1.9.1.min.js"> </script>
+        <script src="./js/gl-matrix-min.js"> </script>
         <script src="./js/sax.js"> </script>
+        <script src="./js/q.min.js"> </script>
         <script src="./js/utils.stroke-words.js"> </script>
         <script src="./js/draw.canvas.js"> </script>
         <script>
@@ -18,14 +20,15 @@
             canvas.height = 500;
             $("#holder").append(canvas);
 
+            var data = WordStroker.utils.StrokeData();
             var cp = WordStroker.utils.sortSurrogates("你");
-            WordStroker.utils.StrokeData.get(
-              cp[0],
+            data.get(
+              cp[0].cp,
               function(json) {
                 cp = WordStroker.utils.sortSurrogates("姻");
                 var strokesA = [json[0], json[1]];
-                WordStroker.utils.StrokeData.get(
-                  cp[0],
+                data.get(
+                  cp[0].cp,
                   function(json) {
                     var strokesB = [json[3], json[4], json[5], json[6], json[7], json[8]];
                     var strokes = strokesA.concat(strokesB);

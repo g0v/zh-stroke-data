@@ -18,7 +18,3 @@
   });
 
 }).call(this);
-
-/*
-//@ sourceMappingURL=stroke2json.js.map
-*/
