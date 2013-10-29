@@ -4,11 +4,14 @@ all = require \./combinations.json
 console.log "CREATE TABLE tops (ch text, part int, ref_id int);";
 console.log "CREATE INDEX ch_tops ON tops (ch);"
 console.log "DELETE FROM tops;";
+
+const ForceFirstChoice = "弋冖亠至周斤"
+
 for ch, cs of all
   comp = CharComp[ch]
   continue if cs.length != comp.length
   for ids, idx in cs
-    if ids.length is 1
+    if ids.length is 1 or comp[idx].c in ForceFirstChoice
       console.log "INSERT INTO tops VALUES ('#ch', #idx, #{ids.0});"
     else
       console.log "INSERT INTO tops VALUES ('#ch', #idx, (SELECT id FROM diffs WHERE id IN (#{ ids * ',' }) ORDER BY diff ASC LIMIT 1));"
