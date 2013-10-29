@@ -5,16 +5,18 @@ console.log "CREATE TABLE tops (ch text, part int, ref_id int);";
 console.log "CREATE INDEX ch_tops ON tops (ch);"
 console.log "DELETE FROM tops;";
 
-const ForceFirstChoice = "弋冖亠至周斤"
+const ForceFirstChoice = "弋冖亠至周斤夾"
+const ForceFirstChoiceChar = "胾"
+const BlackListWhole = <[ '嬴' '盥' '迅' '進' '衢' '亟' '喬' '粵' '暹' ]>
 
 for ch, cs of all
   comp = CharComp[ch]
   continue if cs.length != comp.length
   for ids, idx in cs
-    if ids.length is 1 or comp[idx].c in ForceFirstChoice
+    if ids.length is 1 or comp[idx].c in ForceFirstChoice or ch in ForceFirstChoiceChar
       console.log "INSERT INTO tops VALUES ('#ch', #idx, #{ids.0});"
     else
-      console.log "INSERT INTO tops VALUES ('#ch', #idx, (SELECT id FROM diffs WHERE id IN (#{ ids * ',' }) ORDER BY diff ASC LIMIT 1));"
+      console.log "INSERT INTO tops VALUES ('#ch', #idx, (SELECT distances.id FROM distances LEFT JOIN diffs ON diffs.id = distances.id LEFT JOIN refs on refs.id = distances.id WHERE refs.whole NOT IN (#{ BlackListWhole * ',' }) AND refs.id IN (#{ ids * ',' }) ORDER BY diffs.diff * distance ASC LIMIT 1));"
 
 console.log """
 CREATE TABLE subsets (id int, ch text, part int, comp text, whole text, idx int, len int, x int, y int, w int, h int);

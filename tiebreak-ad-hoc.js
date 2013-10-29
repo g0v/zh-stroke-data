@@ -35,6 +35,11 @@
         w: function(it){
           return it < this.h / 2;
         }
+      },
+      out: {
+        len: function(){
+          return '4';
+        }
       }
     }, {
       test: {
@@ -67,6 +72,28 @@
       out: {
         idx: function(){
           return '3';
+        }
+      }
+    }, {
+      test: {
+        comp: (function(it){
+          return it === '';
+        })
+      },
+      out: {
+        len: function(){
+          return '3';
+        }
+      }
+    }, {
+      test: {
+        comp: (function(it){
+          return it === '雚';
+        })
+      },
+      out: {
+        len: function(){
+          return '18';
         }
       }
     }

@@ -53,6 +53,7 @@ tiebreak-pre2 ::
 tiebreak-pre3 ::
 	psql chars -f diff.sql
 	cd sql-diff && ls *.sql | xargs -P 8 -n 1 -- psql chars -f && cd ..
+	psql chars -f distance.sql
 	psql chars -P t -f combinations.sql | perl -pe 's/^ /"/; s/ . /":/; if ($. == 1) { s/^/{/ } else {s/^"/,"/ }; s/^$/}/' > combinations.json
 
 tiebreak ::
