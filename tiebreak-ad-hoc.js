@@ -5,6 +5,17 @@
     {
       test: {
         comp: (function(it){
+          return it === '艹';
+        })
+      },
+      out: {
+        len: function(){
+          return '4';
+        }
+      }
+    }, {
+      test: {
+        comp: (function(it){
           return it === '肉';
         }),
         whole: (function(it){
@@ -14,6 +25,15 @@
       out: {
         len: function(){
           return '4';
+        }
+      }
+    }, {
+      test: {
+        comp: (function(it){
+          return it === '肉';
+        }),
+        w: function(it){
+          return it < this.h / 2;
         }
       }
     }, {
@@ -69,7 +89,7 @@
       result = true;
       for (k in ref1$ = rule.test) {
         test = ref1$[k];
-        result && (result = test(part[k]));
+        result && (result = test.call(part, part[k]));
       }
       if (result) {
         for (k in ref1$ = rule.out) {

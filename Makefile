@@ -7,6 +7,9 @@ STROKES_COMPOSED = $(STROKES_MISSING:$(DIR_MISSING)/%=$(DIR_COMPOSED)/%)
 $(DIR_COMPOSED)/%.json : $(DIR_MISSING)/%.json
 	-$(COMPOSE) ./$< > ./$@
 
+.js.ls :
+	lsc -c $<
+
 main ::
 	cat ./js/utils.stroke-words.js ./js/draw.js ./js/draw.canvas.js ./js/jquery.stroke-words.js > /Users/audreyt/w/moedict-webkit/js/jquery.strokeWords.js
 
@@ -22,13 +25,13 @@ old :: $(STROKES_COMPOSED)
 clean ::
 	rm -f $(STROKES_COMPOSED)
 
-components ::
+components :: polyfill.js tiebreak-ad-hoc.js
 	lsc ./components.ls > ./components.json
 
 computed-missing ::
 	lsc ./computed-missing.ls > ./computed-missing.json
 
-scale ::
+scale :: polyfill.js tiebreak-ad-hoc.js
 	lsc tiebreak-results.ls > tiebreak-results.json
 	lsc scale-missing.ls
 

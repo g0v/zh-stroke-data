@@ -1,13 +1,6 @@
-String::codePointAt ?= (pos=0) ->
-  str = String @
-  code = str.charCodeAt(pos)
-  if 0xD800 <= code <= 0xDBFF
-    next = str.charCodeAt(pos + 1)
-    if 0xDC00 <= next <= 0xDFFF
-      return ((code - 0xD800) * 0x400) + (next - 0xDC00) + 0x10000
-  return code;
-
 require! fs
+require \./polyfill
+TiebreakAdHoc = require \./tiebreak-ad-hoc
 const S = 256
 const T = 2048
 const OrigChars = require \./orig-chars.json
@@ -22,6 +15,7 @@ for char in Chars
   out = "#{ char.codePointAt!toString 16}.json"
   parts = Results[char]
   continue unless parts
+  parts = parts.map TiebreakAdHoc
   strokes = []
   for {comp: c, whole: ref, idx: stroke-offset, len: stroke-length, x, y, w, h} in parts
     ref-hex = ref.codePointAt!toString 16
@@ -32,10 +26,6 @@ for char in Chars
       max-x = max-y = -Infinity
       ss = require "./json/#ref-hex.json"
       stroke-offset = Infinity if stroke-length is 0
-      stroke-length = 4 if c is \肉 and ref isnt \瘸
-      stroke-length = 3 if c is \阝
-      stroke-offset = 0 if ref in <[ 迴 遐 ]>
-      stroke-offset = 3 if ref in <[ 育 ]>
       if stroke-offset isnt Infinity
         last = stroke-offset + stroke-length - 1
         last <?= ss.length - 1
@@ -74,7 +64,7 @@ for char in Chars
       part.indices = [stroke-offset to last] if stroke-offset isnt Infinity
       strokes.push part if part
     else
-      console.log "Missing comp: #c"
+      console.log "Missing comp: #c(#ref-hex)"
       missing[char] = true
       strokes = null
       break
