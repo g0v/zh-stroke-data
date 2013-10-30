@@ -23,6 +23,7 @@
           var data = new WordStroker.utils.StrokeData({url: "/json/"})
           var c    = WordStroker.utils.sortSurrogates("萌");
           var cp   = c[0].cp
+          paths = []
           data.get(cp).then(function(strokes) {
             for (i in strokes) {
               stroke = strokes[i];
@@ -56,9 +57,10 @@
                 }
               }
               p = new fabric.Path(path + "z");
-              p.fill = "rgb(255,255,255,1.0)";
+              p.fill = "white";
               word.add(p);
             }
+            word.set({left: 50, top: 50});
             word.scaleX = word.scaleY = 0.3;
             canvas.add(word);
           });
