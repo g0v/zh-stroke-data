@@ -2,7 +2,7 @@
 <html lang="en" style="height: 100%;">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <title>常用國字標準字體筆劃 in Paper.js</title>
+        <title>常用國字標準字體筆劃 in Fabric.js</title>
         <link rel="stylesheet" href="/css/demo.css" type="text/css" media="screen">
         <script src="/js/jquery-1.9.1.min.js"></script>
         <script src="/js/gl-matrix-min.js"></script>
@@ -11,15 +11,67 @@
         <script src="/js/utils.stroke-words.js"></script>
         <script src="./js/fabric.js"></script>
         <script>
+          var canvas = new fabric.Canvas("c");
+          var rect = new fabric.Rect({
+            left: 100,
+            top: 100,
+            fill: "red",
+            width: 100,
+            height: 100
+          });
+          canvas.add(rect);
+          /*
+          var word = new fabric.Group();
           var data = new WordStroker.utils.StrokeData({url: "/json/"})
           var c    = WordStroker.utils.sortSurrogates("萌");
           var cp   = c[0].cp
           data.get(cp).then(function(strokes) {
+            for (i in strokes) {
+              stroke = strokes[i];
+              var path = ""
+              for (j in stroke.outline) {
+                cmd = stroke.outline[j];
+                path += cmd.type + " ";
+                switch (cmd.type) {
+                  case "M":
+                    path += cmd.x + " ";
+                    path += cmd.y + " ";
+                    break;
+                  case "L":
+                    path += cmd.x + " ";
+                    path += cmd.y + " ";
+                    break;
+                  case "Q":
+                    path += cmd.begin.x + " ";
+                    path += cmd.begin.y + " ";
+                    path += cmd.end.x + " ";
+                    path += cmd.end.y + " ";
+                    break;
+                  case "C":
+                    path += cmd.begin.x + " ";
+                    path += cmd.begin.y + " ";
+                    path += cmd.mid.x + " ";
+                    path += cmd.mid.y + " ";
+                    path += cmd.end.x + " ";
+                    path += cmd.end.y + " ";
+                    break;
+                }
+              }
+              p = new fabric.Path(path + "z");
+              p.fill = "rgb(255,255,255,1.0)";
+              word.add(p);
+            }
+            word.scaleX = word.scaleY = 0.3;
+            var path = new fabric.Path('M 0 0 L 200 100 L 170 200 z');
+            path.set({left: 0, top: 0});
+            canvas.add(path);
+            canvas.add(word);
           });
+          */
         </script>
     </head>
     <body style="margin: 0; padding: 0;">
-        <canvas id="myCanvas" resize></canvas>
+        <canvas id="c"></canvas>
         <p id="copyright">常用國字標準字體筆劃</p>
     </body>
 </html>
