@@ -3,12 +3,12 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <title>常用國字標準字體筆劃 in Fabric.js</title>
-        <link rel="stylesheet" href="/css/demo.css" type="text/css" media="screen">
-        <script src="/js/jquery-1.9.1.min.js"></script>
-        <script src="/js/gl-matrix-min.js"></script>
-        <script src="/js/sax.js"></script>
-        <script src="/js/q.min.js"></script>
-        <script src="/js/utils.stroke-words.js"></script>
+        <link rel="stylesheet" href="../../css/demo.css" type="text/css" media="screen">
+        <script src="../../js/jquery-1.9.1.min.js"></script>
+        <script src="../../js/gl-matrix-min.js"></script>
+        <script src="../../js/sax.js"></script>
+        <script src="../../js/q.min.js"></script>
+        <script src="../../js/utils.stroke-words.js"></script>
         <script src="./js/fabric.js"></script>
     </head>
     <body style="margin: 0; padding: 0; height: 100%;">
@@ -20,7 +20,7 @@
           canvas.setWidth($body.width());
           canvas.setHeight($body.height());
           var word = new fabric.Group();
-          var data = new WordStroker.utils.StrokeData({url: "/json/"})
+          var data = new WordStroker.utils.StrokeData({url: "../../json/"})
           var c    = WordStroker.utils.sortSurrogates("萌");
           var cp   = c[0].cp
           data.get(cp).then(function(strokes) {
