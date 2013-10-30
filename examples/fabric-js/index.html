@@ -10,17 +10,15 @@
         <script src="/js/q.min.js"></script>
         <script src="/js/utils.stroke-words.js"></script>
         <script src="./js/fabric.js"></script>
+    </head>
+    <body style="margin: 0; padding: 0; height: 100%;">
+        <canvas id="c"></canvas>
+        <p id="copyright">常用國字標準字體筆劃</p>
         <script>
           var canvas = new fabric.Canvas("c");
-          var rect = new fabric.Rect({
-            left: 100,
-            top: 100,
-            fill: "red",
-            width: 100,
-            height: 100
-          });
-          canvas.add(rect);
-          /*
+          $body = $("body");
+          canvas.setWidth($body.width());
+          canvas.setHeight($body.height());
           var word = new fabric.Group();
           var data = new WordStroker.utils.StrokeData({url: "/json/"})
           var c    = WordStroker.utils.sortSurrogates("萌");
@@ -62,16 +60,8 @@
               word.add(p);
             }
             word.scaleX = word.scaleY = 0.3;
-            var path = new fabric.Path('M 0 0 L 200 100 L 170 200 z');
-            path.set({left: 0, top: 0});
-            canvas.add(path);
             canvas.add(word);
           });
-          */
         </script>
-    </head>
-    <body style="margin: 0; padding: 0;">
-        <canvas id="c"></canvas>
-        <p id="copyright">常用國字標準字體筆劃</p>
     </body>
 </html>
