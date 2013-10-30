@@ -16,20 +16,19 @@
         <p id="copyright">常用國字標準字體筆劃</p>
         <script>
           var canvas = new fabric.Canvas("c");
-          $body = $("body");
+          var $body = $("body");
           canvas.setWidth($body.width());
           canvas.setHeight($body.height());
           var word = new fabric.Group();
           var data = new WordStroker.utils.StrokeData({url: "/json/"})
           var c    = WordStroker.utils.sortSurrogates("萌");
           var cp   = c[0].cp
-          paths = []
           data.get(cp).then(function(strokes) {
             for (i in strokes) {
-              stroke = strokes[i];
+              var stroke = strokes[i];
               var path = ""
               for (j in stroke.outline) {
-                cmd = stroke.outline[j];
+                var cmd = stroke.outline[j];
                 path += cmd.type + " ";
                 switch (cmd.type) {
                   case "M":
