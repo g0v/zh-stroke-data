@@ -10,32 +10,102 @@
         <script src="/js/q.min.js"></script>
         <script src="/js/utils.stroke-words.js"></script>
         <script src="./js/three.js"></script>
+        <!--script src="./js/renderer/CSS3DRenderer.js"></script-->
     </head>
     <body style="margin: 0; padding: 0; height: 100%;">
-        <canvas id="c"></canvas>
-        <p id="copyright">常用國字標準字體筆劃</p>
         <script>
+          /**
+           * test WestLangley's fiddle with Chinese stroke paths
+           * http://stackoverflow.com/questions/16118274/converting-svg-paths-with-holes-to-extruded-shapes-in-three-js
+           */
+          /**
+           * initialize three.js
+           */
           var $body = $("body");
+          /* CSS3DRenderer doesnt work D: */
+          //var renderer = new THREE.CSS3DRenderer();
+          var renderer = new THREE.WebGLRenderer();
+          renderer.setSize($body.width(), $body.height());
+          $body.append(renderer.domElement);
+          // scene
+          var scene = new THREE.Scene();
+          // camera
+          var camera = new THREE.PerspectiveCamera(45, $body.width() / $body.height(), 1, 10000);
+          camera.position.set(2000, 0, 3000);
+          scene.add(camera);
+          //lights
+          scene.add(new THREE.AmbientLight(0x1c1c1c));
+          var light = new THREE.PointLight(0xDDDDDD);
+          light.position = camera.position;
+          scene.add(light);
+
+          /* get strokes */
           var data = new WordStroker.utils.StrokeData({url: "/json/"})
           var c    = WordStroker.utils.sortSurrogates("萌");
           var cp   = c[0].cp
           data.get(cp).then(function(strokes) {
+            var shapes = []
             for (i in strokes) {
               var stroke = strokes[i];
+              var shape = new THREE.Shape();
               for (j in stroke.outline) {
                 var cmd = stroke.outline[j];
                 switch (cmd.type) {
                   case "M":
+                    shape.moveTo(cmd.x, -cmd.y);
                     break;
                   case "L":
+                    shape.lineTo(cmd.x, -cmd.y);
                     break;
                   case "Q":
+                    shape.quadraticCurveTo(
+                      cmd.begin.x, -cmd.begin.y,
+                      cmd.end.x, -cmd.end.y
+                    );
                     break;
                   case "C":
+                    shape.bezierCurveTo(
+                      cmd.begin.x, -cmd.begin.y,
+                      cmd.mid.x, -cmd.mid.y,
+                      cmd.end.x, -cmd.end.y
+                    );
                     break;
                 }
               }
+              shapes.push(shape);
             }
+            // geometry
+            var extrusionSettings = {
+              amount: 200,
+              bevelEnabled: true,
+              bevelThickness: 10,
+              bevelSize: 20,
+              bevelSegments: 8,
+              material: 0,
+              extrudeMaterial: 1
+            };
+            /* so it's possible to build a geometry from many strokes */
+            var geometry = new THREE.ExtrudeGeometry(shapes, extrusionSettings);
+            // material
+            var materialFront = new THREE.MeshLambertMaterial({
+              color: 0xFFFFFF,
+              ambient: 0xFFFFFF
+            });
+            var materialSide = new THREE.MeshLambertMaterial({
+              color: 0xEEEEEE,
+              ambient: 0xEEEEEE
+            });
+            var material = new THREE.MeshFaceMaterial([materialFront, materialSide]);
+            // mesh
+            var mesh = new THREE.Mesh(geometry, material);
+            mesh.position.set(-1075, 1075, 0);
+            // object
+            var object = new THREE.Object3D();
+            object.add(mesh);
+            camera.lookAt(object.position);
+            scene.add(object);
+            // render
+            renderer.render(scene, camera);
           });
         </script>
     </body>
