@@ -3,18 +3,56 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <title>常用國字標準字體筆劃 in Paper.js</title>
-        <!--link rel="stylesheet" href="./css/demo.css" type="text/css" media="screen"-->
-        <script src="../../js/utils.stroke-words.js"></script>
+        <link rel="stylesheet" href="/css/demo.css" type="text/css" media="screen">
+        <script src="/js/jquery-1.9.1.min.js"></script>
+        <script src="/js/gl-matrix-min.js"></script>
+        <script src="/js/sax.js"></script>
+        <script src="/js/q.min.js"></script>
+        <script src="/js/utils.stroke-words.js"></script>
         <script src="./js/paper.js"></script>
         <script type="text/paperscript" canvas="myCanvas">
-          var path = new Path();
-          path.strokeColor = "black";
-          var start = new Point(100, 100);
-          path.moveTo(start);
-          path.lineTo(start + [100, -50]);
+          var data = new WordStroker.utils.StrokeData({url: "/json/"})
+          var c    = WordStroker.utils.sortSurrogates("萌");
+          var cp   = c[0].cp
+          var word = new Group
+          data.get(cp).then(function(strokes) {
+            for (i in strokes) {
+              var stroke = strokes[i];
+              var path = new Path();
+              path.fillColor = "white";
+              word.addChild(path);
+              for (j in stroke.outline) {
+                var cmd = stroke.outline[j];
+                switch (cmd.type) {
+                  case "M":
+                    path.moveTo(new Point(cmd.x, cmd.y));
+                    break;
+                  case "L":
+                    path.lineTo(new Point(cmd.x, cmd.y));
+                    break;
+                  case "Q":
+                    path.quadraticCurveTo(
+                      new Point(cmd.begin.x, cmd.begin.y),
+                      new Point(cmd.end.x, cmd.end.y)
+                    )
+                    break;
+                  case "C":
+                    path.cubicCurveTo(
+                      new Point(cmd.begin.x, cmd.begin.y),
+                      new Point(cmd.mid.x, cmd.mid.y),
+                      new Point(cmd.end.x, cmd.end.y)
+                    )
+                    break;
+                }
+              }
+              path.closePath();
+            }
+            word.scale(0.3, new Point(0, 0));
+            word.fullySelected = true;
+          });
         </script>
     </head>
-    <body>
+    <body style="margin: 0; padding: 0;">
         <canvas id="myCanvas" resize></canvas>
         <p id="copyright">常用國字標準字體筆劃</p>
     </body>
