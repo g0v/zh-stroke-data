@@ -177,8 +177,9 @@ var doAddChar = function() {
               m.makeTranslation(-offset.x, -offset.y, -offset.z);
               geometry.applyMatrix(m);
               var mesh = new Physijs.ConvexMesh(geometry, block_material, 9);
-              mesh.position.set(offset.x -1075 + randX, offset.y + 1175 + randY, offset.z + randZ);
-              mesh.rotation.set(0, (randA + 45) * Math.PI / 180, 0);
+              mesh.position = offset.clone();
+              mesh.position.add(new THREE.Vector3(-1075 + randX, 1175 + randY, randZ));
+              //mesh.rotation.set(0, (randA + 45) * Math.PI / 180, 0);
               mesh.castShadow = true;
               mesh.receiveShadow = true;
               scene.add(mesh);
