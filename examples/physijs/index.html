@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%;">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>常用國字標準字體筆劃 in Physijs</title>
+        <link rel="stylesheet" href="../../css/demo.css" type="text/css" media="screen">
+        <script src="../../js/jquery-1.9.1.min.js"></script>
+        <script src="../../js/gl-matrix-min.js"></script>
+        <script src="../../js/sax.js"></script>
+        <script src="../../js/q.min.js"></script>
+        <script src="../../js/utils.stroke-words.js"></script>
+        <script src="../three-js/js/three.js"></script>
+        <script src="js/physi.js"></script>
+    </head>
+    <body style="margin: 0; padding: 0; height: 100%;">
+        <script>
+          /**
+           * play with Physijs
+           */
+          Physijs.scripts.worker = "js/physijs_worker.js";
+          Physijs.scripts.ammo = "ammo.js";
+          /**
+           * initialize three.js
+           */
+          var $body = $("body");
+          /* CSS3DRenderer doesnt work D: */
+          //var renderer = new THREE.CSS3DRenderer();
+          var renderer = new THREE.WebGLRenderer();
+          renderer.setSize($body.width(), $body.height());
+          renderer.shadowMapEnabled = true;
+          renderer.shadowMapSoft = true;
+          $body.append(renderer.domElement);
+          // scene
+          var scene = new Physijs.Scene();
+          scene.setGravity(new THREE.Vector3(0, -300, 0));
+          scene.addEventListener(
+            "update",
+            function() { scene.simulate(undefined, 2); }
+          );
+          // camera
+          var camera = new THREE.PerspectiveCamera(45, $body.width() / $body.height(), 1, 10000);
+          camera.position.set(2500, 0, 2500);
+          scene.add(camera);
+          // lights
+          scene.add(new THREE.AmbientLight(0x333333));
+          var light = new THREE.DirectionalLight(0xFFFFFF);
+          light.position = new THREE.Vector3(0, 3000, 3000);
+          light.target.position.copy(scene.position);
+          light.castShadow = true;
+          light.shadowCameraLeft = -4000;
+          light.shadowCameraRight = 4000;
+          light.shadowCameraTop = 4000;
+          light.shadowCameraBottom = -4000;
+          light.shadowCameraNear = 20;
+          light.shadowCameraFar = 10000;
+          light.shadowMapWidth = light.shadowMapHeight = 512;
+          scene.add(light);
+          // material
+          var materialFront = new THREE.MeshLambertMaterial({
+            color: 0xFFFFFF,
+            ambient: 0xFFFFFF
+          });
+          var material = new Physijs.createMaterial(materialFront, 0.8, 0.4);
+          // ground
+          var ground = new Physijs.BoxMesh(
+            new THREE.CubeGeometry(10000, 1, 10000),
+            material,
+            0
+          );
+          ground.position.set(0, -1075, 0);
+          ground.rotation.set(0, 45 * Math.PI / 180, 0);
+          ground.receiveShadow = true;
+          scene.add(ground);
+
+          /* get strokes */
+          var i, j;
+          var data = new WordStroker.utils.StrokeData({url: "../../json/"})
+          var c    = WordStroker.utils.sortSurrogates("萌");
+          var cp   = c[0].cp
+          data.get(cp).then(function(strokes) {
+            var groups = []
+            var shapes = []
+            for (i in strokes) {
+              var stroke = strokes[i];
+              var shape = new THREE.Shape();
+              for (j in stroke.outline) {
+                var cmd = stroke.outline[j];
+                switch (cmd.type) {
+                  case "M":
+                    shape.moveTo(cmd.x, -cmd.y);
+                    break;
+                  case "L":
+                    shape.lineTo(cmd.x, -cmd.y);
+                    break;
+                  case "Q":
+                    shape.quadraticCurveTo(
+                      cmd.begin.x, -cmd.begin.y,
+                      cmd.end.x, -cmd.end.y
+                    );
+                    break;
+                  case "C":
+                    shape.bezierCurveTo(
+                      cmd.begin.x, -cmd.begin.y,
+                      cmd.mid.x, -cmd.mid.y,
+                      cmd.end.x, -cmd.end.y
+                    );
+                    break;
+                }
+              }
+              shapes.push(shape);
+              i = parseInt(i, 10);
+              switch (i) {
+                case 1:
+                  j = 0;
+                  break;
+                case 3:
+                  j = 1;
+                  break;
+                case 7:
+                  j = 2;
+                  break;
+                case 11:
+                  j = 3;
+                  break;
+                default:
+                  j = null;
+              }
+              if (j !== null) {
+                groups[j] = shapes;
+                shapes = [];
+              }
+            }
+            // geometry
+            var extrusionSettings = {
+              amount: 100,
+              bevelEnabled: false,
+              material: 0,
+              extrudeMaterial: 1
+            };
+            //var object = new THREE.Object3D();
+            /* so it's possible to build a geometry from many strokes */
+            for (i in groups) {
+              //i = parseInt(i, 10);
+              var geometry = new THREE.ExtrudeGeometry(groups[i], extrusionSettings);
+              var mesh = new Physijs.ConvexMesh(geometry, material);
+              mesh.position.set(-1075, 1175, 0);
+              mesh.castShadow = true;
+              mesh.receiveShadow = true;
+              scene.add(mesh);
+            }
+            // object
+            camera.lookAt(new THREE.Vector3(0, -250, 0));
+            //scene.add(object);
+            // render
+            var render = function() {
+              requestAnimationFrame(render);
+              renderer.render(scene, camera);
+            };
+
+            requestAnimationFrame(render);
+            scene.simulate();
+          });
+        </script>
+    </body>
+</html>
