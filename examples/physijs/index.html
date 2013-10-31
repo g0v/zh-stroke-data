@@ -10,6 +10,7 @@
         <script src="../../js/q.min.js"></script>
         <script src="../../js/utils.stroke-words.js"></script>
         <script src="../three-js/js/three.js"></script>
+        <script src="../three-js/js/controls/OrbitControls.js"></script>
         <script src="js/physi.js"></script>
     </head>
     <body style="margin: 0; padding: 0; height: 100%;">
@@ -30,16 +31,33 @@
           renderer.shadowMapEnabled = true;
           renderer.shadowMapSoft = true;
           $body.append(renderer.domElement);
+
+var controls;
           // scene
-          var scene = new Physijs.Scene();
-          scene.setGravity(new THREE.Vector3(0, -300, 0));
+          var scene = new Physijs.Scene({ fixedTimeStep: 1 / 120 });
+          scene.setGravity(new THREE.Vector3(0, -1024, 0));
+var i = 0;
           scene.addEventListener(
             "update",
-            function() { scene.simulate(undefined, 2); }
+            function() {
+                scene.simulate(undefined, 2);
+                controls.update();
+             }
           );
+
+// background
+var geometry  = new THREE.SphereGeometry(8000, 32, 32);
+// create the material, using a texture of startfield
+var material  = new THREE.MeshBasicMaterial();
+material.map   = THREE.ImageUtils.loadTexture('images/stars.jpg');
+material.side  = THREE.BackSide;
+// create the mesh based on geometry and material
+scene.add(new THREE.Mesh(geometry, material));
+
+
           // camera
-          var camera = new THREE.PerspectiveCamera(45, $body.width() / $body.height(), 1, 10000);
-          camera.position.set(2500, 0, 2500);
+          var camera = new THREE.PerspectiveCamera(45, $body.width() / $body.height(), 1, 100000);
+          camera.position.set(22000, 0, 5500);
           scene.add(camera);
           // lights
           scene.add(new THREE.AmbientLight(0x333333));
@@ -57,13 +75,24 @@
           scene.add(light);
           // material
           var materialFront = new THREE.MeshLambertMaterial({
-            color: 0xFFFFFF,
-            ambient: 0xFFFFFF
+            map: THREE.ImageUtils.loadTexture( 'images/wood.jpg' ),
+            color: 0x999999,
+            ambient: 0xF0F0F0
           });
-          var material = new Physijs.createMaterial(materialFront, 0.8, 0.4);
+          var material = new Physijs.createMaterial(materialFront, 8, 0.4);
+
+        var block_material = Physijs.createMaterial(
+                new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture( 'images/plywood.jpg' ), ambient: 0xFF9999 }),
+                0.9, // medium friction
+                0.5 // medium restitution
+        );
+        block_material.map.wrapS = block_material.map.wrapT = THREE.RepeatWrapping;
+        block_material.map.repeat.set( 1, .5 );
+
+
           // ground
           var ground = new Physijs.BoxMesh(
-            new THREE.CubeGeometry(10000, 1, 10000),
+            new THREE.CubeGeometry(10000, 500, 10000),
             material,
             0
           );
@@ -110,17 +139,8 @@
               shapes.push(shape);
               i = parseInt(i, 10);
               switch (i) {
-                case 1:
-                  j = 0;
-                  break;
-                case 3:
-                  j = 1;
-                  break;
-                case 7:
-                  j = 2;
-                  break;
-                case 11:
-                  j = 3;
+                case 1: case 3: case 7: case 11:
+                  j = groups.length;
                   break;
                 default:
                   j = null;
@@ -134,20 +154,30 @@
             var extrusionSettings = {
               amount: 100,
               bevelEnabled: false,
-              material: 0,
-              extrudeMaterial: 1
+              material: block_material,
+              extrudeMaterial: block_material
             };
             //var object = new THREE.Object3D();
             /* so it's possible to build a geometry from many strokes */
+var doAddChar = function() {
+              var randX = Math.random() * 5000 - 2500;
+              var randY = Math.random() * 500 - 250;
+              var randZ = Math.round(Math.random() * 5);
+              var randA = Math.random() * 90 - 45;
             for (i in groups) {
               //i = parseInt(i, 10);
               var geometry = new THREE.ExtrudeGeometry(groups[i], extrusionSettings);
-              var mesh = new Physijs.ConvexMesh(geometry, material);
-              mesh.position.set(-1075, 1175, 0);
+              var mesh = new Physijs.ConvexMesh(geometry, block_material, 9);
+              mesh.position.set(-1075 + randX, 1175 + randY, randZ);
+              mesh.rotation.set(0, (randA + 45) * Math.PI / 180, 0);
               mesh.castShadow = true;
               mesh.receiveShadow = true;
               scene.add(mesh);
             }
+};
+doAddChar();
+doAddChar();
+doAddChar();
             // object
             camera.lookAt(new THREE.Vector3(0, -250, 0));
             //scene.add(object);
@@ -157,8 +187,13 @@
               renderer.render(scene, camera);
             };
 
+controls = new THREE.OrbitControls( camera );
+
             requestAnimationFrame(render);
             scene.simulate();
+$('body').click( function () {
+doAddChar();
+});
           });
         </script>
     </body>
