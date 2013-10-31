@@ -30,7 +30,7 @@
   material.side = THREE.BackSide;
   scene.add(new THREE.Mesh(geometry, material));
   camera = new THREE.PerspectiveCamera(45, $body.width() / $body.height(), 1, 100000);
-  camera.position.set(22000, 0, 5500);
+  camera.position.set(8000, 8000, 8000);
   scene.add(camera);
   scene.add(new THREE.AmbientLight(0x333333));
   light = new THREE.DirectionalLight(0xFFFFFF);
@@ -117,16 +117,15 @@
   };
   /* so it's possible to build a geometry from many strokes */
   doAddChar = function(){
-    var randX, randY, randZ, i$, ref$, len$, group, geometry, offset, m, mesh, results$ = [];
+    var randX, randY, randZ, i, ref$, group, geometry, offset, m, mesh, results$ = [];
     randX = Math.random() * 5000 - 2500;
     randY = Math.random() * 500 - 250;
     randZ = Math.round(Math.random() * 5);
-    for (i$ = 0, len$ = (ref$ = groups).length; i$ < len$; ++i$) {
-      group = ref$[i$];
+    for (i in ref$ = groups) {
+      group = ref$[i];
       geometry = new THREE.ExtrudeGeometry(group, extrusionSettings);
       /* size and center will fail if (x, y, z) of min and max are string */
-      geometry.computeBoundingBox();
-      offset = geometry.boundingBox.center();
+      offset = new THREE.Vector3(centroids[i][0], -centroids[i][1], extrusionSettings.amount / 2);
       m = new THREE.Matrix4;
       m.makeTranslation(-offset.x, -offset.y, -offset.z);
       geometry.applyMatrix(m);

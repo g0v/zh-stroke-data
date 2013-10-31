@@ -34,7 +34,7 @@ scene.add new THREE.Mesh(geometry, material)
 
 # camera
 camera = new THREE.PerspectiveCamera(45, $body.width() / $body.height(), 1, 100000)
-camera.position.set(22000, 0, 5500)
+camera.position.set(8000, 8000, 8000)
 scene.add camera
 #lights
 scene.add new THREE.AmbientLight(0x333333)
@@ -126,12 +126,13 @@ doAddChar = ->
   randY = Math.random() * 500 - 250
   randZ = Math.round(Math.random() * 5)
   #randA = Math.random() * 90 - 45;
-  for group in groups
+  for i, group of groups
     geometry = new THREE.ExtrudeGeometry(group, extrusionSettings)
     /* size and center will fail if (x, y, z) of min and max are string */
-    geometry.computeBoundingBox!
-    offset = geometry.boundingBox.center!
-    #console.log geometry.boundingBox.size!
+    offset = new THREE.Vector3 do
+      centroids[i].0
+      -centroids[i].1
+      extrusionSettings.amount / 2
     m = new THREE.Matrix4
     m.makeTranslation(-offset.x, -offset.y, -offset.z)
     geometry.applyMatrix m
