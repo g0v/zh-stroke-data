@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>postMessage</title>
+        <script src="../../js/jquery-1.9.1.min.js"></script>
+    </head>
+    <body style="margin: 0; padding: 0;">
+        <iframe src="index.html" width="640" height="480" frameborder="0" scrolling="no" marginwidth="0" marginheight="0"></iframe>
+        <p id="msg"></p>
+        <script>
+window.addEventListener("message", function(event) {
+    console.log(event.origin);
+    $("#msg").text($("#msg").text() + event.data);
+});
+        </script>
+    </body>
+</html>

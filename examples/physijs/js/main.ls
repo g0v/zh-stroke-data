@@ -10,7 +10,7 @@ $body = $ \body
 /* CSS3DRenderer doesnt work D: */
 #renderer = new THREE.CSS3DRenderer
 renderer = new THREE.WebGLRenderer
-renderer.setSize $body.width!, $body.height!
+renderer.setSize window.innerWidth, window.innerHeight
 renderer.shadowMapEnabled = yes
 renderer.shadowMapSoft = yes
 $body.append renderer.domElement
@@ -33,7 +33,7 @@ scene.add new THREE.Mesh(geometry, material)
 
 
 # camera
-camera = new THREE.PerspectiveCamera(45, $body.width() / $body.height(), 1, 100000)
+camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 100000)
 camera.position.set(8000, 8000, 8000)
 scene.add camera
 #lights
@@ -122,6 +122,7 @@ extrusionSettings =
   extrudeMaterial: block_material
 /* so it's possible to build a geometry from many strokes */
 doAddChar = ->
+  window.top?postMessage "萌", "*"
   randX = Math.random() * 5000 - 2500
   randY = Math.random() * 500 - 250
   randZ = Math.round(Math.random() * 5)

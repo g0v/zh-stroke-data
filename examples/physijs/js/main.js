@@ -12,7 +12,7 @@
   $body = $('body');
   /* CSS3DRenderer doesnt work D: */
   renderer = new THREE.WebGLRenderer;
-  renderer.setSize($body.width(), $body.height());
+  renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.shadowMapEnabled = true;
   renderer.shadowMapSoft = true;
   $body.append(renderer.domElement);
@@ -29,7 +29,7 @@
   material.map = THREE.ImageUtils.loadTexture('images/stars.jpg');
   material.side = THREE.BackSide;
   scene.add(new THREE.Mesh(geometry, material));
-  camera = new THREE.PerspectiveCamera(45, $body.width() / $body.height(), 1, 100000);
+  camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 100000);
   camera.position.set(8000, 8000, 8000);
   scene.add(camera);
   scene.add(new THREE.AmbientLight(0x333333));
@@ -117,7 +117,10 @@
   };
   /* so it's possible to build a geometry from many strokes */
   doAddChar = function(){
-    var randX, randY, randZ, i, ref$, group, geometry, offset, m, mesh, results$ = [];
+    var ref$, randX, randY, randZ, i, group, geometry, offset, m, mesh, results$ = [];
+    if ((ref$ = window.top) != null) {
+      ref$.postMessage("萌", "*");
+    }
     randX = Math.random() * 5000 - 2500;
     randY = Math.random() * 500 - 250;
     randZ = Math.round(Math.random() * 5);
