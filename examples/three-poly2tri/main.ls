@@ -26,9 +26,11 @@ shape-from-outline = ->
   shape
 
 # main
-scale = 0.1
+scale = 0.025
 dim = 2150
-cols = 5
+cols = 20
+start = 0
+count = 240
 
 scene = new THREE.Scene
 camera = new THREE.OrthographicCamera do
@@ -50,16 +52,32 @@ render = ->
   renderer.render scene, camera
 requestAnimationFrame render
 
-for let i from 0 til 15
+failed = []
+for let i from start til count
   c = OrigChars[i]
   data <- $.get "./a/#c.json"
-  console.log OrigChars[i]
   for j, outline of data?outlines
     x = ~~(i % cols)
     y = ~~(i / cols)
     # bad triangulation is not an error,
     # dont bother to catch it
+    color = 0xffcc00
+    line-color = 0xee6600
+    # trap console.log
+    log = console.log
+    console.log = (...args) ->
+      for str in args
+        if str.match /triangulate/
+          color := 0x330000
+          line-color := 0xff0000
+          failed.push do
+            ch: data.ch
+            outline: j
+          break
+      log.apply console, args
     geometry = new THREE.ShapeGeometry shape-from-outline outline
+    console.log = log
+    # restored
     offset = new THREE.Vector2 do
       +data.centroids[j].0
       -data.centroids[j].1
@@ -68,7 +86,8 @@ for let i from 0 til 15
     geometry.applyMatrix m
     mesh = THREE.SceneUtils.createMultiMaterialObject do
       geometry
-      * new THREE.MeshLambertMaterial color: 0xffcc00
-        new THREE.MeshBasicMaterial color: 0xee6600 wireframe: true transparent: true
+      * new THREE.MeshLambertMaterial color: color
+        new THREE.MeshBasicMaterial color: line-color, wireframe: true, transparent: true
     mesh.position.set x * dim + offset.x, -y * dim + offset.y, 0
     scene.add mesh
+  console.log failed if i is count - 1
