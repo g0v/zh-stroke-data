@@ -2,42 +2,91 @@
 (function(){
   $(function(){
     return $.get('../../orig-chars.json', function(OrigChars){
-      var shiftFloat, shapesFromOutline;
-      console.log(OrigChars);
+      var shiftFloat, shapeFromOutline, scale, dim, cols, scene, camera, light, renderer, render, i$, results$ = [];
       shiftFloat = function(){
         return parseFloat(this.shift());
       };
-      return shapesFromOutline = function(it){
-        var i$, len$, stroke, shape, path, current, tokens, results$ = [];
-        for (i$ = 0, len$ = it.length; i$ < len$; ++i$) {
-          stroke = it[i$];
-          shape = new THREE.Shape;
-          path = new THREE.Path;
-          current = shape;
-          tokens = stroke.split(' ');
-          while (tokens.length) {
-            switch (tokens.shift()) {
-            case 'M':
-              current.moveTo(shiftFloat.call(tokens), shiftFloat.call(tokens));
-              break;
-            case 'L':
-              while (tokens.length > 1) {
-                current.lineTo(shiftFloat.call(tokens), shiftFloat.call(tokens));
-                if (tokens[0] === 'Z') {
-                  if (current !== shape) {
-                    shape.holes.push(path);
-                    path = new THREE.Path;
-                  }
-                  current = path;
-                  break;
+      shapeFromOutline = function(it){
+        var shape, path, current, tokens;
+        shape = new THREE.Shape;
+        path = new THREE.Path;
+        current = shape;
+        tokens = it.split(' ');
+        tokens.shiftFloat = shiftFloat;
+        while (tokens.length) {
+          switch (tokens.shift()) {
+          case 'M':
+            current.moveTo(tokens.shiftFloat(), tokens.shiftFloat());
+            break;
+          case 'L':
+            while (tokens.length > 1) {
+              current.lineTo(tokens.shiftFloat(), tokens.shiftFloat());
+              if (tokens[0] === 'Z') {
+                if (current !== shape) {
+                  shape.holes.push(path);
+                  path = new THREE.Path;
                 }
+                current = path;
+                break;
               }
             }
           }
-          results$.push(shape);
         }
-        return results$;
+        return shape;
       };
+      scale = 0.1;
+      dim = 2150;
+      cols = 5;
+      scene = new THREE.Scene;
+      camera = new THREE.OrthographicCamera(0, window.innerWidth / scale, 0, -window.innerHeight / scale, 1, 1000);
+      camera.position.set(0, 0, 500);
+      light = new THREE.DirectionalLight(0xffffff);
+      light.position.set(0, 0, 1);
+      scene.add(light);
+      renderer = new THREE.WebGLRenderer({
+        antialias: true
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      $('#container').append(renderer.domElement);
+      render = function(){
+        requestAnimationFrame(render);
+        return renderer.render(scene, camera);
+      };
+      requestAnimationFrame(render);
+      for (i$ = 0; i$ < 15; ++i$) {
+        results$.push((fn$.call(this, i$)));
+      }
+      return results$;
+      function fn$(i){
+        var c;
+        c = OrigChars[i];
+        return $.get("./a/" + c + ".json", function(data){
+          var j, ref$, outline, x, y, geometry, offset, m, mesh, results$ = [];
+          console.log(OrigChars[i]);
+          for (j in ref$ = data != null ? data.outlines : void 8) {
+            outline = ref$[j];
+            x = ~~(i % cols);
+            y = ~~(i / cols);
+            geometry = new THREE.ShapeGeometry(shapeFromOutline(outline));
+            offset = new THREE.Vector2(+data.centroids[j][0], -data.centroids[j][1]);
+            m = new THREE.Matrix4;
+            m.makeTranslation(-offset.x, -offset.y, 0);
+            geometry.applyMatrix(m);
+            mesh = THREE.SceneUtils.createMultiMaterialObject(geometry, [
+              new THREE.MeshLambertMaterial({
+                color: 0xffcc00
+              }), new THREE.MeshBasicMaterial({
+                color: 0xee6600,
+                wireframe: true,
+                transparent: true
+              })
+            ]);
+            mesh.position.set(x * dim + offset.x, -y * dim + offset.y, 0);
+            results$.push(scene.add(mesh));
+          }
+          return results$;
+        });
+      }
     });
   });
 }).call(this);
