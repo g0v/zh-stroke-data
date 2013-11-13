@@ -3,7 +3,7 @@
   var slice$ = [].slice;
   $(function(){
     return $.get('../../orig-chars.json', function(OrigChars){
-      var shiftFloat, shapeFromOutline, scale, dim, cols, start, count, scene, camera, light, renderer, render, failed, i$, results$ = [];
+      var shiftFloat, shapeFromOutline, scale, dim, cols, dst, boxes, scene, box, camera, updateCamera, light, renderer, keys, render, load, i, ch, x, y, obj, results$ = [];
       shiftFloat = function(){
         return parseFloat(this.shift());
       };
@@ -35,14 +35,22 @@
         }
         return shape;
       };
-      scale = 0.025;
+      scale = 0.05;
       dim = 2150;
-      cols = 20;
-      start = 0;
-      count = 240;
+      cols = 64;
+      dst = 100;
+      boxes = [];
       scene = new THREE.Scene;
-      camera = new THREE.OrthographicCamera(0, window.innerWidth / scale, 0, -window.innerHeight / scale, 1, 1000);
+      box = new THREE.Box3(new THREE.Vector3(0, -window.innerHeight / scale, -50), new THREE.Vector3(window.innerWidth / scale, 0, 50));
+      camera = new THREE.OrthographicCamera(box.min.x, box.max.x, box.max.y, box.min.y, 1, 1000);
       camera.position.set(0, 0, 500);
+      updateCamera = function(){
+        camera.left = box.min.x;
+        camera.right = box.max.x;
+        camera.bottom = box.min.y;
+        camera.top = box.max.y;
+        return camera.updateProjectionMatrix();
+      };
       light = new THREE.DirectionalLight(0xffffff);
       light.position.set(0, 0, 1);
       scene.add(light);
@@ -51,25 +59,50 @@
       });
       renderer.setSize(window.innerWidth, window.innerHeight);
       $('#container').append(renderer.domElement);
+      keys = {};
+      $(document).keydown(function(e){
+        return keys[e.keyCode] = true;
+      }).keyup(function(e){
+        return keys[e.keyCode] = false;
+      });
       render = function(){
+        var x, y, i$, ref$, len$, o;
+        x = 0;
+        y = 0;
+        if (keys[37] === true) {
+          x -= dst;
+        }
+        if (keys[39] === true) {
+          x += dst;
+        }
+        if (keys[38] === true) {
+          y += dst;
+        }
+        if (keys[40] === true) {
+          y -= dst;
+        }
+        box.min.x += x;
+        box.max.x += x;
+        box.min.y += y;
+        box.max.y += y;
+        updateCamera();
+        for (i$ = 0, len$ = (ref$ = boxes).length; i$ < len$; ++i$) {
+          o = ref$[i$];
+          if (o.load && box.containsPoint(o.position)) {
+            o.load();
+          }
+        }
         requestAnimationFrame(render);
         return renderer.render(scene, camera);
       };
       requestAnimationFrame(render);
-      failed = [];
-      for (i$ = start; i$ < count; ++i$) {
-        results$.push((fn$.call(this, i$)));
-      }
-      return results$;
-      function fn$(i){
-        var c;
-        c = OrigChars[i];
-        return $.get("./a/" + c + ".json", function(data){
-          var j, ref$, outline, x, y, color, lineColor, log, geometry, offset, m, mesh;
+      load = function(){
+        var this$ = this;
+        this.load = null;
+        $.get("./a/" + this.ch + ".json", function(data){
+          var j, ref$, outline, color, lineColor, log, geometry, offset, m, mesh, results$ = [];
           for (j in ref$ = data != null ? data.outlines : void 8) {
             outline = ref$[j];
-            x = ~~(i % cols);
-            y = ~~(i / cols);
             color = 0xffcc00;
             lineColor = 0xee6600;
             log = console.log;
@@ -89,12 +122,10 @@
                 transparent: true
               })
             ]);
-            mesh.position.set(x * dim + offset.x, -y * dim + offset.y, 0);
-            scene.add(mesh);
+            mesh.position.set(offset.x, offset.y, 0);
+            results$.push(this$.add(mesh));
           }
-          if (i === count - 1) {
-            return console.log(failed);
-          }
+          return results$;
           function fn$(){
             var args, i$, len$, str;
             args = slice$.call(arguments);
@@ -103,17 +134,26 @@
               if (str.match(/triangulate/)) {
                 color = 0x330000;
                 lineColor = 0xff0000;
-                failed.push({
-                  ch: data.ch,
-                  outline: j
-                });
                 break;
               }
             }
+            log.call(console, data.ch, j);
             return log.apply(console, args);
           }
         });
+      };
+      for (i in OrigChars) {
+        ch = OrigChars[i];
+        x = ~~(+i % cols);
+        y = ~~(+i / cols);
+        obj = new THREE.Object3D;
+        obj.ch = ch;
+        obj.load = load;
+        obj.position.set(x * dim, -y * dim, 0);
+        boxes.push(obj);
+        results$.push(scene.add(obj));
       }
+      return results$;
     });
   });
 }).call(this);
