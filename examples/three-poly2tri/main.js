@@ -3,7 +3,7 @@
   var slice$ = [].slice;
   $(function(){
     return $.get('../../orig-chars.json', function(OrigChars){
-      var shiftFloat, shapeFromOutline, scale, dim, cols, dst, boxes, scene, box, camera, updateCamera, light, renderer, keys, render, load, i, ch, x, y, obj, results$ = [];
+      var shiftFloat, shapeFromOutline, scale, dim, cols, dst, boxes, scene, w, h, box, camera, updateCamera, light, renderer, keys, render, load, i, ch, x, y, obj, results$ = [];
       shiftFloat = function(){
         return parseFloat(this.shift());
       };
@@ -35,16 +35,23 @@
         }
         return shape;
       };
-      scale = 0.05;
+      scale = 0.1;
       dim = 2150;
       cols = 64;
-      dst = 100;
+      dst = 10;
       boxes = [];
       scene = new THREE.Scene;
-      box = new THREE.Box3(new THREE.Vector3(0, -window.innerHeight / scale, -50), new THREE.Vector3(window.innerWidth / scale, 0, 50));
+      w = window.innerWidth / scale;
+      h = window.innerHeight / scale;
+      box = new THREE.Box3(new THREE.Vector3(0, -h, -50), new THREE.Vector3(w, 0, 50));
       camera = new THREE.OrthographicCamera(box.min.x, box.max.x, box.max.y, box.min.y, 1, 1000);
       camera.position.set(0, 0, 500);
       updateCamera = function(){
+        var w, h, center;
+        w = window.innerWidth / scale;
+        h = window.innerHeight / scale;
+        center = box.center();
+        box.setFromCenterAndSize(center, new THREE.Vector2(w, h));
         camera.left = box.min.x;
         camera.right = box.max.x;
         camera.bottom = box.min.y;
@@ -64,22 +71,24 @@
         return keys[e.keyCode] = true;
       }).keyup(function(e){
         return keys[e.keyCode] = false;
+      }).mousewheel(function(e, delta, dx, dy){
+        return scale = scale + 0.001 * delta;
       });
       render = function(){
-        var x, y, i$, ref$, len$, o;
+        var x, y, i$, ref$, len$, o, p;
         x = 0;
         y = 0;
         if (keys[37] === true) {
-          x -= dst;
+          x -= dst / scale;
         }
         if (keys[39] === true) {
-          x += dst;
+          x += dst / scale;
         }
         if (keys[38] === true) {
-          y += dst;
+          y += dst / scale;
         }
         if (keys[40] === true) {
-          y -= dst;
+          y -= dst / scale;
         }
         box.min.x += x;
         box.max.x += x;
@@ -88,7 +97,8 @@
         updateCamera();
         for (i$ = 0, len$ = (ref$ = boxes).length; i$ < len$; ++i$) {
           o = ref$[i$];
-          if (o.load && box.containsPoint(o.position)) {
+          p = new THREE.Vector3(o.position.x + dim / 2, o.position.y - dim / 2, 0);
+          if (o.load && box.containsPoint(p)) {
             o.load();
           }
         }
