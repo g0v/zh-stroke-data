@@ -80,11 +80,13 @@ render = ->
   box.min.y += y
   box.max.y += y
   updateCamera!
+  box.expandByScalar dim
   for o in boxes
     p = new THREE.Vector3 o.position.x + dim/2, o.position.y - dim/2, 0
-    if o.load and box.containsPoint p
-      #console.log o.position
-      o.load!
+    v = box.containsPoint p
+    o.load?! if v
+    o.traverse -> it.visible = v
+  box.expandByScalar -dim
   requestAnimationFrame render
   renderer.render scene, camera
 requestAnimationFrame render

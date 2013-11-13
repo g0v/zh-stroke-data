@@ -75,7 +75,7 @@
         return scale = scale * Math.pow(1.1, delta);
       });
       render = function(){
-        var x, y, i$, ref$, len$, o, p;
+        var x, y, i$, ref$, len$, o, p, v;
         x = 0;
         y = 0;
         if (keys[37] === true) {
@@ -95,15 +95,24 @@
         box.min.y += y;
         box.max.y += y;
         updateCamera();
+        box.expandByScalar(dim);
         for (i$ = 0, len$ = (ref$ = boxes).length; i$ < len$; ++i$) {
           o = ref$[i$];
           p = new THREE.Vector3(o.position.x + dim / 2, o.position.y - dim / 2, 0);
-          if (o.load && box.containsPoint(p)) {
-            o.load();
+          v = box.containsPoint(p);
+          if (v) {
+            if (typeof o.load === 'function') {
+              o.load();
+            }
           }
+          o.traverse(fn$);
         }
+        box.expandByScalar(-dim);
         requestAnimationFrame(render);
         return renderer.render(scene, camera);
+        function fn$(it){
+          return it.visible = v;
+        }
       };
       requestAnimationFrame(render);
       load = function(){
