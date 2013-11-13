@@ -26,9 +26,10 @@ shape-from-outline = ->
   shape
 
 # main
-scale = 0.1
-dim = 2150
-cols = 64
+scale = 0.05
+dim   = 2150pt
+cols  = 64chars
+dst   = 100pt
 boxes = []
 
 scene = new THREE.Scene
@@ -54,8 +55,23 @@ renderer = new THREE.WebGLRenderer antialias: on
 renderer.setSize window.innerWidth, window.innerHeight
 $ \#container .append renderer.domElement
 
+keys = {}
+$ document .keydown (e) -> keys[e.keyCode] = on
+           .keyup   (e) -> keys[e.keyCode] = off
+
 # render
 render = ->
+  x = 0
+  y = 0
+  if keys[37] is on then x -= dst # left
+  if keys[39] is on then x += dst # right
+  if keys[38] is on then y += dst # up
+  if keys[40] is on then y -= dst # down
+  box.min.x += x
+  box.max.x += x
+  box.min.y += y
+  box.max.y += y
+  updateCamera!
   for o in boxes
     if o.load and box.containsPoint o.position
       #console.log o.position

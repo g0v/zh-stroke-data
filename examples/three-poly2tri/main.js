@@ -3,7 +3,7 @@
   var slice$ = [].slice;
   $(function(){
     return $.get('../../orig-chars.json', function(OrigChars){
-      var shiftFloat, shapeFromOutline, scale, dim, cols, boxes, scene, box, camera, updateCamera, light, renderer, render, load, i, ch, x, y, obj, results$ = [];
+      var shiftFloat, shapeFromOutline, scale, dim, cols, dst, boxes, scene, box, camera, updateCamera, light, renderer, keys, render, load, i, ch, x, y, obj, results$ = [];
       shiftFloat = function(){
         return parseFloat(this.shift());
       };
@@ -35,9 +35,10 @@
         }
         return shape;
       };
-      scale = 0.1;
+      scale = 0.05;
       dim = 2150;
       cols = 64;
+      dst = 100;
       boxes = [];
       scene = new THREE.Scene;
       box = new THREE.Box3(new THREE.Vector3(0, -window.innerHeight / scale, -50), new THREE.Vector3(window.innerWidth / scale, 0, 50));
@@ -58,8 +59,33 @@
       });
       renderer.setSize(window.innerWidth, window.innerHeight);
       $('#container').append(renderer.domElement);
+      keys = {};
+      $(document).keydown(function(e){
+        return keys[e.keyCode] = true;
+      }).keyup(function(e){
+        return keys[e.keyCode] = false;
+      });
       render = function(){
-        var i$, ref$, len$, o;
+        var x, y, i$, ref$, len$, o;
+        x = 0;
+        y = 0;
+        if (keys[37] === true) {
+          x -= dst;
+        }
+        if (keys[39] === true) {
+          x += dst;
+        }
+        if (keys[38] === true) {
+          y += dst;
+        }
+        if (keys[40] === true) {
+          y -= dst;
+        }
+        box.min.x += x;
+        box.max.x += x;
+        box.min.y += y;
+        box.max.y += y;
+        updateCamera();
         for (i$ = 0, len$ = (ref$ = boxes).length; i$ < len$; ++i$) {
           o = ref$[i$];
           if (o.load && box.containsPoint(o.position)) {
