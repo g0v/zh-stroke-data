@@ -26,22 +26,28 @@ shape-from-outline = ->
   shape
 
 # main
-scale = 0.05
+scale = 0.1
 dim   = 2150pt
 cols  = 64chars
-dst   = 100pt
+dst   = 10pt
 boxes = []
 
 scene = new THREE.Scene
+w = window.innerWidth / scale
+h = window.innerHeight / scale
 box = new THREE.Box3 do
-  new THREE.Vector3 0, -window.innerHeight / scale, -50
-  new THREE.Vector3 window.innerWidth / scale, 0, 50
+  new THREE.Vector3 0, -h, -50
+  new THREE.Vector3 w,  0, 50
 camera = new THREE.OrthographicCamera do
   box.min.x, box.max.x,
   box.max.y, box.min.y,
   1, 1000
-camera.position.set 0 0 500
+camera.position.set 0, 0, 500
 updateCamera = ->
+  w = window.innerWidth / scale
+  h = window.innerHeight / scale
+  center = box.center!
+  box.setFromCenterAndSize center, new THREE.Vector2 w, h
   camera.left   = box.min.x
   camera.right  = box.max.x
   camera.bottom = box.min.y
@@ -56,24 +62,27 @@ renderer.setSize window.innerWidth, window.innerHeight
 $ \#container .append renderer.domElement
 
 keys = {}
-$ document .keydown (e) -> keys[e.keyCode] = on
-           .keyup   (e) -> keys[e.keyCode] = off
+$ document .keydown    (e) -> keys[e.keyCode] = on
+           .keyup      (e) -> keys[e.keyCode] = off
+           .mousewheel (e, delta, dx, dy) ->
+             scale := scale + 0.001 * delta
 
 # render
 render = ->
   x = 0
   y = 0
-  if keys[37] is on then x -= dst # left
-  if keys[39] is on then x += dst # right
-  if keys[38] is on then y += dst # up
-  if keys[40] is on then y -= dst # down
+  if keys[37] is on then x -= dst / scale # left
+  if keys[39] is on then x += dst / scale # right
+  if keys[38] is on then y += dst / scale # up
+  if keys[40] is on then y -= dst / scale # down
   box.min.x += x
   box.max.x += x
   box.min.y += y
   box.max.y += y
   updateCamera!
   for o in boxes
-    if o.load and box.containsPoint o.position
+    p = new THREE.Vector3 o.position.x + dim/2, o.position.y - dim/2, 0
+    if o.load and box.containsPoint p
       #console.log o.position
       o.load!
   requestAnimationFrame render
