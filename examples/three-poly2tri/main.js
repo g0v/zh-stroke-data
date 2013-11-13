@@ -35,7 +35,7 @@
         }
         return shape;
       };
-      scale = 0.1;
+      scale = 0.2;
       dim = 2150;
       cols = 64;
       dst = 10;
@@ -72,7 +72,7 @@
       }).keyup(function(e){
         return keys[e.keyCode] = false;
       }).mousewheel(function(e, delta, dx, dy){
-        return scale = scale + 0.001 * delta;
+        return scale = scale * Math.pow(1.1, delta);
       });
       render = function(){
         var x, y, i$, ref$, len$, o, p;

@@ -26,7 +26,7 @@ shape-from-outline = ->
   shape
 
 # main
-scale = 0.1
+scale = 0.2
 dim   = 2150pt
 cols  = 64chars
 dst   = 10pt
@@ -65,7 +65,7 @@ keys = {}
 $ document .keydown    (e) -> keys[e.keyCode] = on
            .keyup      (e) -> keys[e.keyCode] = off
            .mousewheel (e, delta, dx, dy) ->
-             scale := scale + 0.001 * delta
+             scale := scale * Math.pow 1.1, delta
 
 # render
 render = ->
