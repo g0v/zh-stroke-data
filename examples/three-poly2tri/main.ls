@@ -80,13 +80,13 @@ render = ->
   box.min.y += y
   box.max.y += y
   updateCamera!
-  box.expandByScalar dim
+  box.expandByScalar 2 * dim
   for o in boxes
     p = new THREE.Vector3 o.position.x + dim/2, o.position.y - dim/2, 0
     v = box.containsPoint p
     o.load?! if v
     o.traverse -> it.visible = v
-  box.expandByScalar -dim
+  box.expandByScalar -2 * dim
   requestAnimationFrame render
   renderer.render scene, camera
 requestAnimationFrame render
@@ -99,6 +99,36 @@ load = !->
     # dont bother to catch it
     color = 0xffcc00
     line-color = 0xee6600
+    offset = new THREE.Vector2 do
+      +data.centroids[j].0
+      -data.centroids[j].1
+    m = new THREE.Matrix4
+    m.makeTranslation -offset.x, -offset.y, 0
+    shape = shape-from-outline outline
+    # line and vertices
+    points = shape.createPointsGeometry!
+    points.applyMatrix m
+    line = new THREE.Line do
+      points
+      new THREE.LineBasicMaterial color: line-color, lineWidth: 2
+    line.position.set offset.x, offset.y, 0
+    @add line
+    for hole in shape.holes
+      points = hole.createPointsGeometry!
+      points.applyMatrix m
+      line = new THREE.Line do
+        points
+        new THREE.LineBasicMaterial color: line-color, lineWidth: 2
+      line.position.set offset.x, offset.y, 0
+      @add line
+    # the size of each particle decrease strangly
+    #pgeo = points.clone!
+    #particles = new THREE.ParticleSystem do
+    #  pgeo
+    #  new THREE.ParticleBasicMaterial color: color, size: 20, opacity: 0.5
+    #particles.position.set offset.x, offset.y, 0
+    #@add particles
+    # triangulated
     # trap console.log
     log = console.log
     console.log = (...args) ->
@@ -109,20 +139,15 @@ load = !->
           break
       log.call console, data.ch, j
       log.apply console, args
-    geometry = new THREE.ShapeGeometry shape-from-outline outline
+    geometry = new THREE.ShapeGeometry shape
     console.log = log
     # restored
-    offset = new THREE.Vector2 do
-      +data.centroids[j].0
-      -data.centroids[j].1
-    m = new THREE.Matrix4
-    m.makeTranslation -offset.x, -offset.y, 0
     geometry.applyMatrix m
     mesh = THREE.SceneUtils.createMultiMaterialObject do
       geometry
       * new THREE.MeshLambertMaterial color: color
         new THREE.MeshBasicMaterial color: line-color, wireframe: true, transparent: true
-    mesh.position.set offset.x, offset.y, 0
+    mesh.position.set offset.x + dim, offset.y, 0
     @add mesh
 
 for i, ch of OrigChars
@@ -131,6 +156,6 @@ for i, ch of OrigChars
   obj = new THREE.Object3D
   obj.ch = ch
   obj.load = load
-  obj.position.set x * dim, -y * dim, 0
+  obj.position.set x * 2 * dim, -y * dim, 0
   boxes.push obj
   scene.add obj

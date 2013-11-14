@@ -95,7 +95,7 @@
         box.min.y += y;
         box.max.y += y;
         updateCamera();
-        box.expandByScalar(dim);
+        box.expandByScalar(2 * dim);
         for (i$ = 0, len$ = (ref$ = boxes).length; i$ < len$; ++i$) {
           o = ref$[i$];
           p = new THREE.Vector3(o.position.x + dim / 2, o.position.y - dim / 2, 0);
@@ -107,7 +107,7 @@
           }
           o.traverse(fn$);
         }
-        box.expandByScalar(-dim);
+        box.expandByScalar(-2 * dim);
         requestAnimationFrame(render);
         return renderer.render(scene, camera);
         function fn$(it){
@@ -119,18 +119,38 @@
         var this$ = this;
         this.load = null;
         $.get("./a/" + this.ch + ".json", function(data){
-          var j, ref$, outline, color, lineColor, log, geometry, offset, m, mesh, results$ = [];
+          var j, ref$, outline, color, lineColor, offset, m, shape, points, line, i$, ref1$, len$, hole, log, geometry, mesh, results$ = [];
           for (j in ref$ = data != null ? data.outlines : void 8) {
             outline = ref$[j];
             color = 0xffcc00;
             lineColor = 0xee6600;
-            log = console.log;
-            console.log = fn$;
-            geometry = new THREE.ShapeGeometry(shapeFromOutline(outline));
-            console.log = log;
             offset = new THREE.Vector2(+data.centroids[j][0], -data.centroids[j][1]);
             m = new THREE.Matrix4;
             m.makeTranslation(-offset.x, -offset.y, 0);
+            shape = shapeFromOutline(outline);
+            points = shape.createPointsGeometry();
+            points.applyMatrix(m);
+            line = new THREE.Line(points, new THREE.LineBasicMaterial({
+              color: lineColor,
+              lineWidth: 2
+            }));
+            line.position.set(offset.x, offset.y, 0);
+            this$.add(line);
+            for (i$ = 0, len$ = (ref1$ = shape.holes).length; i$ < len$; ++i$) {
+              hole = ref1$[i$];
+              points = hole.createPointsGeometry();
+              points.applyMatrix(m);
+              line = new THREE.Line(points, new THREE.LineBasicMaterial({
+                color: lineColor,
+                lineWidth: 2
+              }));
+              line.position.set(offset.x, offset.y, 0);
+              this$.add(line);
+            }
+            log = console.log;
+            console.log = fn$;
+            geometry = new THREE.ShapeGeometry(shape);
+            console.log = log;
             geometry.applyMatrix(m);
             mesh = THREE.SceneUtils.createMultiMaterialObject(geometry, [
               new THREE.MeshLambertMaterial({
@@ -141,7 +161,7 @@
                 transparent: true
               })
             ]);
-            mesh.position.set(offset.x, offset.y, 0);
+            mesh.position.set(offset.x + dim, offset.y, 0);
             results$.push(this$.add(mesh));
           }
           return results$;
@@ -168,7 +188,7 @@
         obj = new THREE.Object3D;
         obj.ch = ch;
         obj.load = load;
-        obj.position.set(x * dim, -y * dim, 0);
+        obj.position.set(x * 2 * dim, -y * dim, 0);
         boxes.push(obj);
         results$.push(scene.add(obj));
       }
