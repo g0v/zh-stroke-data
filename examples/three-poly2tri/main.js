@@ -119,7 +119,7 @@
         var this$ = this;
         this.load = null;
         $.get("./a/" + this.ch + ".json", function(data){
-          var j, ref$, outline, color, lineColor, offset, m, shape, points, line, i$, ref1$, len$, hole, log, geometry, mesh, results$ = [];
+          var j, ref$, outline, color, lineColor, offset, m, shape, points, line, i$, ref1$, len$, hole, pgeo, particles, log, geometry, mesh, results$ = [];
           for (j in ref$ = data != null ? data.outlines : void 8) {
             outline = ref$[j];
             color = 0xffcc00;
@@ -147,6 +147,14 @@
               line.position.set(offset.x, offset.y, 0);
               this$.add(line);
             }
+            pgeo = points.clone();
+            particles = new THREE.ParticleSystem(pgeo, new THREE.ParticleBasicMaterial({
+              color: color,
+              size: 20,
+              opacity: 0.5
+            }));
+            particles.position.set(offset.x, offset.y, 0);
+            this$.add(particles);
             log = console.log;
             console.log = fn$;
             geometry = new THREE.ShapeGeometry(shape);

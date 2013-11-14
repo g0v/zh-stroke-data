@@ -122,12 +122,12 @@ load = !->
       line.position.set offset.x, offset.y, 0
       @add line
     # the size of each particle decrease strangly
-    #pgeo = points.clone!
-    #particles = new THREE.ParticleSystem do
-    #  pgeo
-    #  new THREE.ParticleBasicMaterial color: color, size: 20, opacity: 0.5
-    #particles.position.set offset.x, offset.y, 0
-    #@add particles
+    pgeo = points.clone!
+    particles = new THREE.ParticleSystem do
+      pgeo
+      new THREE.ParticleBasicMaterial color: color, size: 20, opacity: 0.5
+    particles.position.set offset.x, offset.y, 0
+    @add particles
     # triangulated
     # trap console.log
     log = console.log
