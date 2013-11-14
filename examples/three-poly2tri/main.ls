@@ -84,7 +84,7 @@ render = ->
   for o in boxes
     p = new THREE.Vector3 o.position.x + dim/2, o.position.y - dim/2, 0
     v = box.containsPoint p
-    o.load?! if v
+    o.load?! #if v
     o.traverse -> it.visible = v
   box.expandByScalar -2 * dim
   requestAnimationFrame render
@@ -129,7 +129,7 @@ load = !->
     particles.position.set offset.x, offset.y, 0
     @add particles
     # triangulated
-    # trap console.log
+    # trap console.log for triangulate1
     log = console.log
     console.log = (...args) ->
       for str in args
@@ -139,8 +139,19 @@ load = !->
           break
       log.call console, data.ch, j
       log.apply console, args
+    # trap alert for poly2tri
+    altr = window.alert
+    window.alert = (...args) ->
+      for str in args
+        if str.match /Invalid/
+          color := 0x330000
+          line-color := 0xff0000
+          break
+      log.call console, data.ch, j
+      log.apply console, args
     geometry = new THREE.ShapeGeometry shape
     console.log = log
+    window.alert = altr
     # restored
     geometry.applyMatrix m
     mesh = THREE.SceneUtils.createMultiMaterialObject do

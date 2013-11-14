@@ -100,10 +100,8 @@
           o = ref$[i$];
           p = new THREE.Vector3(o.position.x + dim / 2, o.position.y - dim / 2, 0);
           v = box.containsPoint(p);
-          if (v) {
-            if (typeof o.load === 'function') {
-              o.load();
-            }
+          if (typeof o.load === 'function') {
+            o.load();
           }
           o.traverse(fn$);
         }
@@ -119,7 +117,7 @@
         var this$ = this;
         this.load = null;
         $.get("./a/" + this.ch + ".json", function(data){
-          var j, ref$, outline, color, lineColor, offset, m, shape, points, line, i$, ref1$, len$, hole, pgeo, particles, log, geometry, mesh, results$ = [];
+          var j, ref$, outline, color, lineColor, offset, m, shape, points, line, i$, ref1$, len$, hole, pgeo, particles, log, altr, geometry, mesh, results$ = [];
           for (j in ref$ = data != null ? data.outlines : void 8) {
             outline = ref$[j];
             color = 0xffcc00;
@@ -157,8 +155,11 @@
             this$.add(particles);
             log = console.log;
             console.log = fn$;
+            altr = window.alert;
+            window.alert = fn1$;
             geometry = new THREE.ShapeGeometry(shape);
             console.log = log;
+            window.alert = altr;
             geometry.applyMatrix(m);
             mesh = THREE.SceneUtils.createMultiMaterialObject(geometry, [
               new THREE.MeshLambertMaterial({
@@ -179,6 +180,20 @@
             for (i$ = 0, len$ = args.length; i$ < len$; ++i$) {
               str = args[i$];
               if (str.match(/triangulate/)) {
+                color = 0x330000;
+                lineColor = 0xff0000;
+                break;
+              }
+            }
+            log.call(console, data.ch, j);
+            return log.apply(console, args);
+          }
+          function fn1$(){
+            var args, i$, len$, str;
+            args = slice$.call(arguments);
+            for (i$ = 0, len$ = args.length; i$ < len$; ++i$) {
+              str = args[i$];
+              if (str.match(/Invalid/)) {
                 color = 0x330000;
                 lineColor = 0xff0000;
                 break;

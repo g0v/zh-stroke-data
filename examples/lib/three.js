@@ -29474,7 +29474,7 @@ THREE.Shape.Utils = {
 
 	},
 
-	triangulateShape: function ( contour, holes ) {
+	triangulateShape_: function ( contour, holes ) {
 
 		var shapeWithoutHoles = THREE.Shape.Utils.removeHoles( contour, holes );
 
@@ -29558,8 +29558,7 @@ THREE.Shape.Utils = {
 
 	}, // end triangulate shapes
 
-	/*
-	triangulate2 : function( pts, holes ) {
+	triangulateShape : function( pts, holes ) {
 
 		// For use with Poly2Tri.js
 
@@ -29613,7 +29612,6 @@ THREE.Shape.Utils = {
 		// Returns array of faces with 3 element each
 	return facesPts;
 	},
-*/
 
 	isClockWise: function ( pts ) {
 
