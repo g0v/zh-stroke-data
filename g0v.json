@@ -1,0 +1,45 @@
+{
+  "author": "c9s",
+  "status": "alpha",
+  "name": "zh-stroke-data",
+  "name_zh": "常用國字標準字體筆劃",
+  "description": "zh-stroke-data: stroke data from http://stroke-order.learningweb.moe.edu.tw",
+  "description_zh": "zh-stroke-data: 來自常用國字標準筆順學習網（http://stroke-order.learningweb.moe.edu.tw）的漢字筆劃資料",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/g0v/zh-stroke-data"
+  },
+  "licenses": [
+    {
+      "type": "CC0"
+    }
+  ],
+  "keywords": [
+    "Go",
+    "Perl",
+    "LiveScript",
+    "stroke",
+    "animation"
+  ],
+  "audience": [
+    "contributor"
+  ],
+  "products": [
+    "data",
+    "script"
+  ],
+  "projects": [
+    "3du",
+    "moe",
+    "moedict-webkit"
+  ],
+  "contributors": [
+    "au",
+    "caasi",
+    "viirya"
+  ],
+  "needs": [
+    "programmer",
+    "writer"
+  ]
+}
