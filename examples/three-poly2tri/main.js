@@ -100,8 +100,10 @@
           o = ref$[i$];
           p = new THREE.Vector3(o.position.x + dim / 2, o.position.y - dim / 2, 0);
           v = box.containsPoint(p);
-          if (typeof o.load === 'function') {
-            o.load();
+          if (v) {
+            if (typeof o.load === 'function') {
+              o.load();
+            }
           }
           o.traverse(fn$);
         }

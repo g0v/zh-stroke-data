@@ -84,7 +84,7 @@ render = ->
   for o in boxes
     p = new THREE.Vector3 o.position.x + dim/2, o.position.y - dim/2, 0
     v = box.containsPoint p
-    o.load?! #if v
+    o.load?! if v
     o.traverse -> it.visible = v
   box.expandByScalar -2 * dim
   requestAnimationFrame render
