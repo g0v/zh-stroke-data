@@ -4,16 +4,18 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <title>常用國字標準字體筆劃 HTML5 Canvas</title>
         <link rel="stylesheet" href="./css/demo.css" type="text/css" media="screen">
-        <script type="text/javascript" src="../lib/raphael.js" charset="utf-8"></script>
         <script type="text/javascript" src="../lib/jquery-1.9.1.min.js" charset="utf-8"> </script>
-        <script type="text/javascript" src="../lib/draw.js"> </script>
+        <script type="text/javascript" src="../lib/jquery.ajax-progress.js" charset="utf-8"> </script>
+        <script type="text/javascript" src="../lib/q.min.js" charset="utf-8"></script>
+        <script type="text/javascript" src="../lib/sax.js" charset="utf-8"></script>
+        <script type="text/javascript" src="../lib/raphael.js" charset="utf-8"></script>
+        <script type="text/javascript" src="../lib/zh-stroke-data/loaders.js" charset="utf-8"> </script>
+        <script type="text/javascript" src="./js/draw.js" charset="utf-8"> </script>
         <script type="text/javascript">
-          $(document).ready(function() {
-            $word = $("#word");
-            $word.change(function() {
-              WordStroker.raphael.strokeWords($("#holder").get()[0], $word.val());
-            });
-            WordStroker.raphael.strokeWords($("#holder").get()[0], $word.val());
+          $(function() {
+              f = function () { strokeWords($("#holder").get()[0], $("#word").val()); };
+              f();
+              $("#word").change(f);
           });
         </script>
     </head>

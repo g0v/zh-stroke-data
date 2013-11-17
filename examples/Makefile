@@ -1,2 +1,2 @@
 run ::
-	cd ../; node ./examples/static-here.js 8888
+	node ./static-here.js 8888

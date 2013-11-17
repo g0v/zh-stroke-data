@@ -1,32 +1,22 @@
 $ ->
-  filterNodes = (childNodes) ->
-    nodes = []
-    for n in childNodes
-      nodes.push n if n.nodeType == 1
-    return nodes
-
   drawOutline = (paper, outline ,pathAttrs) ->
     path = []
-    for node in outline.childNodes
-      continue if node.nodeType != 1
-      a = node.attributes
-      continue unless a
-      switch node.nodeName
-        when "MoveTo"
-          path.push [ "M", parseFloat(a.x.value) , parseFloat(a.y.value) ]
-        when "LineTo"
-          path.push [ "L", parseFloat(a.x.value) , parseFloat(a.y.value) ]
-        when "CubicTo"
-          path.push [ "C", parseFloat(a.x1.value) , parseFloat(a.y1.value), parseFloat(a.x2.value), parseFloat(a.y2.value), parseFloat(a.x3.value), parseFloat(a.y3.value) ]
-        when "QuadTo"
-          path.push [ "Q", parseFloat(a.x1.value) , parseFloat(a.y1.value), parseFloat(a.x2.value), parseFloat(a.y2.value) ]
+    for cmd in outline
+      switch cmd.type
+        when "M"
+          path.push [ "M", cmd.x, cmd.y ]
+        when "L"
+          path.push [ "L", cmd.x, cmd.y ]
+        when "C"
+          path.push [ "C", cmd.begin.x, cmd.begin.y, cmd.mid.x, cmd.mid.y, cmd.end.x, cmd.mid.y ]
+        when "Q"
+          path.push [ "Q", cmd.begin.x, cmd.begin.y, cmd.end.x, cmd.end.y ]
     paper.path(path).attr(pathAttrs).transform("s0.2,0.2,0,0")
 
-  fetchStrokeXml = (code, cb) -> $.get "utf8/" + code.toLowerCase() + ".xml", cb, "xml"
-
   strokeWord = (element, word) ->
-    utf8code = escape(word).replace(/%u/ , "")
-    fetchStrokeXml utf8code, (doc) ->
+    utf8code = escape(word).replace(/%u/ , "").toLowerCase()
+    console.log(utf8code)
+    zhStrokeData.loaders.XML("../data/utf8/" + utf8code + ".xml").then (strokes) ->
       dim = 430
       paper = Raphael(element, dim, dim)
       gridLines = [
@@ -49,18 +39,18 @@ $ ->
       pathAttrs = { stroke: color, "stroke-width": 5, "stroke-linecap": "round", "fill": color }
       timeoutSeconds = 0
       delay = 500
-      for outline in doc.getElementsByTagName 'Outline'
-        do (outline) ->
+      for stroke in strokes
+        do (stroke) ->
           setTimeout (->
-            drawOutline(paper,outline,pathAttrs)
+            drawOutline(paper,stroke.outline,pathAttrs)
           ), timeoutSeconds += delay
 
-  strokeWords = (element, words) ->
+  window.strokeWords = (element, words) ->
     strokeWord(element, a) for a in words.split //
 
-  window.WordStroker or= {}
-  window.WordStroker.raphael =
-    strokeWords: strokeWords
+  #window.WordStroker or= {}
+  #window.WordStroker.raphael =
+  #  strokeWords: strokeWords
 
   #$('#word').change (e) ->
   #  word = $(this).val()
