@@ -34,8 +34,8 @@ get-binary = (path, d) ->
     xhr = new XMLHttpRequest
     xhr.open \GET, path, true
     xhr.responseType = \arraybuffer
-    xhr.onprogress = progress
-    xhr.onreadystatechange = (e) ->
+    xhr.onprogress = !-> d.notify it
+    xhr.onreadystatechange = (e) !->
       if @readyState is 4
         if @status is 200
           d.resolve this.response
@@ -48,10 +48,10 @@ get-binary = (path, d) ->
 
 cache-binary = do ->
   cache = {}
-  get: (packed, d) ->
+  get: (dir, packed, d) ->
     if not cache[packed]
       d = Q.defer! if not is-deferred d
-      get-binary "#{packed}.bin", d
+      get-binary "#dir#packed.bin", d
       cache[packed] = d.promise
     cache[packed]
 
@@ -164,16 +164,20 @@ scale = (v) ->
   v * 2060.0px / 256 # hard coded DDDD:
 
 BinaryLoader = (path, d) !->
+  start = 1 + path.lastIndexOf \/
+  dir = path.substr 0, start
   packed = path.substr path.length-6, 2
-  file_id = parseInt path.substr(6, path.length-12), 16
-  p = cache-binary.get packed
+  file_id = parseInt path.substring(start, path.length-6), 16
+  p = cache-binary.get dir, packed
   p.fail     -> d.reject it
    .progress -> d.notify it
   bin <- p.then
+  var offset
   size = M: 1, L: 1, Q: 2, C: 3
   data_view = new DataView bin
   stroke_count = data_view.getUint16 0, true
-  for i in from 0 til stroke_count
+  i = 0
+  while i < stroke_count
     id = data_view.getUint16 2+i*6, true
     if id is file_id
       offset = data_view.getUint32 2+i*6+2, true

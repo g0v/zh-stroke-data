@@ -51,13 +51,15 @@
       xhr = new XMLHttpRequest;
       xhr.open('GET', path, true);
       xhr.responseType = 'arraybuffer';
-      xhr.onprogress = progress;
+      xhr.onprogress = function(it){
+        d.notify(it);
+      };
       xhr.onreadystatechange = function(e){
         if (this.readyState === 4) {
           if (this.status === 200) {
-            return d.resolve(this.response);
+            d.resolve(this.response);
           } else {
-            return d.reject(this.status);
+            d.reject(this.status);
           }
         }
       };
@@ -71,12 +73,12 @@
     var cache;
     cache = {};
     return {
-      get: function(packed, d){
+      get: function(dir, packed, d){
         if (!cache[packed]) {
           if (!isDeferred(d)) {
             d = Q.defer();
           }
-          getBinary(packed + ".bin", d);
+          getBinary(dir + "" + packed + ".bin", d);
           cache[packed] = d.promise;
         }
         return cache[packed];
@@ -235,17 +237,19 @@
     return v * 2060.0 / 256;
   };
   BinaryLoader = function(path, d){
-    var packed, file_id, p;
+    var start, dir, packed, file_id, p;
+    start = 1 + path.lastIndexOf('/');
+    dir = path.substr(0, start);
     packed = path.substr(path.length - 6, 2);
-    file_id = parseInt(path.substr(6, path.length - 12), 16);
-    p = cacheBinary.get(packed);
+    file_id = parseInt(path.substring(start, path.length - 6), 16);
+    p = cacheBinary.get(dir, packed);
     p.fail(function(it){
       return d.reject(it);
     }).progress(function(it){
       return d.notify(it);
     });
     p.then(function(bin){
-      var size, data_view, stroke_count, i$, ref$, len$, i, id, offset, p, ret, strokes_len, outline, cmd_len, cood_len, j$, cmd, xs, ys, j, track, track_len, size_indices, size_len, ss, index;
+      var offset, size, data_view, stroke_count, i, id, p, ret, strokes_len, i$, outline, cmd_len, cood_len, j$, cmd, xs, ys, j, len$, track, track_len, size_indices, size_len, ss, index;
       size = {
         M: 1,
         L: 1,
@@ -254,8 +258,8 @@
       };
       data_view = new DataView(bin);
       stroke_count = data_view.getUint16(0, true);
-      for (i$ = 0, len$ = (ref$ = from(0, til(stroke_count))).length; i$ < len$; ++i$) {
-        i = ref$[i$];
+      i = 0;
+      while (i < stroke_count) {
         id = data_view.getUint16(2 + i * 6, true);
         if (id === file_id) {
           offset = data_view.getUint32(2 + i * 6 + 2, true);
