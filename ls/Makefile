@@ -1,2 +1,2 @@
 run ::
-	lsc -cwo ../js/ ./loaders.ls
+	lsc -cwo ../js/ ./loaders.ls ./string.ls
