@@ -1,5 +1,5 @@
 $ ->
-  interal-options =
+  internal-options =
     dim:        2150px
     track-width: 150px
 
@@ -75,7 +75,7 @@ $ ->
       # temp hack for custom canvas
       @myCanvas = document.createElement \canvas
       $ @myCanvas
-        .css \width "#{@styl-width!}px"
+        .css \width "#{@style-width!}px"
         .css \height "#{@style-height!}px"
       @myCanvas.width = @fill-width!
       @myCanvas.height = @fill-height!
@@ -83,7 +83,7 @@ $ ->
     init: ->
       @currentStroke = 0
       @currentTrack  = 0
-      @time          = 0.0sec
+      @time          = 0.0
     width: ->
       @options.dim
     height: ->
@@ -166,48 +166,46 @@ $ ->
         else
           @update!
 
-  draw-element-with-word = (element, word, options) ->
+  stroke-word = (element, word, options) ->
     options or= {}
     stroker = new Word(options)
     $word = $ '<div class="word"></div>'
     $loader = $ '<div class="loader"><div style="width: 0"></div><i class="icon-spinner icon-spin icon-large icon-fixed-width"></i></div>'
     $word.append stroker.canvas
     $(element).append $word
-    data = WordStroker.utils.StrokeData do
-      url:      options.url
-      dataType: options.dataType
+    loader = zh-stroke-data.loaders.JSON
     return do
       load: ->
         promise = it or $.Deferred!
         $word.append $loader
-        data.get do
-          word.cp
-          # success
-          (json) ->
-            $loader.remove()
-            promise.resolve do
-              drawBackground: -> stroker.draw-background!
-              draw:           -> stroker.draw json
-              remove:         -> $(stroker.canvas).remove!
-          # fail
-          ->
-            $loader.remove!
-            promise.resolve do
-              drawBackground: -> stroker.draw-background!
-              draw: ->
-                p = jQuery.Deferred!
-                $(stroker.canvas).fadeTo \fast, 0.5, -> p.resolve!
-                p
-              remove:         -> $(stroker.canvas).remove!
+        # deal with options.dataType later
+        data = loader "#{options.url}json/#{word.codePointAt!toString 16}.json"
+        data.then (json) ->
+          $loader.remove()
+          promise.resolve do
+            drawBackground: -> stroker.draw-background!
+            draw:           -> stroker.draw json
+            remove:         -> $(stroker.canvas).remove!
+        .fail ->
+          $loader.remove!
+          promise.resolve do
+            drawBackground: -> stroker.draw-background!
+            draw: ->
+              p = jQuery.Deferred!
+              $(stroker.canvas).fadeTo \fast, 0.5, -> p.resolve!
+              p
+            remove:         -> $(stroker.canvas).remove!
           # progress
-          (e) ->
-            if e.lengthComputable
-              $loader
-                .find '> div'
-                .css \width", "#{e.loaded/e.total*100}%"
-            promise.notifyWith e, [e, word.text]
+        .progress (e) ->
+          if e.lengthComputable
+            $loader
+              .find '> div'
+              .css \width", "#{e.loaded/e.total*100}%"
+          promise.notifyWith e, [e, word]
         promise
 
-  draw-element-with-words = (element, words, options) ->
-    WordStroker.utils.sortSurrogates(words).map (word) ->
-      drawElementWithWord element, word, options
+  window.zh-stroke-data ?= {}
+  window.zh-stroke-data.strokers ?= {}
+  window.zh-stroke-data.strokers.canvas = (element, words, options) ->
+    words.sortSurrogates!map (word) ->
+      stroke-word element, word, options

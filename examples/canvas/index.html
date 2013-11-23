@@ -13,14 +13,31 @@
         <script src="./js/draw.js"> </script>
         <script>
           $(function () {
-            zhStrokeData.loaders.Binary("../data/bin/4e00.bin").then(function (json) {
-              console.log(json);
-            });
-            chars = "敢有聽著󿌇唱歌".sortSurrogates();
-            console.log(chars.join(''));
-            console.log(chars.map(function (ch) {
-              return ch.codePointAt().toString(16);
-            }));
+            var $word = $("#word");
+            var f = function () {
+              loaders = zhStrokeData.strokers.canvas(
+                "#holder",
+                $word.val(),
+                {
+                  url: "../data/",
+                  dataType: "json"
+                }
+              );
+              promises = loaders.map(function (l) {
+                return l.load().done(function (w) {
+                  w.drawBackground();
+                });
+              });
+              (promises.reduceRight(function (next, current) {
+                return function () {
+                  current.done(function (w) {
+                    w.draw().done(next);
+                  });
+                };
+              }, function(){})());
+            };
+            $word.change(f);
+            f();
           });
         </script>
     </head>
