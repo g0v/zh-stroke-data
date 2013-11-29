@@ -169,8 +169,8 @@ class Stroke extends Comp
     super canvas
     ctx.restore!
 
-window.zh-stroke-data ?= {}
-window.zh-stroke-data.Comp = Comp
-window.zh-stroke-data.Track = Track
-window.zh-stroke-data.Stroke = Stroke
+(window.zh-stroke-data ?= {})
+  ..Comp = Comp
+  ..Track = Track
+  ..Stroke = Stroke
 

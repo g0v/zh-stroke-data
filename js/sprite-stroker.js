@@ -4,8 +4,18 @@
   SpriteStroker = (function(){
     SpriteStroker.displayName = 'SpriteStroker';
     var prototype = SpriteStroker.prototype, constructor = SpriteStroker;
-    function SpriteStroker(comp, options){
-      this.comp = comp;
+    function SpriteStroker(options){
+      this.options = $.extend({
+        autoplay: false,
+        controls: false,
+        width: 0,
+        height: 0,
+        loop: false,
+        muted: true,
+        preload: 'metadata',
+        poster: '',
+        src: ''
+      });
     }
     prototype.audioTracks = 0;
     prototype.videoTracks = 0;
@@ -13,25 +23,25 @@
     prototype.autoplay = false;
     prototype.buffered = null;
     prototype.controller = null;
-    prototype.controls = false;
-    prototype.currentSrc = '';
+    prototype.controls = SpriteStroker.options.consoles;
+    prototype.currentSrc = SpriteStroker.src;
+    prototype.src = SpriteStroker.options.src;
     prototype.currentTime = 0;
-    prototype.defaultMuted = true;
+    prototype.defaultMuted = SpriteStroker.options.muted;
+    prototype.muted = SpriteStroker.defaultMuted;
     prototype.defaultPlaybackRate = 1.0;
-    prototype.PlaybackRate = 1.0;
+    prototype.PlaybackRate = SpriteStroker.defaultPlaybackRate;
     prototype.duration = 0;
     prototype.ended = false;
     prototype.error = null;
     prototype.initialTime = 0;
-    prototype.loop = false;
+    prototype.loop = SpriteStroker.options.loop;
     prototype.mediaGroup = '';
-    prototype.muted = true;
     prototype.paused = false;
     prototype.played = false;
-    prototype.preload = '';
+    prototype.preload = SpriteStroker.options.preload;
     prototype.seekable = null;
     prototype.seeking = false;
-    prototype.src = '';
     prototype.volume = 0;
     prototype.canPlayType = function(str){
       return 'probably' || 'maybe' || '';
@@ -40,11 +50,11 @@
     prototype.load = function(){};
     prototype.pause = function(){};
     prototype.play = function(){};
-    prototype.width = 0;
-    prototype.height = 0;
+    prototype.width = SpriteStroker.options.width;
+    prototype.height = SpriteStroker.options.height;
     prototype.videoWidth = 0;
     prototype.videoHeight = 0;
-    prototype.poster = '';
+    prototype.poster = SpriteStroker.options.poster;
     return SpriteStroker;
   }());
   (ref$ = (ref1$ = window.zhStrokeData) != null

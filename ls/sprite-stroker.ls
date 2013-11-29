@@ -1,5 +1,15 @@
 class SpriteStroker
-  (@comp, options) ->
+  (options) ->
+    @options = $.extend do
+      autoplay: off
+      controls: off
+      width: 0
+      height: 0
+      loop: off
+      muted: yes
+      preload: 'metadata' # or 'none' or 'auto'
+      poster: ''
+      src: ''
   # mimic MediaElement
   audioTracks        : 0
   videoTracks        : 0
@@ -7,28 +17,28 @@ class SpriteStroker
   autoplay           : off
   buffered           : null # read only TimeRanges
   controller         : null # MediaController
-  controls           : off
+  controls           : @options.consoles
   #crossOrigin       : ''
-  currentSrc         : ''   # read only
+  currentSrc         : @src # read only
+  src                : @options.src
   currentTime        : 0
-  defaultMuted       : yes
+  defaultMuted       : @options.muted
+  muted              : @defaultMuted
   defaultPlaybackRate: 1.0
-  PlaybackRate       : 1.0
+  PlaybackRate       : @defaultPlaybackRate
   duration           : 0    # read only
   ended              : no   # read only
   error              : null # read only MediaError
   initialTime        : 0    # read only
-  loop               : off
+  loop               : @options.loop
   mediaGroup         : ''
-  muted              : yes
   #networkState      : 0
   paused             : no   # read only
-  played             : no   # read only
-  preload            : ''
+  played             : no   # read only TimeRanges
+  preload            : @options.preload
   #readyState        : 0
   seekable           : null # read only TimeRanges
   seeking            : no   # read only
-  src                : ''
   volume             : 0
   canPlayType        : (str) -> 'probably' or 'maybe' or ''
   fastSeek           : (time) !->
@@ -36,11 +46,11 @@ class SpriteStroker
   pause              : !->
   play               : !->
   # mimic VideoElement
-  width              : 0
-  height             : 0
-  videoWidth         : 0
-  videoHeight        : 0
-  poster             : ''
+  width              : @options.width
+  height             : @options.height
+  videoWidth         : 0    # read only
+  videoHeight        : 0    # read only
+  poster             : @options.poster
 
 (window.zh-stroke-data ?= {}).stroker ?= {}
 window.zh-stroke-data.SpriteStroker = SpriteStroker
