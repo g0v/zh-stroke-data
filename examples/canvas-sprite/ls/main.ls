@@ -12,6 +12,7 @@ $ ->
   canvas.height = canvas.offsetHieght = $body.height! / 0.5
   $body.append $canvas
 
+  /*
   for let i, ch of $word.val!sortSurrogates!
     i = parseInt i, 10
     w = 2150px * 0.025
@@ -29,3 +30,7 @@ $ ->
           ..time = 1.0
           ..render canvas
       .fail -> console.log ch, it.status
+  */
+
+  console.log zh-stroke-data
+  ss = new zh-stroke-data.SpriteStroker \你那邊幾點 url: '../data/json/'

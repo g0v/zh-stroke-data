@@ -97,6 +97,10 @@ class Comp
       child.render canvas
       len -= child.length
 
+class Empty extends Comp
+  -> super!
+  render: ->
+
 class Track extends Comp
   (@data, @options = {}) ->
     super null, new AABB
@@ -170,7 +174,8 @@ class Stroke extends Comp
     ctx.restore!
 
 (window.zh-stroke-data ?= {})
-  ..Comp = Comp
-  ..Track = Track
+  ..Comp   = Comp
+  ..Empty  = Empty
+  ..Track  = Track
   ..Stroke = Stroke
 
