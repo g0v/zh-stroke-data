@@ -1,0 +1,24 @@
+body {
+    background: #333;
+    color: #fff;
+    font: 300 100.1% "Helvetica Neue", Helvetica, "Arial Unicode MS", Arial, sans-serif;
+}
+#holder {
+    left: 50%;
+    margin: -240px 0 0 -320px;
+    position: absolute;
+    border: 1px solid #ccc;
+    top: 50%;
+    width: 430px;
+    height: 430px;
+}
+#copyright {
+    bottom: 0;
+    font: 300 .7em "Helvetica Neue", Helvetica, "Arial Unicode MS", Arial, sans-serif;
+    position: absolute;
+    right: 1em;
+    text-align: right;
+}
+#copyright a {
+    color: #fff;
+}

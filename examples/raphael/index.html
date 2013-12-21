@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>常用國字標準字體筆劃 HTML5 Canvas</title>
+        <link rel="stylesheet" href="./css/demo.css" type="text/css" media="screen">
+        <script type="text/javascript" src="../lib/jquery-1.9.1.min.js" charset="utf-8"> </script>
+        <script type="text/javascript" src="../lib/jquery.ajax-progress.js" charset="utf-8"> </script>
+        <script type="text/javascript" src="../lib/q.min.js" charset="utf-8"></script>
+        <script type="text/javascript" src="../lib/sax.js" charset="utf-8"></script>
+        <script type="text/javascript" src="../lib/raphael.js" charset="utf-8"></script>
+        <script type="text/javascript" src="../lib/zh-stroke-data/loaders.js" charset="utf-8"> </script>
+        <script type="text/javascript" src="./js/draw.js" charset="utf-8"> </script>
+        <script type="text/javascript">
+          $(function() {
+              f = function () { strokeWords($("#holder").get()[0], $("#word").val()); };
+              f();
+              $("#word").change(f);
+          });
+        </script>
+    </head>
+    <body>
+        <input type="text" id="word" value="發"/>
+        <div id="holder"></div>
+        <p id="copyright">常用國字標準字體筆劃</p>
+    </body>
+</html>

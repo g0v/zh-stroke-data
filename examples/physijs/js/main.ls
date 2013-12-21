@@ -29,7 +29,7 @@ material  = new THREE.MeshBasicMaterial
 material.map   = THREE.ImageUtils.loadTexture \images/stars.jpg
 material.side  = THREE.BackSide
 # create the mesh based on geometry and material
-scene.add new THREE.Mesh(geometry, material)
+#scene.add new THREE.Mesh(geometry, material)
 
 
 # camera
