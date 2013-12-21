@@ -88,7 +88,7 @@ class SpriteStroker
   canPlayType        : (str) -> 'probably' or 'maybe' or ''
   fastSeek           : (time) !-> @currentTime = time
   load               : !->
-  pause              : !->
+  pause              : !-> @paused = !!it
   play               : !~>
     if @sprite
       total-time = @sprite.length / @options.speed

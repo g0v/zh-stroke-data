@@ -34,5 +34,13 @@ $ ->
   */
 
   ss = new zh-stroke-data.SpriteStroker \你那邊幾點 url: '../data/json/'
+  $(\#speed)
+    .change !->
+      console.log +$(@).val!
+      ss.options.speed = +$(@).val!
+    .val ss.options.speed
+  $(\#play).click !->
+    ss.pause no
+    ss.play!
+  $(\#pause).click !-> ss.pause yes
   $body.append ss.dom-element
-  ss.play!

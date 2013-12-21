@@ -86,7 +86,9 @@
       this.currentTime = time;
     };
     prototype.load = function(){};
-    prototype.pause = function(){};
+    prototype.pause = function(it){
+      this.paused = !!it;
+    };
     prototype.play = function(){
       var totalTime;
       if (this.sprite) {

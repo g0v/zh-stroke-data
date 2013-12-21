@@ -36,6 +36,16 @@ $(function(){
   ss = new zhStrokeData.SpriteStroker('你那邊幾點', {
     url: '../data/json/'
   });
-  $body.append(ss.domElement);
-  return ss.play();
+  $('#speed').change(function(){
+    console.log(+$(this).val());
+    ss.options.speed = +$(this).val();
+  }).val(ss.options.speed);
+  $('#play').click(function(){
+    ss.pause(false);
+    ss.play();
+  });
+  $('#pause').click(function(){
+    ss.pause(true);
+  });
+  return $body.append(ss.domElement);
 });
