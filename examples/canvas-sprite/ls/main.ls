@@ -1,6 +1,7 @@
 $ ->
   $body   = $ \body
   $word   = $ \#word
+  /*
   ($canvas = $ \<canvas></canvas>)
     .css \width "#{$body.width!}px"
     .css \height "#{$body.height!}px"
@@ -10,7 +11,7 @@ $ ->
   canvas = $canvas.get!0
   canvas.width  = canvas.offsetWidth  = $body.width!  / 0.5
   canvas.height = canvas.offsetHieght = $body.height! / 0.5
-  $body.append $canvas
+  */
 
   /*
   for let i, ch of $word.val!sortSurrogates!
@@ -32,5 +33,6 @@ $ ->
       .fail -> console.log ch, it.status
   */
 
-  console.log zh-stroke-data
   ss = new zh-stroke-data.SpriteStroker \你那邊幾點 url: '../data/json/'
+  $body.append ss.dom-element
+  ss.play!

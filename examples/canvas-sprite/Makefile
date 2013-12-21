@@ -1,2 +1,2 @@
 run ::
-	lsc -cbo ./js ./ls/*.ls
+	lsc -cbwo ./js ./ls/*.ls
