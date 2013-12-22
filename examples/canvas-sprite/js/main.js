@@ -34,7 +34,7 @@ $(function(){
       .fail -> console.log ch, it.status
   */
   ss = new zhStrokeData.SpriteStroker('你那邊幾點', {
-    url: '../data/json/'
+    url: '../../json/'
   });
   $('#speed').change(function(){
     console.log(+$(this).val());

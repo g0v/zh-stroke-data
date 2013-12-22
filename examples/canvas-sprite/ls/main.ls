@@ -33,7 +33,7 @@ $ ->
       .fail -> console.log ch, it.status
   */
 
-  ss = new zh-stroke-data.SpriteStroker \你那邊幾點 url: '../data/json/'
+  ss = new zh-stroke-data.SpriteStroker \你那邊幾點 url: '../../json/'
   $(\#speed)
     .change !->
       console.log +$(@).val!

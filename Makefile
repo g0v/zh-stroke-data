@@ -10,6 +10,9 @@ $(DIR_COMPOSED)/%.json : $(DIR_MISSING)/%.json
 .js.ls :
 	lsc -c $<
 
+serve ::
+	node ./static-here.js 8888
+
 main ::
 	cat ./js/utils.stroke-words.js ./js/draw.js ./js/draw.canvas.js ./js/jquery.stroke-words.js > /Users/audreyt/w/moedict-webkit/js/jquery.strokeWords.js
 
