@@ -17,19 +17,20 @@
     <body>
         <span>
             速度（原始像素/秒）：
-            <input type="text" id="speed" value=""/>
+            10 <input type="range" id="speed" min="10" max="10000"/> 10000
         </span>
         <br/>
         <span>
-            筆劃間停滯幾秒：
-            <input type="text" id="stroke" value=""/>
+            筆劃間停滯 <span id="sdelay"></span> 秒：
+            0 <input type="range" id="stroke" min="0" max="10" step="0.1"/> 10
         </span>
         <br/>
         <span>
-            字間停滯幾秒：
-            <input type="text" id="char" value=""/>
+            字間停滯 <span id="cdelay"></span> 秒：
+            0 <input type="range" id="char" min="0" max="10" step="0.1"/> 10
         </span>
         <br/>
+        <input type="text" id="progress"/>
         <input type="button" id="play" value="play"/>
         <input type="button" id="pause" value="pause"/>
         <p id="copyright">常用國字標準字體筆劃</p>

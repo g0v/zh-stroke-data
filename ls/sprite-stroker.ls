@@ -21,7 +21,7 @@ class SpriteStroker
       ###
       # others
       ###
-      speed: 1000px_per_sec #px in original resolution
+      speed: 5000px_per_sec #px in original resolution
       stroke-delay: 0.2s
       char-delay: 1s
       options
@@ -108,7 +108,7 @@ class SpriteStroker
       (@sprite = new zh-stroke-data.Comp chars)
         ..scale-x = @width  / 2150
         ..scale-y = @height / 2150
-      @dom-element.width  = @width * chars.length
+      @dom-element.width  = @width * promises.length
   ###
   # mimic MediaElement
   ###
@@ -127,7 +127,7 @@ class SpriteStroker
   #muted              : @defaultMuted
   defaultPlaybackRate: 1.0
   PlaybackRate       : 1.0
-  duration           : 0    # rea:qd only
+  duration           : 0    # read only
   ended              : no   # read only
   error              : null # read only MediaError
   #initialTime        : 0    # read only
@@ -152,7 +152,7 @@ class SpriteStroker
       @sprite.time += step / @sprite.length
       @currentTime = @sprite.time * @sprite.length / @speed
     # should get interval from Date
-    requestAnimationFrame @play if not @paused
+    requestAnimationFrame @play if not @paused and @sprite.time < 1
   ###
   # mimic VideoElement
   ###

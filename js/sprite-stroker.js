@@ -21,7 +21,7 @@
         poster: '',
         url: './json/',
         dataType: 'json',
-        speed: 1000,
+        speed: 5000,
         strokeDelay: 0.2,
         charDelay: 1
       }, options);
@@ -136,7 +136,7 @@
         x$ = this$.sprite = new zhStrokeData.Comp(chars);
         x$.scaleX = this$.width / 2150;
         x$.scaleY = this$.height / 2150;
-        return this$.domElement.width = this$.width * chars.length;
+        return this$.domElement.width = this$.width * promises.length;
       });
     }
     prototype.videoTracks = 1;
@@ -172,7 +172,7 @@
         this.sprite.time += step / this.sprite.length;
         this.currentTime = this.sprite.time * this.sprite.length / this.speed;
       }
-      if (!this.paused) {
+      if (!this.paused && this.sprite.time < 1) {
         requestAnimationFrame(this.play);
       }
     };

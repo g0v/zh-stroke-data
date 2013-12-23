@@ -1,17 +1,3 @@
-options =
-  dim: 2150
-  scales:
-    fill: 0.025
-    style: 0.5
-  ##
-  # TODO
-  ##
-  # It's hard to do delays now
-  ##
-  delays:
-    stroke: 0.25s
-    word: 0.5s
-
 class AABB
   (
     @min = x: Infinity, y: Infinity
@@ -100,6 +86,7 @@ class Comp
       .setTransform scaleX, 0, 0, scaleY, x, y
     len = @length * @time
     for child in @children | len > 0
+      continue if child.length is 0
       child.time = Math.min(child.length, len) / child.length
       child.render canvas
       len -= child.length
