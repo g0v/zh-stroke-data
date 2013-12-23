@@ -4,7 +4,7 @@ class SpriteStroker
     json: zh-stroke-data.loaders.JSON
     bin : zh-stroke-data.loaders.Binary
   (str, options) ->
-    @options = $.extend do
+    options = $.extend do
       ###
       # mimic <video>
       ###
@@ -22,37 +22,93 @@ class SpriteStroker
       # others
       ###
       speed: 1000px_per_sec #px in original resolution
-      strokeDelay: 0.2s
-      charDelay: 0.4s
+      stroke-delay: 0.2s
+      char-delay: 1s
       options
-    @loop        = @options.loop
-    @preload     = @options.preload
-    @width       = @options.width
-    @height      = @options.height
-    @posters     = @options.posters
-    @url         = @options.url
-    @dataType    = @options.dataType
-    @speed       = @options.speed
-    @strokeDelay = @options.strokeDelay
-    @charDelay   = @options.charDelay
+    @autoplay    = options.autoplay
+    @loop        = options.loop
+    @preload     = options.preload
+    @width       = options.width
+    @height      = options.height
+    @posters     = options.posters
+    @url         = options.url
+    @dataType    = options.dataType
     @dom-element = document.createElement \canvas
-    @dom-element.width  = @options.width
-    @dom-element.height = @options.height
+    @dom-element.width  = @width
+    @dom-element.height = @height
 
-    @promises = for ch in str.sortSurrogates!
+    @stroke-gap =
+      speed: options.speed
+      delay: options.strokeDelay
+      objs: []
+      update: !->
+        for o in @objs
+          o.computeLength!
+          #bad
+          o.parent.childrenChanged!
+    @char-gap =
+      speed: options.speed
+      delay: options.charDelay
+      objs: []
+      update: !->
+        for o in @objs
+          o.computeLength!
+          o.parent.childrenChanged!
+    Object.defineProperty do
+      this
+      \speed
+        set: ->
+          @stroke-gap
+            ..speed = it
+            ..update!
+          @char-gap
+            ..speed = it
+            ..update!
+          @stroke-gap.speed
+        get: -> @stroke-gap.speed
+    Object.defineProperty do
+      this
+      \strokeDelay
+        set: ->
+          @stroke-gap
+            ..delay = it
+            ..update!
+          @stroke-gap.delay
+        get: -> @stroke-gap.delay
+    Object.defineProperty do
+      this
+      \charDelay
+        set: ->
+          @char-gap
+            ..delay = it
+            ..update!
+          @char-gap.delay
+        get: -> @char-gap.delay
+
+    promises = for ch in str.sortSurrogates!
       @@loaders[@dataType] "#{@url}#{ch.codePointAt!toString 16}.#{@dataType}"
-    p = @promises[0]
-    p.then ~>
-      strokes = []
-      for i, data of it
-        strokes.push new zh-stroke-data.Stroke data
+    Q.all(promises).then ~>
+      chars = []
+      for i, char-data of it
+        strokes = []
+        for j, data of char-data
+          strokes.push new zh-stroke-data.Stroke data
+          continue if +j is it.length - 1
+          gap = new zh-stroke-data.Empty @stroke-gap
+          @stroke-gap.objs.push gap
+          strokes.push gap
+        char = new zh-stroke-data.Comp strokes
+        # should be char width
+        char.x = @width * +i
+        chars.push char
         continue if +i is it.length - 1
-        empty = new zh-stroke-data.Empty
-        empty.length = @options.speed * @options.strokeDelay
-        strokes.push empty
-      (@sprite = new zh-stroke-data.Comp strokes)
-        ..scale-x = @options.width  / 2150
-        ..scale-y = @options.height / 2150
+        gap = new zh-stroke-data.Empty @char-gap
+        @char-gap.objs.push gap
+        chars.push gap
+      (@sprite = new zh-stroke-data.Comp chars)
+        ..scale-x = @width  / 2150
+        ..scale-y = @height / 2150
+      @dom-element.width  = @width * chars.length
   ###
   # mimic MediaElement
   ###
@@ -91,11 +147,11 @@ class SpriteStroker
   pause              : !-> @paused = !!it
   play               : !~>
     if @sprite
-      total-time = @sprite.length / @options.speed
-      @sprite.time = if @currentTime > total-time then 1 else @currentTime / total-time
       @sprite.render @dom-element
+      step = @speed * 1 / 60
+      @sprite.time += step / @sprite.length
+      @currentTime = @sprite.time * @sprite.length / @speed
     # should get interval from Date
-    @currentTime += 1/60
     requestAnimationFrame @play if not @paused
   ###
   # mimic VideoElement

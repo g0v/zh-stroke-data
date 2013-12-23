@@ -44,24 +44,31 @@ class AABB
       ..stroke!
 
 class Comp
-  (@children = [], @aabb) ->
-    if not @aabb
-      @aabb = new AABB
-      @children.forEach (child) ~>
-        child.parent = @
-        @aabb.addPoint child.aabb.min
-        @aabb.addPoint child.aabb.max
-    @length = @children.reduce (prev, current) ->
-      prev + current.length
-    , 0
+  (@children = [], @aabb = new AABB) ->
+    for child in @children
+      child.parent = this
+      @aabb.addPoint child.aabb.min
+      @aabb.addPoint child.aabb.max
+    @computeLength!
     @gaps = @children.reduce (results, current) ~>
       results.concat [results[*-1] + current.length / @length]
     , [0]
     @gaps.shift()
     @time = 0.0
     @x = @y = 0px
-    @scaleX = @scaleY = 1.0
+    @scale-x = @scale-y = 1.0
     @parent = null
+  computeLength: ->
+    @length = @children.reduce (prev, current) ->
+      prev + current.length
+    , 0
+  childrenChanged: !->
+    @computeLength!
+    len = 0
+    for child in @children
+      len += child.time * child.length
+    @time = len / @length
+    @parent?childrenChanged!
   breakUp: (strokeNums = []) ->
     comps = []
     strokeNums.reduce (start, len) ~>
@@ -98,14 +105,17 @@ class Comp
       len -= child.length
 
 class Empty extends Comp
-  -> super!
+  (@data) -> super!
+  computeLength: ->
+    @length = @data.speed * @data.delay
   render: ->
 
 class Track extends Comp
   (@data, @options = {}) ->
-    super null, new AABB
     # TODO: should mv init value out here
     @options.trackWidth or= 150px
+    super!
+  computeLength: ->
     @length = Math.sqrt @data.vector.x * @data.vector.x + @data.vector.y * @data.vector.y
   render: (canvas) ->
     size = @data.size or @options.trackWidth
