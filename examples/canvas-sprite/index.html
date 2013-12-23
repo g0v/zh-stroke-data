@@ -8,14 +8,29 @@
         <script src="../lib/jquery-1.9.1.min.js"> </script>
         <script src="../lib/sax.js"> </script>
         <script src="../lib/q.min.js"> </script>
-        <script src="../lib/zh-stroke-data/string.js"> </script>
-        <script src="../lib/zh-stroke-data/loaders.js"> </script>
-        <script src="../lib/zh-stroke-data/sprite.js"> </script>
-        <script src="../lib/zh-stroke-data/sprite-stroker.js"> </script>
+        <script src="../../js/string.js"> </script>
+        <script src="../../js/loaders.js"> </script>
+        <script src="../../js/sprite.js"> </script>
+        <script src="../../js/sprite-stroker.js"> </script>
         <script src="./js/main.js"> </script>
     </head>
     <body>
-        <input type="text" id="speed" value=""/>
+        <span>
+            速度（原始像素/秒）：
+            10 <input type="range" id="speed" min="10" max="10000"/> 10000
+        </span>
+        <br/>
+        <span>
+            筆劃間停滯 <span id="sdelay"></span> 秒：
+            0 <input type="range" id="stroke" min="0" max="10" step="0.1"/> 10
+        </span>
+        <br/>
+        <span>
+            字間停滯 <span id="cdelay"></span> 秒：
+            0 <input type="range" id="char" min="0" max="10" step="0.1"/> 10
+        </span>
+        <br/>
+        <input type="text" id="progress"/>
         <input type="button" id="play" value="play"/>
         <input type="button" id="pause" value="pause"/>
         <p id="copyright">常用國字標準字體筆劃</p>

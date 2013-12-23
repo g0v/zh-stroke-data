@@ -27,7 +27,7 @@
       var utf8code;
       utf8code = escape(word).replace(/%u/, "").toLowerCase();
       console.log(utf8code);
-      return zhStrokeData.loaders.XML("../data/utf8/" + utf8code + ".xml").then(function(strokes) {
+      return zhStrokeData.loaders.XML("../../utf8/" + utf8code + ".xml").then(function(strokes) {
         var color, delay, dim, gridLines, line, paper, pathAttrs, stroke, timeoutSeconds, _i, _j, _len, _len1, _results;
         dim = 430;
         paper = Raphael(element, dim, dim);

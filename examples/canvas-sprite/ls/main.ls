@@ -1,46 +1,31 @@
 $ ->
-  $body   = $ \body
-  $word   = $ \#word
-  /*
-  ($canvas = $ \<canvas></canvas>)
-    .css \width "#{$body.width!}px"
-    .css \height "#{$body.height!}px"
-    .css \position \absolute
-    .css \top 0px
-    .css \left" 0px
-  canvas = $canvas.get!0
-  canvas.width  = canvas.offsetWidth  = $body.width!  / 0.5
-  canvas.height = canvas.offsetHieght = $body.height! / 0.5
-  */
+  ss = new zh-stroke-data.SpriteStroker \宅度不同 url: '../../json/'
 
-  /*
-  for let i, ch of $word.val!sortSurrogates!
-    i = parseInt i, 10
-    w = 2150px * 0.025
-    ww = 2150px * 0.025 * 0.5
-    width = ~~($body.width() / ww)
-    zh-stroke-data.loaders.JSON "../data/json/#{ch.codePointAt!toString 16}.json"
-      .then ->
-        strokes = it.map -> new zh-stroke-data.Stroke it
-        word = new zh-stroke-data.Comp strokes
-        word
-          ..x = w * ~~(i % width)
-          ..y = w * ~~(i / width)
-          ..scaleX = 0.025
-          ..scaleY = 0.025
-          ..time = 1.0
-          ..render canvas
-      .fail -> console.log ch, it.status
-  */
-
-  ss = new zh-stroke-data.SpriteStroker \你那邊幾點 url: '../data/json/'
+  $sdelay = $ \#sdelay
+  $cdelay = $ \#cdelay
+  $(\body).append ss.dom-element
   $(\#speed)
     .change !->
-      console.log +$(@).val!
-      ss.options.speed = +$(@).val!
-    .val ss.options.speed
+      ss.speed = +$(@).val!
+    .val ss.speed
+  $(\#stroke)
+    .change !->
+      ss.stroke-delay = +$(@).val!
+      $sdelay.text ss.stroke-delay
+    .val ss.stroke-delay
+  $sdelay.text ss.stroke-delay
+  $(\#char)
+    .change !->
+      ss.char-delay = +$(@).val!
+      $cdelay.text ss.char-delay
+    .val ss.char-delay
+  $cdelay.text ss.char-delay
   $(\#play).click !->
     ss.pause no
     ss.play!
   $(\#pause).click !-> ss.pause yes
-  $body.append ss.dom-element
+
+  update = !->
+    $(\#progress).val ss.currentTime
+    requestAnimationFrame update
+  requestAnimationFrame update

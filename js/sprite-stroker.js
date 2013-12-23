@@ -10,9 +10,9 @@
       bin: zhStrokeData.loaders.Binary
     };
     function SpriteStroker(str, options){
-      var res$, i$, ref$, len$, ch, p, this$ = this;
+      var promises, res$, i$, ref$, len$, ch, this$ = this;
       this.play = bind$(this, 'play', prototype);
-      this.options = $.extend({
+      options = $.extend({
         autoplay: false,
         width: 215,
         height: 215,
@@ -21,47 +21,122 @@
         poster: '',
         url: './json/',
         dataType: 'json',
-        speed: 1000,
+        speed: 5000,
         strokeDelay: 0.2,
-        charDelay: 0.4
+        charDelay: 1
       }, options);
-      this.loop = this.options.loop;
-      this.preload = this.options.preload;
-      this.width = this.options.width;
-      this.height = this.options.height;
-      this.posters = this.options.posters;
-      this.url = this.options.url;
-      this.dataType = this.options.dataType;
-      this.speed = this.options.speed;
-      this.strokeDelay = this.options.strokeDelay;
-      this.charDelay = this.options.charDelay;
+      this.autoplay = options.autoplay;
+      this.loop = options.loop;
+      this.preload = options.preload;
+      this.width = options.width;
+      this.height = options.height;
+      this.posters = options.posters;
+      this.url = options.url;
+      this.dataType = options.dataType;
       this.domElement = document.createElement('canvas');
-      this.domElement.width = this.options.width;
-      this.domElement.height = this.options.height;
+      this.domElement.width = this.width;
+      this.domElement.height = this.height;
+      this.strokeGap = {
+        speed: options.speed,
+        delay: options.strokeDelay,
+        objs: [],
+        update: function(){
+          var i$, ref$, len$, o;
+          for (i$ = 0, len$ = (ref$ = this.objs).length; i$ < len$; ++i$) {
+            o = ref$[i$];
+            o.computeLength();
+            o.parent.childrenChanged();
+          }
+        }
+      };
+      this.charGap = {
+        speed: options.speed,
+        delay: options.charDelay,
+        objs: [],
+        update: function(){
+          var i$, ref$, len$, o;
+          for (i$ = 0, len$ = (ref$ = this.objs).length; i$ < len$; ++i$) {
+            o = ref$[i$];
+            o.computeLength();
+            o.parent.childrenChanged();
+          }
+        }
+      };
+      Object.defineProperty(this, 'speed', {
+        set: function(it){
+          var x$, y$;
+          x$ = this.strokeGap;
+          x$.speed = it;
+          x$.update();
+          y$ = this.charGap;
+          y$.speed = it;
+          y$.update();
+          return this.strokeGap.speed;
+        },
+        get: function(){
+          return this.strokeGap.speed;
+        }
+      });
+      Object.defineProperty(this, 'strokeDelay', {
+        set: function(it){
+          var x$;
+          x$ = this.strokeGap;
+          x$.delay = it;
+          x$.update();
+          return this.strokeGap.delay;
+        },
+        get: function(){
+          return this.strokeGap.delay;
+        }
+      });
+      Object.defineProperty(this, 'charDelay', {
+        set: function(it){
+          var x$;
+          x$ = this.charGap;
+          x$.delay = it;
+          x$.update();
+          return this.charGap.delay;
+        },
+        get: function(){
+          return this.charGap.delay;
+        }
+      });
       res$ = [];
       for (i$ = 0, len$ = (ref$ = str.sortSurrogates()).length; i$ < len$; ++i$) {
         ch = ref$[i$];
         res$.push(constructor.loaders[this.dataType](this.url + "" + ch.codePointAt().toString(16) + "." + this.dataType));
       }
-      this.promises = res$;
-      p = this.promises[0];
-      p.then(function(it){
-        var strokes, i, data, empty, x$;
-        strokes = [];
+      promises = res$;
+      Q.all(promises).then(function(it){
+        var chars, i, charData, strokes, j, data, gap, char, x$;
+        chars = [];
         for (i in it) {
-          data = it[i];
-          strokes.push(new zhStrokeData.Stroke(data));
+          charData = it[i];
+          strokes = [];
+          for (j in charData) {
+            data = charData[j];
+            strokes.push(new zhStrokeData.Stroke(data));
+            if (+j === it.length - 1) {
+              continue;
+            }
+            gap = new zhStrokeData.Empty(this$.strokeGap);
+            this$.strokeGap.objs.push(gap);
+            strokes.push(gap);
+          }
+          char = new zhStrokeData.Comp(strokes);
+          char.x = this$.width * +i;
+          chars.push(char);
           if (+i === it.length - 1) {
             continue;
           }
-          empty = new zhStrokeData.Empty;
-          empty.length = this$.options.speed * this$.options.strokeDelay;
-          strokes.push(empty);
+          gap = new zhStrokeData.Empty(this$.charGap);
+          this$.charGap.objs.push(gap);
+          chars.push(gap);
         }
-        x$ = this$.sprite = new zhStrokeData.Comp(strokes);
-        x$.scaleX = this$.options.width / 2150;
-        x$.scaleY = this$.options.height / 2150;
-        return x$;
+        x$ = this$.sprite = new zhStrokeData.Comp(chars);
+        x$.scaleX = this$.width / 2150;
+        x$.scaleY = this$.height / 2150;
+        return this$.domElement.width = this$.width * promises.length;
       });
     }
     prototype.videoTracks = 1;
@@ -90,16 +165,14 @@
       this.paused = !!it;
     };
     prototype.play = function(){
-      var totalTime;
+      var step;
       if (this.sprite) {
-        totalTime = this.sprite.length / this.options.speed;
-        this.sprite.time = this.currentTime > totalTime
-          ? 1
-          : this.currentTime / totalTime;
         this.sprite.render(this.domElement);
+        step = this.speed * 1 / 60;
+        this.sprite.time += step / this.sprite.length;
+        this.currentTime = this.sprite.time * this.sprite.length / this.speed;
       }
-      this.currentTime += 1 / 60;
-      if (!this.paused) {
+      if (!this.paused && this.sprite.time < 1) {
         requestAnimationFrame(this.play);
       }
     };

@@ -16,7 +16,7 @@ $ ->
   strokeWord = (element, word) ->
     utf8code = escape(word).replace(/%u/ , "").toLowerCase()
     console.log(utf8code)
-    zhStrokeData.loaders.XML("../data/utf8/" + utf8code + ".xml").then (strokes) ->
+    zhStrokeData.loaders.XML("../../utf8/" + utf8code + ".xml").then (strokes) ->
       dim = 430
       paper = Raphael(element, dim, dim)
       gridLines = [
