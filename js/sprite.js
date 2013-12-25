@@ -73,7 +73,7 @@
     Comp.displayName = 'Comp';
     var prototype = Comp.prototype, constructor = Comp;
     function Comp(children, aabb){
-      var i$, ref$, len$, child, this$ = this;
+      var i$, ref$, len$, child;
       this.children = children != null
         ? children
         : [];
@@ -87,10 +87,6 @@
         this.aabb.addPoint(child.aabb.max);
       }
       this.computeLength();
-      this.gaps = this.children.reduce(function(results, current){
-        return results.concat([results[results.length - 1] + current.length / this$.length]);
-      }, [0]);
-      this.gaps.shift();
       this.time = 0.0;
       this.x = this.y = 0;
       this.scaleX = this.scaleY = 1.0;
@@ -136,8 +132,10 @@
         return prev.concat(child.hitTest(pt));
       }, results);
     };
+    prototype.beforeRender = function(ctx){};
+    prototype.afterRender = function(ctx){};
     prototype.render = function(canvas){
-      var x, y, scaleX, scaleY, p, len, i$, ref$, len$, child, results$ = [];
+      var x, y, scaleX, scaleY, p, ctx, len, i$, ref$, len$, child;
       x = this.x;
       y = this.y;
       scaleX = this.scaleX;
@@ -150,7 +148,8 @@
         scaleY *= p.scaleY;
         p = p.parent;
       }
-      canvas.getContext('2d').setTransform(scaleX, 0, 0, scaleY, x, y);
+      (ctx = canvas.getContext('2d')).setTransform(scaleX, 0, 0, scaleY, x, y);
+      this.beforeRender(ctx);
       len = this.length * this.time;
       for (i$ = 0, len$ = (ref$ = this.children).length; i$ < len$; ++i$) {
         child = ref$[i$];
@@ -160,10 +159,10 @@
           }
           child.time = Math.min(child.length, len) / child.length;
           child.render(canvas);
-          results$.push(len -= child.length);
+          len -= child.length;
         }
       }
-      return results$;
+      return this.afterRender(ctx);
     };
     return Comp;
   }());
@@ -272,15 +271,15 @@
         return [];
       }
     };
-    prototype.render = function(canvas){
-      var ctx, x$;
-      ctx = canvas.getContext("2d");
+    prototype.beforeRender = function(ctx){
+      var x$;
       x$ = ctx;
       x$.save();
       x$.beginPath();
       this.pathOutline(ctx);
-      ctx.clip();
-      superclass.prototype.render.call(this, canvas);
+      return ctx.clip();
+    };
+    prototype.afterRender = function(ctx){
       return ctx.restore();
     };
     return Stroke;
