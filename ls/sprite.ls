@@ -36,10 +36,6 @@ class Comp
       @aabb.addPoint child.aabb.min
       @aabb.addPoint child.aabb.max
     @computeLength!
-    @gaps = @children.reduce (results, current) ~>
-      results.concat [results[*-1] + current.length / @length]
-    , [0]
-    @gaps.shift()
     @time = 0.0
     @x = @y = 0px
     @scale-x = @scale-y = 1.0
@@ -69,6 +65,8 @@ class Comp
     @children.reduce (prev, child) ->
       prev.concat child.hitTest pt
     , results
+  beforeRender: (ctx) ->
+  afterRender: (ctx) ->
   render: (canvas) ->
     # calculating scale and position
     x = @x
@@ -82,14 +80,16 @@ class Comp
       scaleX *= p.scaleX
       scaleY *= p.scaleY
       p = p.parent
-    canvas.getContext \2d
+    (ctx = canvas.getContext \2d)
       .setTransform scaleX, 0, 0, scaleY, x, y
+    @beforeRender ctx
     len = @length * @time
     for child in @children | len > 0
       continue if child.length is 0
       child.time = Math.min(child.length, len) / child.length
       child.render canvas
       len -= child.length
+    @afterRender ctx
 
 class Empty extends Comp
   (@data) -> super!
@@ -160,14 +160,13 @@ class Stroke extends Comp
             path.end.x, path.end.y
   hitTest: (pt) ->
     if @aabb.containPoint pt then [@] else []
-  render: (canvas) ->
-    ctx = canvas.getContext "2d"
+  beforeRender: (ctx) ->
     ctx
       ..save!
       ..beginPath!
     @pathOutline ctx
     ctx.clip!
-    super canvas
+  afterRender: (ctx) ->
     ctx.restore!
 
 (window.zh-stroke-data ?= {})

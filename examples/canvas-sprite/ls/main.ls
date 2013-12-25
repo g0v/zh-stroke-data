@@ -3,7 +3,7 @@ $ ->
 
   $sdelay = $ \#sdelay
   $cdelay = $ \#cdelay
-  $(\body).append ss.dom-element
+  $(\#sprite).append ss.dom-element
   $(\#speed)
     .change !->
       ss.speed = +$(@).val!
@@ -29,3 +29,7 @@ $ ->
     $(\#progress).val ss.currentTime
     requestAnimationFrame update
   requestAnimationFrame update
+
+  ps = new zh-stroke-data.PrintingStroker \兩天當一天 url: '../../json/'
+
+  $(\#printing).append ps.dom-element
