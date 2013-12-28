@@ -105,16 +105,16 @@ class Track extends Comp
   (@data, @options = {}) ->
     # TODO: should mv init value out here
     @options.trackWidth or= 150px
+    @data.size or= @options.trackWidth
     super!
   computeLength: ->
     @length = Math.sqrt @data.vector.x * @data.vector.x + @data.vector.y * @data.vector.y
   render: (canvas) ->
-    size = @data.size or @options.trackWidth
     canvas.getContext \2d
       ..beginPath!
       ..strokeStyle = \#000
       ..fillStyle = \#000
-      ..lineWidth = 2 * size
+      ..lineWidth = 2 * @data.size
       ..lineCap = \round
       ..moveTo @data.x, @data.y
       ..lineTo do
@@ -176,13 +176,54 @@ class Stroke extends Comp
 class IndexedStroke extends Stroke
   (data, @index) ->
     super data
+    track = @children.0
+    x = track.data.x
+    y = track.data.y
+    vx = track.data.vector.x / track.length
+    vy = track.data.vector.y / track.length
+    up = Math.atan2(vy, vx)
+    up = if Math.PI/2 > up >= - Math.PI/2 then up - Math.PI/2 else up + Math.PI/2
+    upx = Math.cos up
+    upy = Math.sin up
+    x += track.data.size / 2 * vx
+    x += track.data.size * 2 / 3 * upx
+    y += track.data.size / 2 * vy
+    y += track.data.size * 2 / 3 * upy
+    @arrow =
+      rear:
+        x: x - 64 * vx
+        y: y - 64 * vy
+      tip:
+        x: x + 128 * vx
+        y: y + 128 * vy
+      text:
+        x: x + 64 * upx
+        y: y + 64 * upy
+      head:
+        x: x + 64 * vx
+        y: y + 64 * vy
+      edge:
+        x: x + 64 * vx + 32 * upx
+        y: y + 64 * vy + 32 * upy
   afterRender: (ctx) ->
     super ctx
-    if @time is 1
-      ctx
-        ..font = "128px sans-serif"
-        ..fillStyle = "\#f00"
-        ..fillText @index, @children.0.data.x, @children.0.data.y - 72
+    ctx
+      ..strokeStyle = \#c00
+      ..lineWidth = 12
+      ..beginPath!
+      ..moveTo @arrow.rear.x, @arrow.rear.y
+      ..lineTo @arrow.tip.x, @arrow.tip.y
+      ..stroke!
+      ..fillStyle = \#c00
+      ..beginPath!
+      ..moveTo @arrow.head.x, @arrow.head.y
+      ..lineTo @arrow.tip.x, @arrow.tip.y
+      ..lineTo @arrow.edge.x, @arrow.edge.y
+      ..fill!
+      ..font = "128px sans-serif"
+      ..textAlign = \center
+      ..textBaseline = \middle
+      ..fillText @index, @arrow.text.x, @arrow.text.y
 
 (window.zh-stroke-data ?= {})
   ..Comp   = Comp
