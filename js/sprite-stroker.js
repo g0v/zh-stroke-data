@@ -115,7 +115,7 @@
           strokes = [];
           for (j in charData) {
             data = charData[j];
-            strokes.push(new zhStrokeData.Stroke(data));
+            strokes.push(new zhStrokeData.IndexedStroke(data, +j + 1));
             if (+j === it.length - 1) {
               continue;
             }

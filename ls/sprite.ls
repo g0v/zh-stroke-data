@@ -16,6 +16,11 @@ class AABB
     @min.y = pt.y if pt.y < @min.y
     @max.x = pt.x if pt.x > @max.x
     @max.y = pt.y if pt.y > @max.y
+  addBox: (aabb) ->
+    @min.x = aabb.min.x if aabb.min.x < @min.x
+    @min.y = aabb.min.y if aabb.min.y < @min.y
+    @max.x = aabb.max.x if aabb.max.x > @max.x
+    @max.y = aabb.max.y if aabb.max.y > @max.y
   containPoint: (pt) ->
     @min.x < pt.x < @max.x and
     @min.y < pt.y < @max.y
@@ -33,8 +38,7 @@ class Comp
   (@children = [], @aabb = new AABB) ->
     for child in @children
       child.parent = this
-      @aabb.addPoint child.aabb.min
-      @aabb.addPoint child.aabb.max
+      @aabb.addBox child.aabb
     @computeLength!
     @time = 0.0
     @x = @y = 0px
@@ -134,12 +138,12 @@ class Stroke extends Comp
     @outline = data.outline
     aabb = new AABB
     for path in @outline
-      if \x in path
+      if path.x isnt undefined
         aabb.addPoint path
-      if \end in path
+      if path.end isnt undefined
         aabb.addPoint path.begin
         aabb.addPoint path.end
-      if \mid in path
+      if path.mid isnt undefined
         aabb.addPoint path.mid
     super children, aabb
   pathOutline: (ctx) ->
@@ -169,9 +173,21 @@ class Stroke extends Comp
   afterRender: (ctx) ->
     ctx.restore!
 
+class IndexedStroke extends Stroke
+  (data, @index) ->
+    super data
+  afterRender: (ctx) ->
+    super ctx
+    if @time is 1
+      ctx
+        ..font = "128px sans-serif"
+        ..fillStyle = "\#f00"
+        ..fillText @index, @children.0.data.x, @children.0.data.y - 72
+
 (window.zh-stroke-data ?= {})
   ..Comp   = Comp
   ..Empty  = Empty
   ..Track  = Track
   ..Stroke = Stroke
+  ..IndexedStroke = IndexedStroke
 

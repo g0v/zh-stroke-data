@@ -25,18 +25,17 @@ class SpriteStroker
       stroke-delay: 0.2s
       char-delay: 1s
       options
-    @autoplay    = options.autoplay
-    @loop        = options.loop
-    @preload     = options.preload
-    @width       = options.width
-    @height      = options.height
-    @posters     = options.posters
-    @url         = options.url
-    @dataType    = options.dataType
-    @dom-element = document.createElement \canvas
+    @autoplay = options.autoplay
+    @loop     = options.loop
+    @preload  = options.preload
+    @width    = options.width
+    @height   = options.height
+    @posters  = options.posters
+    @url      = options.url
+    @dataType = options.dataType
+    @dom-element        = document.createElement \canvas
     @dom-element.width  = @width
     @dom-element.height = @height
-
     @stroke-gap =
       speed: options.speed
       delay: options.strokeDelay
@@ -92,7 +91,7 @@ class SpriteStroker
       for i, char-data of it
         strokes = []
         for j, data of char-data
-          strokes.push new zh-stroke-data.Stroke data
+          strokes.push new zh-stroke-data.IndexedStroke data, +j + 1
           continue if +j is it.length - 1
           gap = new zh-stroke-data.Empty @stroke-gap
           @stroke-gap.objs.push gap
