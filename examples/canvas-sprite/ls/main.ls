@@ -1,5 +1,7 @@
 $ ->
-  ss = new zh-stroke-data.SpriteStroker \宅度不同 url: '../../json/'
+  ss = new zh-stroke-data.SpriteStroker do
+    \宅度不同
+    url: '../../json/'
 
   $sdelay = $ \#sdelay
   $cdelay = $ \#cdelay
