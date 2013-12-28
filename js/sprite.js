@@ -200,19 +200,19 @@
         ? options
         : {};
       (ref$ = this.options).trackWidth || (ref$.trackWidth = 150);
+      (ref$ = this.data).size || (ref$.size = this.options.trackWidth);
       Track.superclass.call(this);
     }
     prototype.computeLength = function(){
       return this.length = Math.sqrt(this.data.vector.x * this.data.vector.x + this.data.vector.y * this.data.vector.y);
     };
     prototype.render = function(canvas){
-      var size, x$;
-      size = this.data.size || this.options.trackWidth;
+      var x$;
       x$ = canvas.getContext('2d');
       x$.beginPath();
       x$.strokeStyle = '#000';
       x$.fillStyle = '#000';
-      x$.lineWidth = 2 * size;
+      x$.lineWidth = 2 * this.data.size;
       x$.lineCap = 'round';
       x$.moveTo(this.data.x, this.data.y);
       x$.lineTo(this.data.x + this.data.vector.x * this.time, this.data.y + this.data.vector.y * this.time);
@@ -300,19 +300,68 @@
   IndexedStroke = (function(superclass){
     var prototype = extend$((import$(IndexedStroke, superclass).displayName = 'IndexedStroke', IndexedStroke), superclass).prototype, constructor = IndexedStroke;
     function IndexedStroke(data, index){
+      var track, x, y, vx, vy, up, upx, upy;
       this.index = index;
       IndexedStroke.superclass.call(this, data);
+      track = this.children[0];
+      x = track.data.x;
+      y = track.data.y;
+      vx = track.data.vector.x / track.length;
+      vy = track.data.vector.y / track.length;
+      up = Math.atan2(vy, vx);
+      up = Math.PI / 2 > up && up >= -Math.PI / 2
+        ? up - Math.PI / 2
+        : up + Math.PI / 2;
+      upx = Math.cos(up);
+      upy = Math.sin(up);
+      x += track.data.size / 2 * vx;
+      x += track.data.size * 2 / 3 * upx;
+      y += track.data.size / 2 * vy;
+      y += track.data.size * 2 / 3 * upy;
+      this.arrow = {
+        rear: {
+          x: x - 64 * vx,
+          y: y - 64 * vy
+        },
+        tip: {
+          x: x + 128 * vx,
+          y: y + 128 * vy
+        },
+        text: {
+          x: x + 64 * upx,
+          y: y + 64 * upy
+        },
+        head: {
+          x: x + 64 * vx,
+          y: y + 64 * vy
+        },
+        edge: {
+          x: x + 64 * vx + 32 * upx,
+          y: y + 64 * vy + 32 * upy
+        }
+      };
     }
     prototype.afterRender = function(ctx){
       var x$;
       superclass.prototype.afterRender.call(this, ctx);
-      if (this.time === 1) {
-        x$ = ctx;
-        x$.font = "128px sans-serif";
-        x$.fillStyle = "#f00";
-        x$.fillText(this.index, this.children[0].data.x, this.children[0].data.y - 72);
-        return x$;
-      }
+      x$ = ctx;
+      x$.strokeStyle = '#c00';
+      x$.lineWidth = 12;
+      x$.beginPath();
+      x$.moveTo(this.arrow.rear.x, this.arrow.rear.y);
+      x$.lineTo(this.arrow.tip.x, this.arrow.tip.y);
+      x$.stroke();
+      x$.fillStyle = '#c00';
+      x$.beginPath();
+      x$.moveTo(this.arrow.head.x, this.arrow.head.y);
+      x$.lineTo(this.arrow.tip.x, this.arrow.tip.y);
+      x$.lineTo(this.arrow.edge.x, this.arrow.edge.y);
+      x$.fill();
+      x$.font = "128px sans-serif";
+      x$.textAlign = 'center';
+      x$.textBaseline = 'middle';
+      x$.fillText(this.index, this.arrow.text.x, this.arrow.text.y);
+      return x$;
     };
     return IndexedStroke;
   }(Stroke));
