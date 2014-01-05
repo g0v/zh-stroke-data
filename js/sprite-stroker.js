@@ -108,34 +108,46 @@
       }
       promises = res$;
       Q.all(promises).then(function(it){
-        var chars, i, charData, strokes, j, data, gap, char, x$;
+        var chars, arrowGroupGroup, i, charData, strokes, arrows, j, data, stroke, arrow, gap, char, arrowGroup, x$, y$;
         chars = [];
+        arrowGroupGroup = [];
         for (i in it) {
           charData = it[i];
           strokes = [];
+          arrows = [];
           for (j in charData) {
             data = charData[j];
-            strokes.push(new zhStrokeData.IndexedStroke(data, +j + 1));
+            strokes.push(stroke = new zhStrokeData.Stroke(data));
+            arrows.push(arrow = new zhStrokeData.Arrow(stroke, +j + 1));
+            arrow.length = stroke.length;
             if (+j === it.length - 1) {
               continue;
             }
             gap = new zhStrokeData.Empty(this$.strokeGap);
             this$.strokeGap.objs.push(gap);
             strokes.push(gap);
+            arrows.push(gap);
           }
           char = new zhStrokeData.Comp(strokes);
+          arrowGroup = new zhStrokeData.Comp(arrows);
           char.x = this$.width * +i;
+          arrowGroup.x = char.x;
           chars.push(char);
+          arrowGroupGroup.push(arrowGroup);
           if (+i === it.length - 1) {
             continue;
           }
           gap = new zhStrokeData.Empty(this$.charGap);
           this$.charGap.objs.push(gap);
           chars.push(gap);
+          arrowGroupGroup.push(gap);
         }
         x$ = this$.sprite = new zhStrokeData.Comp(chars);
         x$.scaleX = this$.width / 2150;
         x$.scaleY = this$.height / 2150;
+        y$ = this$.arrowSprite = new zhStrokeData.Comp(arrowGroupGroup);
+        y$.scaleX = this$.width / 2150;
+        y$.scaleY = this$.height / 2150;
         return this$.domElement.width = this$.width * promises.length;
       });
     }
@@ -168,8 +180,10 @@
       var step;
       if (this.sprite) {
         this.sprite.render(this.domElement);
+        this.arrowSprite.render(this.domElement);
         step = this.speed * 1 / 60;
         this.sprite.time += step / this.sprite.length;
+        this.arrowSprite.time = this.sprite.time;
         this.currentTime = this.sprite.time * this.sprite.length / this.speed;
       }
       if (!this.paused && this.sprite.time < 1) {

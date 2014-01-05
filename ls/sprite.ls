@@ -1,4 +1,44 @@
 class AABB
+  scan = (group, axis = \x) ->
+    | not Array.isArray group         => throw new Error 'not a group of AABBs'
+    | group.0.min[axis] is undefined  => throw new Error 'axis not found'
+    | otherwise
+      points = []
+      for box in group
+        if not box.isEmpty!
+          points.push do
+            box:   box
+            value: box.min[axis]
+            depth: 1
+          points.push do
+            value: box.max[axis]
+            depth: -1
+      points.sort (a, b) ->
+        | a.value <  b.value => -1
+        | a.value is b.value => 0
+        | a.value >  b.value => 1
+      groups = []
+      g = []
+      d = 0
+      for p in points
+        d += p.depth
+        if d isnt 0
+          g.push p.box if p.box
+        else
+          groups.push g
+          g = []
+      result = []
+      another-axis = if axis is \x then \y else \x
+      if groups.length > 1
+        for g in groups
+          result = result.concat scan(g, another-axis)
+      else
+        result = groups
+      result
+  @rdc = (g) ->
+    xs = scan g, \x
+    ys = scan g, \y
+    if xs.length > ys.length then xs else ys
   (
     @min = x: Infinity, y: Infinity
     @max = x: -Infinity, y: -Infinity
@@ -9,6 +49,8 @@ class AABB
       get: -> @max.y - @min.y
     Object.defineProperty @, "size",
       get: -> @width * @height
+  isEmpty: ->
+    @min.x >= @max.x or @min.y >= @max.y
   clone: ->
     new AABB(@min, @max)
   addPoint: (pt) ->
@@ -26,10 +68,10 @@ class AABB
     @min.y < pt.y < @max.y
   delta: (box) ->
     new AABB(@min, box.min).size + new AABB(@max, box.max).size
-  render: (canvas) ->
+  render: (canvas, color = \#f00, width = 10px) ->
     canvas.getContext \2d
-      ..strokeStyle = \#f00
-      ..lineWidth = 10px
+      ..strokeStyle = color
+      ..lineWidth = width
       ..beginPath!
       ..rect @min.x, @min.y, @width, @height
       ..stroke!
@@ -70,7 +112,9 @@ class Comp
       prev.concat child.hitTest pt
     , results
   beforeRender: (ctx) ->
+  doRender: (ctx) ->
   afterRender: (ctx) ->
+  # please dont override this method
   render: (canvas) ->
     # calculating scale and position
     x = @x
@@ -93,6 +137,7 @@ class Comp
       child.time = Math.min(child.length, len) / child.length
       child.render canvas
       len -= child.length
+    @doRender ctx
     @afterRender ctx
 
 class Empty extends Comp
@@ -103,14 +148,14 @@ class Empty extends Comp
 
 class Track extends Comp
   (@data, @options = {}) ->
+    super!
     # TODO: should mv init value out here
     @options.trackWidth or= 150px
     @data.size or= @options.trackWidth
-    super!
   computeLength: ->
     @length = Math.sqrt @data.vector.x * @data.vector.x + @data.vector.y * @data.vector.y
-  render: (canvas) ->
-    canvas.getContext \2d
+  doRender: (ctx) ->
+    ctx
       ..beginPath!
       ..strokeStyle = \#000
       ..fillStyle = \#000
@@ -173,40 +218,43 @@ class Stroke extends Comp
   afterRender: (ctx) ->
     ctx.restore!
 
-class IndexedStroke extends Stroke
-  (data, @index) ->
-    super data
-    track = @children.0
-    x = track.data.x
-    y = track.data.y
-    vx = track.data.vector.x / track.length
-    vy = track.data.vector.y / track.length
-    up = Math.atan2(vy, vx)
-    up = if Math.PI/2 > up >= - Math.PI/2 then up - Math.PI/2 else up + Math.PI/2
-    upx = Math.cos up
-    upy = Math.sin up
-    x += track.data.size / 2 * vx
-    x += track.data.size * 2 / 3 * upx
-    y += track.data.size / 2 * vy
-    y += track.data.size * 2 / 3 * upy
+class Arrow extends Comp
+  (@stroke, @index) ->
+    super!
+    track = stroke.children.0
+    data = track.data
+    @vector =
+      x: data.vector.x / track.length
+      y: data.vector.y / track.length
+    angle = Math.atan2(@vector.y, @vector.x)
+    angle = if Math.PI/2 > angle >= - Math.PI/2 then angle - Math.PI/2 else angle + Math.PI/2
+    @up =
+      x: Math.cos angle
+      y: Math.sin angle
+    x  = data.size / 2 * @vector.x
+    y  = data.size / 2 * @vector.y
+    x += data.size * 2 / 3 * @up.x
+    y += data.size * 2 / 3 * @up.y
     @arrow =
       rear:
-        x: x - 64 * vx
-        y: y - 64 * vy
+        x: x - 64 * @vector.x
+        y: y - 64 * @vector.y
       tip:
-        x: x + 128 * vx
-        y: y + 128 * vy
+        x: x + 128 * @vector.x
+        y: y + 128 * @vector.y
       text:
-        x: x + 64 * upx
-        y: y + 64 * upy
+        x: x + 64 * @up.x
+        y: y + 64 * @up.y
       head:
-        x: x + 64 * vx
-        y: y + 64 * vy
+        x: x + 64 * @vector.x
+        y: y + 64 * @vector.y
       edge:
-        x: x + 64 * vx + 32 * upx
-        y: y + 64 * vy + 32 * upy
-  afterRender: (ctx) ->
-    super ctx
+        x: x + 64 * @vector.x + 32 * @up.x
+        y: y + 64 * @vector.y + 32 * @up.y
+  computeLength: ->
+    @length = @stroke.length
+  doRender: (ctx) ->
+    /*
     ctx
       ..strokeStyle = \#c00
       ..lineWidth = 12
@@ -224,11 +272,12 @@ class IndexedStroke extends Stroke
       ..textAlign = \center
       ..textBaseline = \middle
       ..fillText @index, @arrow.text.x, @arrow.text.y
+    */
 
 (window.zh-stroke-data ?= {})
+  ..AABB   = AABB
   ..Comp   = Comp
   ..Empty  = Empty
   ..Track  = Track
   ..Stroke = Stroke
-  ..IndexedStroke = IndexedStroke
-
+  ..Arrow  = Arrow

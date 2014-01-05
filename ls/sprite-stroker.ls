@@ -88,23 +88,36 @@ class SpriteStroker
       @@loaders[@dataType] "#{@url}#{ch.codePointAt!toString 16}.#{@dataType}"
     Q.all(promises).then ~>
       chars = []
+      # WTF XDDDD
+      arrowGroupGroup = []
       for i, char-data of it
         strokes = []
+        arrows  = []
         for j, data of char-data
-          strokes.push new zh-stroke-data.IndexedStroke data, +j + 1
+          strokes.push (stroke = new zh-stroke-data.Stroke data)
+          arrows.push  (arrow = new zh-stroke-data.Arrow stroke, +j+1)
+          arrow.length = stroke.length
           continue if +j is it.length - 1
           gap = new zh-stroke-data.Empty @stroke-gap
           @stroke-gap.objs.push gap
           strokes.push gap
+          arrows.push  gap
         char = new zh-stroke-data.Comp strokes
+        arrowGroup = new zh-stroke-data.Comp arrows
         # should be char width
         char.x = @width * +i
+        arrowGroup.x = char.x
         chars.push char
+        arrowGroupGroup.push arrowGroup
         continue if +i is it.length - 1
         gap = new zh-stroke-data.Empty @char-gap
         @char-gap.objs.push gap
         chars.push gap
+        arrowGroupGroup.push gap
       (@sprite = new zh-stroke-data.Comp chars)
+        ..scale-x = @width  / 2150
+        ..scale-y = @height / 2150
+      (@arrowSprite = new zh-stroke-data.Comp arrowGroupGroup)
         ..scale-x = @width  / 2150
         ..scale-y = @height / 2150
       @dom-element.width  = @width * promises.length
@@ -147,8 +160,10 @@ class SpriteStroker
   play               : !~>
     if @sprite
       @sprite.render @dom-element
+      @arrowSprite.render @dom-element
       step = @speed * 1 / 60
       @sprite.time += step / @sprite.length
+      @arrowSprite.time = @sprite.time
       @currentTime = @sprite.time * @sprite.length / @speed
     # should get interval from Date
     requestAnimationFrame @play if not @paused and @sprite.time < 1
