@@ -7,7 +7,6 @@
     axises = ['x', 'y'];
     scan = function(group, axis){
       var points, i$, len$, box, groups, g, d, p;
-      axis == null && (axis = 'x');
       switch (false) {
       case !!Array.isArray(group):
         throw new Error('first argument should be an array');
@@ -94,6 +93,41 @@
         return results$;
       }
     };
+    AABB.collide = function(it){
+      var result, i$, to$, i, j$, to1$, j;
+      switch (false) {
+      case !!Array.isArray(it):
+        throw new Error('first argument should be an array');
+      default:
+        result = [];
+        for (i$ = 0, to$ = it.length; i$ < to$; ++i$) {
+          i = i$;
+          for (j$ = i + 1, to1$ = it.length; j$ < to1$; ++j$) {
+            j = j$;
+            if (it[i].intersect(it[j])) {
+              result.push([it[i], it[j]]);
+            }
+          }
+        }
+        return result;
+      }
+    };
+    AABB.hit = function(it){
+      var g;
+      switch (false) {
+      case !!Array.isArray(it):
+        throw new Error('first argument should be an array');
+      default:
+        return Array.prototype.concat.apply([], (function(){
+          var i$, ref$, len$, results$ = [];
+          for (i$ = 0, len$ = (ref$ = this.rdc(it)).length; i$ < len$; ++i$) {
+            g = ref$[i$];
+            results$.push(this.collide(g));
+          }
+          return results$;
+        }.call(this)));
+      }
+    };
     function AABB(min, max){
       this.min = min != null
         ? min
@@ -107,22 +141,28 @@
           x: -Infinity,
           y: -Infinity
         };
-      Object.defineProperty(this, "width", {
-        get: function(){
-          return this.max.x - this.min.x;
-        }
-      });
-      Object.defineProperty(this, "height", {
-        get: function(){
-          return this.max.y - this.min.y;
-        }
-      });
-      Object.defineProperty(this, "size", {
-        get: function(){
-          return this.width * this.height;
-        }
-      });
     }
+    Object.defineProperty(prototype, 'width', {
+      get: function(){
+        return this.max.x - this.min.x;
+      },
+      configurable: true,
+      enumerable: true
+    });
+    Object.defineProperty(prototype, 'height', {
+      get: function(){
+        return this.max.y - this.min.y;
+      },
+      configurable: true,
+      enumerable: true
+    });
+    Object.defineProperty(prototype, 'size', {
+      get: function(){
+        return this.width * this.height;
+      },
+      configurable: true,
+      enumerable: true
+    });
     prototype.isEmpty = function(){
       return this.min.x >= this.max.x || this.min.y >= this.max.y;
     };
@@ -160,6 +200,9 @@
     prototype.containPoint = function(pt){
       var ref$;
       return (this.min.x < (ref$ = pt.x) && ref$ < this.max.x) && (this.min.y < (ref$ = pt.y) && ref$ < this.max.y);
+    };
+    prototype.intersect = function(it){
+      return this.min.x <= it.max.x && this.max.x >= it.min.x && this.min.y <= it.max.y && this.max.y >= it.min.y;
     };
     prototype.delta = function(box){
       return new AABB(this.min, box.min).size + new AABB(this.max, box.max).size;

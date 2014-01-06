@@ -1,6 +1,6 @@
 class AABB
   axises = <[ x y ]>
-  scan = (group, axis = \x) ->
+  scan = (group, axis) ->
     | not Array.isArray group         => throw new Error 'first argument should be an array'
     | group.0.min[axis] is undefined  => throw new Error 'axis not found'
     | otherwise
@@ -30,7 +30,7 @@ class AABB
           g = []
       groups
   @rdc = (g, todo = axises.slice!) ->
-    | not Array.isArray g         => throw new Error 'first argument should be an array'
+    | not Array.isArray g => throw new Error 'first argument should be an array'
     | otherwise
       # 
       results = for axis in todo
@@ -45,16 +45,29 @@ class AABB
           gs
       # return longest groups
       results.reduce (c, n) -> if c.length > n.length then c else n
+  @collide = ->
+    | not Array.isArray it => throw new Error 'first argument should be an array'
+    | otherwise
+      result = []
+      for i from 0 til it.length
+        for j from i+1 til it.length
+          if it[i].intersect it[j]
+            result.push [it[i], it[j]]
+      result
+  @hit = ->
+    | not Array.isArray it => throw new Error 'first argument should be an array'
+    | otherwise
+      Array::concat.apply [], for g in @rdc it => @collide g
   (
     @min = x: Infinity, y: Infinity
     @max = x: -Infinity, y: -Infinity
   ) ->
-    Object.defineProperty @, "width",
-      get: -> @max.x - @min.x
-    Object.defineProperty @, "height",
-      get: -> @max.y - @min.y
-    Object.defineProperty @, "size",
-      get: -> @width * @height
+  width:~
+    -> @max.x - @min.x
+  height:~
+    -> @max.y - @min.y
+  size:~
+    -> @width * @height
   isEmpty: ->
     @min.x >= @max.x or @min.y >= @max.y
   clone: ->
@@ -72,6 +85,9 @@ class AABB
   containPoint: (pt) ->
     @min.x < pt.x < @max.x and
     @min.y < pt.y < @max.y
+  intersect: ->
+    @min.x <= it.max.x and @max.x >= it.min.x and
+    @min.y <= it.max.y and @max.y >= it.min.y
   delta: (box) ->
     new AABB(@min, box.min).size + new AABB(@max, box.max).size
   render: (canvas, color = \#f00, width = 10px) ->
