@@ -1,6 +1,7 @@
 class AABB
+  axises = <[ x y ]>
   scan = (group, axis = \x) ->
-    | not Array.isArray group         => throw new Error 'not a group of AABBs'
+    | not Array.isArray group         => throw new Error 'first argument should be an array'
     | group.0.min[axis] is undefined  => throw new Error 'axis not found'
     | otherwise
       points = []
@@ -15,7 +16,7 @@ class AABB
             depth: -1
       points.sort (a, b) ->
         | a.value <  b.value => -1
-        | a.value is b.value => 0
+        | a.value == b.value => 0
         | a.value >  b.value => 1
       groups = []
       g = []
@@ -27,18 +28,23 @@ class AABB
         else
           groups.push g
           g = []
-      result = []
-      another-axis = if axis is \x then \y else \x
-      if groups.length > 1
-        for g in groups
-          result = result.concat scan(g, another-axis)
-      else
-        result = groups
-      result
-  @rdc = (g) ->
-    xs = scan g, \x
-    ys = scan g, \y
-    if xs.length > ys.length then xs else ys
+      groups
+  @rdc = (g, todo = axises.slice!) ->
+    | not Array.isArray g         => throw new Error 'first argument should be an array'
+    | otherwise
+      # 
+      results = for axis in todo
+        gs = scan g, axis
+        if gs.length > 1
+          # group split, do rdc in other axises
+          next = axises.slice!
+          next.splice next.indexOf(axis), 1
+          # collect all sub groups
+          Array::concat.apply [], for g in gs => @rdc g, next
+        else
+          gs
+      # return longest groups
+      results.reduce (c, n) -> if c.length > n.length then c else n
   (
     @min = x: Infinity, y: Infinity
     @max = x: -Infinity, y: -Infinity

@@ -3,13 +3,14 @@
   var AABB, Comp, Empty, Track, Stroke, Arrow, x$, ref$;
   AABB = (function(){
     AABB.displayName = 'AABB';
-    var scan, prototype = AABB.prototype, constructor = AABB;
+    var axises, scan, prototype = AABB.prototype, constructor = AABB;
+    axises = ['x', 'y'];
     scan = function(group, axis){
-      var points, i$, len$, box, groups, g, d, p, result, anotherAxis;
+      var points, i$, len$, box, groups, g, d, p;
       axis == null && (axis = 'x');
       switch (false) {
       case !!Array.isArray(group):
-        throw new Error('not a group of AABBs');
+        throw new Error('first argument should be an array');
       case group[0].min[axis] !== undefined:
         throw new Error('axis not found');
       default:
@@ -53,27 +54,44 @@
             g = [];
           }
         }
-        result = [];
-        anotherAxis = axis === 'x' ? 'y' : 'x';
-        if (groups.length > 1) {
-          for (i$ = 0, len$ = groups.length; i$ < len$; ++i$) {
-            g = groups[i$];
-            result = result.concat(scan(g, anotherAxis));
-          }
-        } else {
-          result = groups;
-        }
-        return result;
+        return groups;
       }
     };
-    AABB.rdc = function(g){
-      var xs, ys;
-      xs = scan(g, 'x');
-      ys = scan(g, 'y');
-      if (xs.length > ys.length) {
-        return xs;
-      } else {
-        return ys;
+    AABB.rdc = function(g, todo){
+      var results, res$, i$, len$, axis, gs, next;
+      todo == null && (todo = axises.slice());
+      switch (false) {
+      case !!Array.isArray(g):
+        throw new Error('first argument should be an array');
+      default:
+        res$ = [];
+        for (i$ = 0, len$ = todo.length; i$ < len$; ++i$) {
+          axis = todo[i$];
+          gs = scan(g, axis);
+          if (gs.length > 1) {
+            next = axises.slice();
+            next.splice(next.indexOf(axis), 1);
+            res$.push(Array.prototype.concat.apply([], (fn$.call(this))));
+          } else {
+            res$.push(gs);
+          }
+        }
+        results = res$;
+        return results.reduce(function(c, n){
+          if (c.length > n.length) {
+            return c;
+          } else {
+            return n;
+          }
+        });
+      }
+      function fn$(){
+        var i$, ref$, len$, results$ = [];
+        for (i$ = 0, len$ = (ref$ = gs).length; i$ < len$; ++i$) {
+          g = ref$[i$];
+          results$.push(this.rdc(g, next));
+        }
+        return results$;
       }
     };
     function AABB(min, max){
