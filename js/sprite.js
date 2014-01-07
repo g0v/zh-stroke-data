@@ -401,7 +401,7 @@
       x$.beginPath();
       x$.strokeStyle = '#000';
       x$.fillStyle = '#000';
-      x$.lineWidth = 2 * this.data.size;
+      x$.lineWidth = 4 * this.data.size;
       x$.lineCap = 'round';
       x$.moveTo(this.data.x, this.data.y);
       x$.lineTo(this.data.x + this.data.vector.x * this.time, this.data.y + this.data.vector.y * this.time);
@@ -486,10 +486,24 @@
   Arrow = (function(superclass){
     var prototype = extend$((import$(Arrow, superclass).displayName = 'Arrow', Arrow), superclass).prototype, constructor = Arrow;
     function Arrow(stroke, index){
-      var track, data, angle, x, y;
+      var max, track0, track, i$, ref$, len$, t, data, angle, x, y;
       this.stroke = stroke;
       this.index = index;
-      track = stroke.children[0];
+      max = stroke.children.reduce(function(c, n){
+        if (c.length > n.length) {
+          return c;
+        } else {
+          return n;
+        }
+      });
+      track0 = stroke.children[0];
+      for (i$ = 0, len$ = (ref$ = stroke.children).length; i$ < len$; ++i$) {
+        t = ref$[i$];
+        if (t.length > max.length / 2.5) {
+          track = t;
+          break;
+        }
+      }
       data = track.data;
       this.vector = {
         x: data.vector.x / track.length,
@@ -505,41 +519,42 @@
       };
       x = data.size / 2 * this.vector.x;
       y = data.size / 2 * this.vector.y;
-      x += data.size * 2 / 3 * this.up.x;
-      y += data.size * 2 / 3 * this.up.y;
+      x += data.size / 2 * this.up.x;
+      y += data.size / 2 * this.up.y;
+      this.textSize = 48;
       this.arrow = {
         rear: {
-          x: x - 64 * this.vector.x,
-          y: y - 64 * this.vector.y
+          x: x - this.textSize * this.vector.x,
+          y: y - this.textSize * this.vector.y
         },
         tip: {
-          x: x + 128 * this.vector.x,
-          y: y + 128 * this.vector.y
+          x: x + 2 * this.textSize * this.vector.x,
+          y: y + 2 * this.textSize * this.vector.y
         },
         text: {
-          x: x + 64 * this.up.x,
-          y: y + 64 * this.up.y
+          x: x + this.textSize * this.up.x,
+          y: y + this.textSize * this.up.y
         },
         textMin: {
-          x: x + 64 * this.up.x - 64,
-          y: y + 64 * this.up.y - 64
+          x: x + this.textSize * this.up.x - this.textSize,
+          y: y + this.textSize * this.up.y - this.textSize
         },
         textMax: {
-          x: x + 64 * this.up.x + 64,
-          y: y + 64 * this.up.y + 64
+          x: x + this.textSize * this.up.x + this.textSize,
+          y: y + this.textSize * this.up.y + this.textSize
         },
         head: {
-          x: x + 64 * this.vector.x,
-          y: y + 64 * this.vector.y
+          x: x + this.textSize * this.vector.x,
+          y: y + this.textSize * this.vector.y
         },
         edge: {
-          x: x + 64 * this.vector.x + 32 * this.up.x,
-          y: y + 64 * this.vector.y + 32 * this.up.y
+          x: x + this.textSize * this.vector.x + this.textSize * this.up.x,
+          y: y + this.textSize * this.vector.y + this.textSize * this.up.y
         }
       };
       Arrow.superclass.call(this);
-      this.x = stroke.x + data.x;
-      this.y = stroke.y + data.y;
+      this.x = stroke.x + track0.data.x;
+      this.y = stroke.y + track0.data.y;
     }
     prototype.computeLength = function(){
       return this.length = this.stroke.length;
@@ -567,7 +582,7 @@
       x$.lineTo(this.arrow.tip.x, this.arrow.tip.y);
       x$.lineTo(this.arrow.edge.x, this.arrow.edge.y);
       x$.fill();
-      x$.font = "128px sans-serif";
+      x$.font = 2 * this.textSize + "px sans-serif";
       x$.textAlign = 'center';
       x$.textBaseline = 'middle';
       x$.fillText(this.index, this.arrow.text.x, this.arrow.text.y);
