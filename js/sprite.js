@@ -520,6 +520,14 @@
           x: x + 64 * this.up.x,
           y: y + 64 * this.up.y
         },
+        textMin: {
+          x: x + 64 * this.up.x - 64,
+          y: y + 64 * this.up.y - 64
+        },
+        textMax: {
+          x: x + 64 * this.up.x + 64,
+          y: y + 64 * this.up.y + 64
+        },
         head: {
           x: x + 64 * this.vector.x,
           y: y + 64 * this.vector.y
