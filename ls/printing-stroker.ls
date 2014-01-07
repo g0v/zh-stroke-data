@@ -37,7 +37,6 @@ class PrintingStroker
         strokes
       @dom-element.width  = @width  * max
       @dom-element.height = @height * chars.length
-      console.log chars
       for i, c of chars
         i = +i
         for j of c
@@ -47,7 +46,7 @@ class PrintingStroker
               ..time = 1
               ..x = @width  * j
               ..y = @height * i
-              ..render @dom-element
+              ..render @dom-element.getContext \2d
 
 (window.zh-stroke-data ?= {})
   ..PrintingStroker = PrintingStroker

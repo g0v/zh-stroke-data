@@ -130,7 +130,7 @@
           }
           char = new zhStrokeData.Comp(strokes);
           arrowGroup = new zhStrokeData.Comp(arrows);
-          char.x = this$.width * +i;
+          char.x = 2150 * +i;
           arrowGroup.x = char.x;
           chars.push(char);
           arrowGroupGroup.push(arrowGroup);
@@ -177,10 +177,11 @@
       this.paused = !!it;
     };
     prototype.play = function(){
-      var step;
+      var ctx, step;
       if (this.sprite) {
-        this.sprite.render(this.domElement);
-        this.arrowSprite.render(this.domElement);
+        ctx = this.domElement.getContext('2d');
+        this.sprite.render(ctx);
+        this.arrowSprite.render(ctx, true);
         step = this.speed * 1 / 60;
         this.sprite.time += step / this.sprite.length;
         this.arrowSprite.time = this.sprite.time;

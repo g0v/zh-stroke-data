@@ -7,6 +7,7 @@ class AABB
       points = []
       for box in group
         if not box.isEmpty!
+          # should not do this over and over again
           points.push do
             box:   box
             value: box.min[axis]
@@ -62,6 +63,10 @@ class AABB
     @min = x: Infinity, y: Infinity
     @max = x: -Infinity, y: -Infinity
   ) ->
+    if isNaN @min.x then @min.x = Infinity
+    if isNaN @min.y then @min.y = Infinity
+    if isNaN @max.x then @max.x = -Infinity
+    if isNaN @max.y then @max.y = -Infinity
   width:~
     -> @max.x - @min.x
   height:~
@@ -72,12 +77,22 @@ class AABB
     @min.x >= @max.x or @min.y >= @max.y
   clone: ->
     new AABB(@min, @max)
-  addPoint: (pt) ->
+  # lame solution
+  transform: (m00, m01, m10, m11, m20, m21) ->
+    aabb = new AABB {
+      x: m00 * @min.x + m10 * @min.y + m20
+      y: m01 * @min.x + m11 * @min.y + m21
+    },{
+      x: m00 * @max.x + m10 * @max.y + m20
+      y: m01 * @max.x + m11 * @max.y + m21
+    }
+    aabb
+  addPoint: (pt) !->
     @min.x = pt.x if pt.x < @min.x
     @min.y = pt.y if pt.y < @min.y
     @max.x = pt.x if pt.x > @max.x
     @max.y = pt.y if pt.y > @max.y
-  addBox: (aabb) ->
+  addBox: (aabb) !->
     @min.x = aabb.min.x if aabb.min.x < @min.x
     @min.y = aabb.min.y if aabb.min.y < @min.y
     @max.x = aabb.max.x if aabb.max.x > @max.x
@@ -88,10 +103,9 @@ class AABB
   intersect: ->
     @min.x <= it.max.x and @max.x >= it.min.x and
     @min.y <= it.max.y and @max.y >= it.min.y
-  delta: (box) ->
-    new AABB(@min, box.min).size + new AABB(@max, box.max).size
-  render: (canvas, color = \#f00, width = 10px) ->
-    canvas.getContext \2d
+  render: (ctx, color = \#f90, width = 10px) !->
+    return if @isEmpty!
+    ctx
       ..strokeStyle = color
       ..lineWidth = width
       ..beginPath!
@@ -99,10 +113,10 @@ class AABB
       ..stroke!
 
 class Comp
-  (@children = [], @aabb = new AABB) ->
+  (@children = []) ->
     for child in @children
       child.parent = this
-      @aabb.addBox child.aabb
+    @computeAABB!
     @computeLength!
     @time = 0.0
     @x = @y = 0px
@@ -112,6 +126,14 @@ class Comp
     @length = @children.reduce (prev, current) ->
       prev + current.length
     , 0
+  computeAABB: ->
+    @aabb = new AABB
+    for c in @children
+      @aabb.addBox c.aabb.transform do
+        c.scale-x, 0,
+        0, c.scale-y,
+        c.x,     c.y
+    @aabb
   childrenChanged: !->
     @computeLength!
     len = 0
@@ -133,31 +155,22 @@ class Comp
     @children.reduce (prev, child) ->
       prev.concat child.hitTest pt
     , results
-  beforeRender: (ctx) ->
-  doRender: (ctx) ->
-  afterRender: (ctx) ->
+  beforeRender: (ctx) !->
+    ctx
+      ..save!
+      ..transform @scale-x, 0, 0, @scale-y, @x, @y
+  doRender:     (ctx) !->
+  afterRender:  (ctx) !-> ctx.restore!
   # please dont override this method
-  render: (canvas) ->
-    # calculating scale and position
-    x = @x
-    y = @y
-    scaleX = @scaleX
-    scaleY = @scaleY
-    p = @parent
-    while p
-      x += p.x
-      y += p.y
-      scaleX *= p.scaleX
-      scaleY *= p.scaleY
-      p = p.parent
-    (ctx = canvas.getContext \2d)
-      .setTransform scaleX, 0, 0, scaleY, x, y
+  render: (ctx, aabb = off) !->
+    #ctx.transform @scale-x, 0, 0, @scale-y, @x, @y
     @beforeRender ctx
+    @aabb.render ctx if aabb
     len = @length * @time
     for child in @children | len > 0
       continue if child.length is 0
       child.time = Math.min(child.length, len) / child.length
-      child.render canvas
+      child.render ctx, aabb
       len -= child.length
     @doRender ctx
     @afterRender ctx
@@ -166,17 +179,27 @@ class Empty extends Comp
   (@data) -> super!
   computeLength: ->
     @length = @data.speed * @data.delay
-  render: ->
+  computeAABB: ->
+    @aabb = new AABB
+  render: ~>
 
 class Track extends Comp
   (@data, @options = {}) ->
-    super!
     # TODO: should mv init value out here
     @options.trackWidth or= 150px
     @data.size or= @options.trackWidth
+    super!
   computeLength: ->
     @length = Math.sqrt @data.vector.x * @data.vector.x + @data.vector.y * @data.vector.y
-  doRender: (ctx) ->
+  computeAABB: ->
+    @aabb = new AABB {
+      x: @data.x
+      y: @data.y
+    },{
+      x: @data.x + @data.vector.x
+      y: @data.y + @data.vector.y
+    }
+  doRender: (ctx) !->
     ctx
       ..beginPath!
       ..strokeStyle = \#000
@@ -203,17 +226,19 @@ class Stroke extends Comp
           y: current.y - prev.y
         size: prev.size
     @outline = data.outline
-    aabb = new AABB
+    super children
+  computeAABB: ->
+    @aabb = new AABB
     for path in @outline
       if path.x isnt undefined
-        aabb.addPoint path
+        @aabb.addPoint path
       if path.end isnt undefined
-        aabb.addPoint path.begin
-        aabb.addPoint path.end
+        @aabb.addPoint path.begin
+        @aabb.addPoint path.end
       if path.mid isnt undefined
-        aabb.addPoint path.mid
-    super children, aabb
-  pathOutline: (ctx) ->
+        @aabb.addPoint path.mid
+    @aabb
+  pathOutline: (ctx) !->
     for path in @outline
       switch path.type
         when \M
@@ -229,20 +254,19 @@ class Stroke extends Comp
           ctx.quadraticCurveTo do
             path.begin.x, path.begin.y,
             path.end.x, path.end.y
-  hitTest: (pt) ->
-    if @aabb.containPoint pt then [@] else []
-  beforeRender: (ctx) ->
+  beforeRender: (ctx) !->
+    super ctx
     ctx
       ..save!
       ..beginPath!
     @pathOutline ctx
     ctx.clip!
-  afterRender: (ctx) ->
+  afterRender: (ctx) !->
     ctx.restore!
+    super ctx
 
 class Arrow extends Comp
   (@stroke, @index) ->
-    super!
     track = stroke.children.0
     data = track.data
     @vector =
@@ -253,8 +277,8 @@ class Arrow extends Comp
     @up =
       x: Math.cos angle
       y: Math.sin angle
-    x  = data.size / 2 * @vector.x
-    y  = data.size / 2 * @vector.y
+    x = data.size / 2 * @vector.x
+    y = data.size / 2 * @vector.y
     x += data.size * 2 / 3 * @up.x
     y += data.size * 2 / 3 * @up.y
     @arrow =
@@ -273,10 +297,18 @@ class Arrow extends Comp
       edge:
         x: x + 64 * @vector.x + 32 * @up.x
         y: y + 64 * @vector.y + 32 * @up.y
+    super!
+    @x = stroke.x + data.x
+    @y = stroke.y + data.y
   computeLength: ->
     @length = @stroke.length
-  doRender: (ctx) ->
-    /*
+  computeAABB: ->
+    @aabb = new AABB
+    for key of @arrow
+      @aabb.addPoint @arrow[key]
+    @aabb
+  render: !-> super it, on
+  doRender: (ctx) !->
     ctx
       ..strokeStyle = \#c00
       ..lineWidth = 12
@@ -294,7 +326,6 @@ class Arrow extends Comp
       ..textAlign = \center
       ..textBaseline = \middle
       ..fillText @index, @arrow.text.x, @arrow.text.y
-    */
 
 (window.zh-stroke-data ?= {})
   ..AABB   = AABB

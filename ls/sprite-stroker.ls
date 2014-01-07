@@ -105,7 +105,7 @@ class SpriteStroker
         char = new zh-stroke-data.Comp strokes
         arrowGroup = new zh-stroke-data.Comp arrows
         # should be char width
-        char.x = @width * +i
+        char.x = 2150 * +i
         arrowGroup.x = char.x
         chars.push char
         arrowGroupGroup.push arrowGroup
@@ -159,8 +159,9 @@ class SpriteStroker
   pause              : !-> @paused = !!it
   play               : !~>
     if @sprite
-      @sprite.render @dom-element
-      @arrowSprite.render @dom-element
+      ctx = @dom-element.getContext \2d
+      @sprite.render ctx
+      @arrowSprite.render ctx, on
       step = @speed * 1 / 60
       @sprite.time += step / @sprite.length
       @arrowSprite.time = @sprite.time

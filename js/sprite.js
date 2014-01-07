@@ -141,6 +141,18 @@
           x: -Infinity,
           y: -Infinity
         };
+      if (isNaN(this.min.x)) {
+        this.min.x = Infinity;
+      }
+      if (isNaN(this.min.y)) {
+        this.min.y = Infinity;
+      }
+      if (isNaN(this.max.x)) {
+        this.max.x = -Infinity;
+      }
+      if (isNaN(this.max.y)) {
+        this.max.y = -Infinity;
+      }
     }
     Object.defineProperty(prototype, 'width', {
       get: function(){
@@ -169,6 +181,17 @@
     prototype.clone = function(){
       return new AABB(this.min, this.max);
     };
+    prototype.transform = function(m00, m01, m10, m11, m20, m21){
+      var aabb;
+      aabb = new AABB({
+        x: m00 * this.min.x + m10 * this.min.y + m20,
+        y: m01 * this.min.x + m11 * this.min.y + m21
+      }, {
+        x: m00 * this.max.x + m10 * this.max.y + m20,
+        y: m01 * this.max.x + m11 * this.max.y + m21
+      });
+      return aabb;
+    };
     prototype.addPoint = function(pt){
       if (pt.x < this.min.x) {
         this.min.x = pt.x;
@@ -180,7 +203,7 @@
         this.max.x = pt.x;
       }
       if (pt.y > this.max.y) {
-        return this.max.y = pt.y;
+        this.max.y = pt.y;
       }
     };
     prototype.addBox = function(aabb){
@@ -194,7 +217,7 @@
         this.max.x = aabb.max.x;
       }
       if (aabb.max.y > this.max.y) {
-        return this.max.y = aabb.max.y;
+        this.max.y = aabb.max.y;
       }
     };
     prototype.containPoint = function(pt){
@@ -204,39 +227,35 @@
     prototype.intersect = function(it){
       return this.min.x <= it.max.x && this.max.x >= it.min.x && this.min.y <= it.max.y && this.max.y >= it.min.y;
     };
-    prototype.delta = function(box){
-      return new AABB(this.min, box.min).size + new AABB(this.max, box.max).size;
-    };
-    prototype.render = function(canvas, color, width){
+    prototype.render = function(ctx, color, width){
       var x$;
-      color == null && (color = '#f00');
+      color == null && (color = '#f90');
       width == null && (width = 10);
-      x$ = canvas.getContext('2d');
+      if (this.isEmpty()) {
+        return;
+      }
+      x$ = ctx;
       x$.strokeStyle = color;
       x$.lineWidth = width;
       x$.beginPath();
       x$.rect(this.min.x, this.min.y, this.width, this.height);
       x$.stroke();
-      return x$;
     };
     return AABB;
   }());
   Comp = (function(){
     Comp.displayName = 'Comp';
     var prototype = Comp.prototype, constructor = Comp;
-    function Comp(children, aabb){
+    function Comp(children){
       var i$, ref$, len$, child;
       this.children = children != null
         ? children
         : [];
-      this.aabb = aabb != null
-        ? aabb
-        : new AABB;
       for (i$ = 0, len$ = (ref$ = this.children).length; i$ < len$; ++i$) {
         child = ref$[i$];
         child.parent = this;
-        this.aabb.addBox(child.aabb);
       }
+      this.computeAABB();
       this.computeLength();
       this.time = 0.0;
       this.x = this.y = 0;
@@ -247,6 +266,15 @@
       return this.length = this.children.reduce(function(prev, current){
         return prev + current.length;
       }, 0);
+    };
+    prototype.computeAABB = function(){
+      var i$, ref$, len$, c;
+      this.aabb = new AABB;
+      for (i$ = 0, len$ = (ref$ = this.children).length; i$ < len$; ++i$) {
+        c = ref$[i$];
+        this.aabb.addBox(c.aabb.transform(c.scaleX, 0, 0, c.scaleY, c.x, c.y));
+      }
+      return this.aabb;
     };
     prototype.childrenChanged = function(){
       var len, i$, ref$, len$, child;
@@ -283,25 +311,23 @@
         return prev.concat(child.hitTest(pt));
       }, results);
     };
-    prototype.beforeRender = function(ctx){};
+    prototype.beforeRender = function(ctx){
+      var x$;
+      x$ = ctx;
+      x$.save();
+      x$.transform(this.scaleX, 0, 0, this.scaleY, this.x, this.y);
+    };
     prototype.doRender = function(ctx){};
-    prototype.afterRender = function(ctx){};
-    prototype.render = function(canvas){
-      var x, y, scaleX, scaleY, p, ctx, len, i$, ref$, len$, child;
-      x = this.x;
-      y = this.y;
-      scaleX = this.scaleX;
-      scaleY = this.scaleY;
-      p = this.parent;
-      while (p) {
-        x += p.x;
-        y += p.y;
-        scaleX *= p.scaleX;
-        scaleY *= p.scaleY;
-        p = p.parent;
-      }
-      (ctx = canvas.getContext('2d')).setTransform(scaleX, 0, 0, scaleY, x, y);
+    prototype.afterRender = function(ctx){
+      ctx.restore();
+    };
+    prototype.render = function(ctx, aabb){
+      var len, i$, ref$, len$, child;
+      aabb == null && (aabb = false);
       this.beforeRender(ctx);
+      if (aabb) {
+        this.aabb.render(ctx);
+      }
       len = this.length * this.time;
       for (i$ = 0, len$ = (ref$ = this.children).length; i$ < len$; ++i$) {
         child = ref$[i$];
@@ -310,12 +336,12 @@
             continue;
           }
           child.time = Math.min(child.length, len) / child.length;
-          child.render(canvas);
+          child.render(ctx, aabb);
           len -= child.length;
         }
       }
       this.doRender(ctx);
-      return this.afterRender(ctx);
+      this.afterRender(ctx);
     };
     return Comp;
   }());
@@ -323,10 +349,14 @@
     var prototype = extend$((import$(Empty, superclass).displayName = 'Empty', Empty), superclass).prototype, constructor = Empty;
     function Empty(data){
       this.data = data;
+      this.render = bind$(this, 'render', prototype);
       Empty.superclass.call(this);
     }
     prototype.computeLength = function(){
       return this.length = this.data.speed * this.data.delay;
+    };
+    prototype.computeAABB = function(){
+      return this.aabb = new AABB;
     };
     prototype.render = function(){};
     return Empty;
@@ -339,12 +369,21 @@
       this.options = options != null
         ? options
         : {};
-      Track.superclass.call(this);
       (ref$ = this.options).trackWidth || (ref$.trackWidth = 150);
       (ref$ = this.data).size || (ref$.size = this.options.trackWidth);
+      Track.superclass.call(this);
     }
     prototype.computeLength = function(){
       return this.length = Math.sqrt(this.data.vector.x * this.data.vector.x + this.data.vector.y * this.data.vector.y);
+    };
+    prototype.computeAABB = function(){
+      return this.aabb = new AABB({
+        x: this.data.x,
+        y: this.data.y
+      }, {
+        x: this.data.x + this.data.vector.x,
+        y: this.data.y + this.data.vector.y
+      });
     };
     prototype.doRender = function(ctx){
       var x$;
@@ -357,14 +396,13 @@
       x$.moveTo(this.data.x, this.data.y);
       x$.lineTo(this.data.x + this.data.vector.x * this.time, this.data.y + this.data.vector.y * this.time);
       x$.stroke();
-      return x$;
     };
     return Track;
   }(Comp));
   Stroke = (function(superclass){
     var prototype = extend$((import$(Stroke, superclass).displayName = 'Stroke', Stroke), superclass).prototype, constructor = Stroke;
     function Stroke(data){
-      var children, i$, to$, i, prev, current, aabb, ref$, len$, path;
+      var children, i$, to$, i, prev, current;
       children = [];
       for (i$ = 1, to$ = data.track.length; i$ < to$; ++i$) {
         i = i$;
@@ -381,59 +419,57 @@
         }));
       }
       this.outline = data.outline;
-      aabb = new AABB;
+      Stroke.superclass.call(this, children);
+    }
+    prototype.computeAABB = function(){
+      var i$, ref$, len$, path;
+      this.aabb = new AABB;
       for (i$ = 0, len$ = (ref$ = this.outline).length; i$ < len$; ++i$) {
         path = ref$[i$];
         if (path.x !== undefined) {
-          aabb.addPoint(path);
+          this.aabb.addPoint(path);
         }
         if (path.end !== undefined) {
-          aabb.addPoint(path.begin);
-          aabb.addPoint(path.end);
+          this.aabb.addPoint(path.begin);
+          this.aabb.addPoint(path.end);
         }
         if (path.mid !== undefined) {
-          aabb.addPoint(path.mid);
+          this.aabb.addPoint(path.mid);
         }
       }
-      Stroke.superclass.call(this, children, aabb);
-    }
+      return this.aabb;
+    };
     prototype.pathOutline = function(ctx){
-      var i$, ref$, len$, path, results$ = [];
+      var i$, ref$, len$, path;
       for (i$ = 0, len$ = (ref$ = this.outline).length; i$ < len$; ++i$) {
         path = ref$[i$];
         switch (path.type) {
         case 'M':
-          results$.push(ctx.moveTo(path.x, path.y));
+          ctx.moveTo(path.x, path.y);
           break;
         case 'L':
-          results$.push(ctx.lineTo(path.x, path.y));
+          ctx.lineTo(path.x, path.y);
           break;
         case 'C':
-          results$.push(ctx.bezierCurveTo(path.begin.x, path.begin.y, path.mid.x, path.mid.y, path.end.x, path.end.y));
+          ctx.bezierCurveTo(path.begin.x, path.begin.y, path.mid.x, path.mid.y, path.end.x, path.end.y);
           break;
         case 'Q':
-          results$.push(ctx.quadraticCurveTo(path.begin.x, path.begin.y, path.end.x, path.end.y));
+          ctx.quadraticCurveTo(path.begin.x, path.begin.y, path.end.x, path.end.y);
         }
-      }
-      return results$;
-    };
-    prototype.hitTest = function(pt){
-      if (this.aabb.containPoint(pt)) {
-        return [this];
-      } else {
-        return [];
       }
     };
     prototype.beforeRender = function(ctx){
       var x$;
+      superclass.prototype.beforeRender.call(this, ctx);
       x$ = ctx;
       x$.save();
       x$.beginPath();
       this.pathOutline(ctx);
-      return ctx.clip();
+      ctx.clip();
     };
     prototype.afterRender = function(ctx){
-      return ctx.restore();
+      ctx.restore();
+      superclass.prototype.afterRender.call(this, ctx);
     };
     return Stroke;
   }(Comp));
@@ -443,7 +479,6 @@
       var track, data, angle, x, y;
       this.stroke = stroke;
       this.index = index;
-      Arrow.superclass.call(this);
       track = stroke.children[0];
       data = track.data;
       this.vector = {
@@ -484,11 +519,44 @@
           y: y + 64 * this.vector.y + 32 * this.up.y
         }
       };
+      Arrow.superclass.call(this);
+      this.x = stroke.x + data.x;
+      this.y = stroke.y + data.y;
     }
     prototype.computeLength = function(){
       return this.length = this.stroke.length;
     };
-    prototype.doRender = function(ctx){};
+    prototype.computeAABB = function(){
+      var key;
+      this.aabb = new AABB;
+      for (key in this.arrow) {
+        this.aabb.addPoint(this.arrow[key]);
+      }
+      return this.aabb;
+    };
+    prototype.render = function(it){
+      superclass.prototype.render.call(this, it, true);
+    };
+    prototype.doRender = function(ctx){
+      var x$;
+      x$ = ctx;
+      x$.strokeStyle = '#c00';
+      x$.lineWidth = 12;
+      x$.beginPath();
+      x$.moveTo(this.arrow.rear.x, this.arrow.rear.y);
+      x$.lineTo(this.arrow.tip.x, this.arrow.tip.y);
+      x$.stroke();
+      x$.fillStyle = '#c00';
+      x$.beginPath();
+      x$.moveTo(this.arrow.head.x, this.arrow.head.y);
+      x$.lineTo(this.arrow.tip.x, this.arrow.tip.y);
+      x$.lineTo(this.arrow.edge.x, this.arrow.edge.y);
+      x$.fill();
+      x$.font = "128px sans-serif";
+      x$.textAlign = 'center';
+      x$.textBaseline = 'middle';
+      x$.fillText(this.index, this.arrow.text.x, this.arrow.text.y);
+    };
     return Arrow;
   }(Comp));
   x$ = (ref$ = window.zhStrokeData) != null
@@ -500,6 +568,9 @@
   x$.Track = Track;
   x$.Stroke = Stroke;
   x$.Arrow = Arrow;
+  function bind$(obj, key, target){
+    return function(){ return (target || obj)[key].apply(obj, arguments) };
+  }
   function extend$(sub, sup){
     function fun(){} fun.prototype = (sub.superclass = sup).prototype;
     (sub.prototype = new fun).constructor = sub;
