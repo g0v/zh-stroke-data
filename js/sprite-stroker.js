@@ -107,36 +107,89 @@
         res$.push(constructor.loaders[this.dataType](this.url + "" + ch.codePointAt().toString(16) + "." + this.dataType));
       }
       promises = res$;
+      this.arrows = [];
       Q.all(promises).then(function(it){
-        var chars, i, charData, strokes, j, data, gap, char, x$;
+        var chars, arrowGroupGroup, i, charData, strokes, arrows, j, data, stroke, arrow, gap, char, arrowGroup, x$, y$, step, lresult$, pairs, a, i$, len$, p, c0, c1, v, z$, z1$, results$ = [];
         chars = [];
+        arrowGroupGroup = [];
         for (i in it) {
           charData = it[i];
           strokes = [];
+          arrows = [];
           for (j in charData) {
             data = charData[j];
-            strokes.push(new zhStrokeData.IndexedStroke(data, +j + 1));
+            strokes.push(stroke = new zhStrokeData.Stroke(data));
+            arrows.push(arrow = new zhStrokeData.Arrow(stroke, +j + 1));
+            arrow.length = stroke.length;
+            this$.arrows.push(arrow);
             if (+j === it.length - 1) {
               continue;
             }
             gap = new zhStrokeData.Empty(this$.strokeGap);
             this$.strokeGap.objs.push(gap);
             strokes.push(gap);
+            arrows.push(gap);
           }
           char = new zhStrokeData.Comp(strokes);
-          char.x = this$.width * +i;
+          arrowGroup = new zhStrokeData.Comp(arrows);
+          char.x = 2150 * +i;
+          arrowGroup.x = char.x;
           chars.push(char);
+          arrowGroupGroup.push(arrowGroup);
           if (+i === it.length - 1) {
             continue;
           }
           gap = new zhStrokeData.Empty(this$.charGap);
           this$.charGap.objs.push(gap);
           chars.push(gap);
+          arrowGroupGroup.push(gap);
         }
         x$ = this$.sprite = new zhStrokeData.Comp(chars);
         x$.scaleX = this$.width / 2150;
         x$.scaleY = this$.height / 2150;
-        return this$.domElement.width = this$.width * promises.length;
+        y$ = this$.arrowSprite = new zhStrokeData.Comp(arrowGroupGroup);
+        y$.scaleX = this$.width / 2150;
+        y$.scaleY = this$.height / 2150;
+        this$.domElement.width = this$.width * promises.length;
+        step = 0.5;
+        do {
+          lresult$ = [];
+          pairs = zhStrokeData.AABB.hit((fn$.call(this$)));
+          for (i$ = 0, len$ = pairs.length; i$ < len$; ++i$) {
+            p = pairs[i$];
+            c0 = {
+              x: (p[0].min.x + p[0].max.x) / 2,
+              y: (p[0].min.y + p[0].max.y) / 2
+            };
+            c1 = {
+              x: (p[1].min.x + p[1].max.x) / 2,
+              y: (p[1].min.y + p[1].max.y) / 2
+            };
+            v = {
+              x: (c1.x - c0.x) * step,
+              y: (c1.y - c0.y) * step
+            };
+            z$ = p[0].entity;
+            z$.x -= v.x;
+            z$.y -= v.y;
+            z1$ = p[1].entity;
+            z1$.x += v.x;
+            z1$.y += v.y;
+            lresult$.push(z1$);
+          }
+          results$.push(lresult$);
+        } while (pairs.length !== 0);
+        return results$;
+        function fn$(){
+          var i$, ref$, len$, x$, results$ = [];
+          for (i$ = 0, len$ = (ref$ = this.arrows).length; i$ < len$; ++i$) {
+            a = ref$[i$];
+            x$ = a.globalAABB();
+            x$.entity = a;
+            results$.push(x$);
+          }
+          return results$;
+        }
       });
     }
     prototype.videoTracks = 1;
@@ -165,11 +218,14 @@
       this.paused = !!it;
     };
     prototype.play = function(){
-      var step;
+      var ctx, step;
       if (this.sprite) {
-        this.sprite.render(this.domElement);
+        ctx = this.domElement.getContext('2d');
+        this.sprite.render(ctx);
+        this.arrowSprite.render(ctx);
         step = this.speed * 1 / 60;
         this.sprite.time += step / this.sprite.length;
+        this.arrowSprite.time = this.sprite.time;
         this.currentTime = this.sprite.time * this.sprite.length / this.speed;
       }
       if (!this.paused && this.sprite.time < 1) {

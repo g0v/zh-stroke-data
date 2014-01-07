@@ -1,0 +1,19 @@
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    padding: 0;
+}
+
+#word {
+    position: absolute;
+    display: none;
+}
+
+#copyright {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+}

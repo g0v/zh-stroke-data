@@ -59,7 +59,6 @@
         chars = res$;
         this$.domElement.width = this$.width * max;
         this$.domElement.height = this$.height * chars.length;
-        console.log(chars);
         for (i in chars) {
           c = chars[i];
           lresult$ = [];
@@ -73,7 +72,7 @@
               y$.time = 1;
               y$.x = this$.width * j;
               y$.y = this$.height * i;
-              y$.render(this$.domElement);
+              y$.render(this$.domElement.getContext('2d'));
               lresult1$.push(y$);
             }
             lresult$.push(lresult1$);
