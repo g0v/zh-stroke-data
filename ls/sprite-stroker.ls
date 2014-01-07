@@ -103,6 +103,8 @@ class SpriteStroker
           gap = new zh-stroke-data.Empty @stroke-gap
           @stroke-gap.objs.push gap
           strokes.push gap
+          gap = new zh-stroke-data.Empty @stroke-gap
+          @stroke-gap.objs.push gap
           arrows.push  gap
         char = new zh-stroke-data.Comp strokes
         arrowGroup = new zh-stroke-data.Comp arrows
@@ -115,6 +117,8 @@ class SpriteStroker
         gap = new zh-stroke-data.Empty @char-gap
         @char-gap.objs.push gap
         chars.push gap
+        gap = new zh-stroke-data.Empty @char-gap
+        @char-gap.objs.push gap
         arrowGroupGroup.push gap
       (@sprite = new zh-stroke-data.Comp chars)
         ..scale-x = @width  / 2150
@@ -185,6 +189,7 @@ class SpriteStroker
   pause              : !-> @paused = !!it
   play               : !~>
     if @sprite
+      @dom-element.width = @dom-element.width
       ctx = @dom-element.getContext \2d
       @sprite.render ctx
       @arrowSprite.render ctx#, on

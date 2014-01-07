@@ -298,6 +298,12 @@ class Arrow extends Comp
       text:
         x: x + 64 * @up.x
         y: y + 64 * @up.y
+      text-min:
+        x: x + 64 * @up.x - 64
+        y: y + 64 * @up.y - 64
+      text-max:
+        x: x + 64 * @up.x + 64
+        y: y + 64 * @up.y + 64
       head:
         x: x + 64 * @vector.x
         y: y + 64 * @vector.y

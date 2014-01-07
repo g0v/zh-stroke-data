@@ -128,6 +128,8 @@
             gap = new zhStrokeData.Empty(this$.strokeGap);
             this$.strokeGap.objs.push(gap);
             strokes.push(gap);
+            gap = new zhStrokeData.Empty(this$.strokeGap);
+            this$.strokeGap.objs.push(gap);
             arrows.push(gap);
           }
           char = new zhStrokeData.Comp(strokes);
@@ -142,6 +144,8 @@
           gap = new zhStrokeData.Empty(this$.charGap);
           this$.charGap.objs.push(gap);
           chars.push(gap);
+          gap = new zhStrokeData.Empty(this$.charGap);
+          this$.charGap.objs.push(gap);
           arrowGroupGroup.push(gap);
         }
         x$ = this$.sprite = new zhStrokeData.Comp(chars);
@@ -220,6 +224,7 @@
     prototype.play = function(){
       var ctx, step;
       if (this.sprite) {
+        this.domElement.width = this.domElement.width;
         ctx = this.domElement.getContext('2d');
         this.sprite.render(ctx);
         this.arrowSprite.render(ctx);
