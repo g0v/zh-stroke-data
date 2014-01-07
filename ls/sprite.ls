@@ -211,7 +211,7 @@ class Track extends Comp
       ..beginPath!
       ..strokeStyle = \#000
       ..fillStyle = \#000
-      ..lineWidth = 2 * @data.size
+      ..lineWidth = 4 * @data.size
       ..lineCap = \round
       ..moveTo @data.x, @data.y
       ..lineTo do
@@ -274,7 +274,14 @@ class Stroke extends Comp
 
 class Arrow extends Comp
   (@stroke, @index) ->
-    track = stroke.children.0
+    max = stroke.children.reduce (c, n) ->
+      if c.length > n.length then c else n
+    track0 = stroke.children.0
+    var track
+    for t in stroke.children
+      if t.length > max.length / 2.5
+        track = t
+        break
     data = track.data
     @vector =
       x: data.vector.x / track.length
@@ -286,33 +293,34 @@ class Arrow extends Comp
       y: Math.sin angle
     x = data.size / 2 * @vector.x
     y = data.size / 2 * @vector.y
-    x += data.size * 2 / 3 * @up.x
-    y += data.size * 2 / 3 * @up.y
+    x += data.size / 2 * @up.x
+    y += data.size / 2 * @up.y
+    @text-size = 48
     @arrow =
       rear:
-        x: x - 64 * @vector.x
-        y: y - 64 * @vector.y
+        x: x - @text-size * @vector.x
+        y: y - @text-size * @vector.y
       tip:
-        x: x + 128 * @vector.x
-        y: y + 128 * @vector.y
+        x: x + 2 * @text-size * @vector.x
+        y: y + 2 * @text-size * @vector.y
       text:
-        x: x + 64 * @up.x
-        y: y + 64 * @up.y
+        x: x + @text-size * @up.x
+        y: y + @text-size * @up.y
       text-min:
-        x: x + 64 * @up.x - 64
-        y: y + 64 * @up.y - 64
+        x: x + @text-size * @up.x - @text-size
+        y: y + @text-size * @up.y - @text-size
       text-max:
-        x: x + 64 * @up.x + 64
-        y: y + 64 * @up.y + 64
+        x: x + @text-size * @up.x + @text-size
+        y: y + @text-size * @up.y + @text-size
       head:
-        x: x + 64 * @vector.x
-        y: y + 64 * @vector.y
+        x: x + @text-size * @vector.x
+        y: y + @text-size * @vector.y
       edge:
-        x: x + 64 * @vector.x + 32 * @up.x
-        y: y + 64 * @vector.y + 32 * @up.y
+        x: x + @text-size * @vector.x + @text-size * @up.x
+        y: y + @text-size * @vector.y + @text-size * @up.y
     super!
-    @x = stroke.x + data.x
-    @y = stroke.y + data.y
+    @x = stroke.x + track0.data.x
+    @y = stroke.y + track0.data.y
   computeLength: ->
     @length = @stroke.length
   computeAABB: ->
@@ -335,7 +343,7 @@ class Arrow extends Comp
       ..lineTo @arrow.tip.x, @arrow.tip.y
       ..lineTo @arrow.edge.x, @arrow.edge.y
       ..fill!
-      ..font = "128px sans-serif"
+      ..font = "#{2*@text-size}px sans-serif"
       ..textAlign = \center
       ..textBaseline = \middle
       ..fillText @index, @arrow.text.x, @arrow.text.y
