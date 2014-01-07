@@ -107,8 +107,9 @@
         res$.push(constructor.loaders[this.dataType](this.url + "" + ch.codePointAt().toString(16) + "." + this.dataType));
       }
       promises = res$;
+      this.arrows = [];
       Q.all(promises).then(function(it){
-        var chars, arrowGroupGroup, i, charData, strokes, arrows, j, data, stroke, arrow, gap, char, arrowGroup, x$, y$;
+        var chars, arrowGroupGroup, i, charData, strokes, arrows, j, data, stroke, arrow, gap, char, arrowGroup, x$, y$, step, lresult$, pairs, a, i$, len$, p, c0, c1, v, z$, z1$, results$ = [];
         chars = [];
         arrowGroupGroup = [];
         for (i in it) {
@@ -120,6 +121,7 @@
             strokes.push(stroke = new zhStrokeData.Stroke(data));
             arrows.push(arrow = new zhStrokeData.Arrow(stroke, +j + 1));
             arrow.length = stroke.length;
+            this$.arrows.push(arrow);
             if (+j === it.length - 1) {
               continue;
             }
@@ -148,7 +150,46 @@
         y$ = this$.arrowSprite = new zhStrokeData.Comp(arrowGroupGroup);
         y$.scaleX = this$.width / 2150;
         y$.scaleY = this$.height / 2150;
-        return this$.domElement.width = this$.width * promises.length;
+        this$.domElement.width = this$.width * promises.length;
+        step = 0.5;
+        do {
+          lresult$ = [];
+          pairs = zhStrokeData.AABB.hit((fn$.call(this$)));
+          for (i$ = 0, len$ = pairs.length; i$ < len$; ++i$) {
+            p = pairs[i$];
+            c0 = {
+              x: (p[0].min.x + p[0].max.x) / 2,
+              y: (p[0].min.y + p[0].max.y) / 2
+            };
+            c1 = {
+              x: (p[1].min.x + p[1].max.x) / 2,
+              y: (p[1].min.y + p[1].max.y) / 2
+            };
+            v = {
+              x: (c1.x - c0.x) * step,
+              y: (c1.y - c0.y) * step
+            };
+            z$ = p[0].entity;
+            z$.x -= v.x;
+            z$.y -= v.y;
+            z1$ = p[1].entity;
+            z1$.x += v.x;
+            z1$.y += v.y;
+            lresult$.push(z1$);
+          }
+          results$.push(lresult$);
+        } while (pairs.length !== 0);
+        return results$;
+        function fn$(){
+          var i$, ref$, len$, x$, results$ = [];
+          for (i$ = 0, len$ = (ref$ = this.arrows).length; i$ < len$; ++i$) {
+            a = ref$[i$];
+            x$ = a.globalAABB();
+            x$.entity = a;
+            results$.push(x$);
+          }
+          return results$;
+        }
       });
     }
     prototype.videoTracks = 1;
@@ -181,7 +222,7 @@
       if (this.sprite) {
         ctx = this.domElement.getContext('2d');
         this.sprite.render(ctx);
-        this.arrowSprite.render(ctx, true);
+        this.arrowSprite.render(ctx);
         step = this.speed * 1 / 60;
         this.sprite.time += step / this.sprite.length;
         this.arrowSprite.time = this.sprite.time;

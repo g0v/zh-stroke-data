@@ -134,6 +134,13 @@ class Comp
         0, c.scale-y,
         c.x,     c.y
     @aabb
+  globalAABB: ->
+    aabb = @aabb
+    p = this
+    while p
+      aabb = aabb.transform p.scale-x, 0, 0, p.scale-y, p.x, p.y
+      p = p.parent
+    aabb
   childrenChanged: !->
     @computeLength!
     len = 0
@@ -307,7 +314,7 @@ class Arrow extends Comp
     for key of @arrow
       @aabb.addPoint @arrow[key]
     @aabb
-  render: !-> super it, on
+  #render: !-> super it, on
   doRender: (ctx) !->
     ctx
       ..strokeStyle = \#c00

@@ -86,6 +86,7 @@ class SpriteStroker
 
     promises = for ch in str.sortSurrogates!
       @@loaders[@dataType] "#{@url}#{ch.codePointAt!toString 16}.#{@dataType}"
+    @arrows = []
     Q.all(promises).then ~>
       chars = []
       # WTF XDDDD
@@ -97,6 +98,7 @@ class SpriteStroker
           strokes.push (stroke = new zh-stroke-data.Stroke data)
           arrows.push  (arrow = new zh-stroke-data.Arrow stroke, +j+1)
           arrow.length = stroke.length
+          @arrows.push arrow
           continue if +j is it.length - 1
           gap = new zh-stroke-data.Empty @stroke-gap
           @stroke-gap.objs.push gap
@@ -121,6 +123,30 @@ class SpriteStroker
         ..scale-x = @width  / 2150
         ..scale-y = @height / 2150
       @dom-element.width  = @width * promises.length
+      # simple force layout
+      step = 0.5
+      do
+        pairs = zh-stroke-data.AABB.hit do
+          for a in @arrows
+            (a.globalAABB!)
+              ..entity = a
+        for p in pairs
+          c0 =
+            x: (p.0.min.x + p.0.max.x) / 2
+            y: (p.0.min.y + p.0.max.y) / 2
+          c1 =
+            x: (p.1.min.x + p.1.max.x) / 2
+            y: (p.1.min.y + p.1.max.y) / 2
+          v =
+            x: (c1.x - c0.x) * step
+            y: (c1.y - c0.y) * step
+          p.0.entity
+            ..x -= v.x
+            ..y -= v.y
+          p.1.entity
+            ..x += v.x
+            ..y += v.y
+      while pairs.length isnt 0
   ###
   # mimic MediaElement
   ###
@@ -161,7 +187,7 @@ class SpriteStroker
     if @sprite
       ctx = @dom-element.getContext \2d
       @sprite.render ctx
-      @arrowSprite.render ctx, on
+      @arrowSprite.render ctx#, on
       step = @speed * 1 / 60
       @sprite.time += step / @sprite.length
       @arrowSprite.time = @sprite.time

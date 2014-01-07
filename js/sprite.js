@@ -276,6 +276,16 @@
       }
       return this.aabb;
     };
+    prototype.globalAABB = function(){
+      var aabb, p;
+      aabb = this.aabb;
+      p = this;
+      while (p) {
+        aabb = aabb.transform(p.scaleX, 0, 0, p.scaleY, p.x, p.y);
+        p = p.parent;
+      }
+      return aabb;
+    };
     prototype.childrenChanged = function(){
       var len, i$, ref$, len$, child;
       this.computeLength();
@@ -533,9 +543,6 @@
         this.aabb.addPoint(this.arrow[key]);
       }
       return this.aabb;
-    };
-    prototype.render = function(it){
-      superclass.prototype.render.call(this, it, true);
     };
     prototype.doRender = function(ctx){
       var x$;
