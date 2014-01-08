@@ -109,7 +109,7 @@
       promises = res$;
       this.arrows = [];
       Q.all(promises).then(function(it){
-        var chars, arrowGroupGroup, i, charData, strokes, arrows, j, data, stroke, arrow, gap, char, arrowGroup, x$, y$, step, lresult$, pairs, a, i$, len$, p, c0, c1, v, z$, z1$, results$ = [];
+        var chars, arrowGroupGroup, i, charData, strokes, arrows, j, data, stroke, arrow, x$, gap, char, arrowGroup, y$, z$, step, lresult$, pairs, a, i$, len$, p, z1$, results$ = [];
         chars = [];
         arrowGroupGroup = [];
         for (i in it) {
@@ -120,7 +120,9 @@
             data = charData[j];
             strokes.push(stroke = new zhStrokeData.Stroke(data));
             arrows.push(arrow = new zhStrokeData.Arrow(stroke, +j + 1));
-            arrow.length = stroke.length;
+            x$ = arrow;
+            x$.length = stroke.length;
+            x$.step = 0;
             this$.arrows.push(arrow);
             if (+j === it.length - 1) {
               continue;
@@ -148,37 +150,22 @@
           this$.charGap.objs.push(gap);
           arrowGroupGroup.push(gap);
         }
-        x$ = this$.sprite = new zhStrokeData.Comp(chars);
-        x$.scaleX = this$.width / 2150;
-        x$.scaleY = this$.height / 2150;
-        y$ = this$.arrowSprite = new zhStrokeData.Comp(arrowGroupGroup);
+        y$ = this$.sprite = new zhStrokeData.Comp(chars);
         y$.scaleX = this$.width / 2150;
         y$.scaleY = this$.height / 2150;
+        z$ = this$.arrowSprite = new zhStrokeData.Comp(arrowGroupGroup);
+        z$.scaleX = this$.width / 2150;
+        z$.scaleY = this$.height / 2150;
         this$.domElement.width = this$.width * promises.length;
-        step = 0.5;
+        step = 0.05;
         do {
           lresult$ = [];
           pairs = zhStrokeData.AABB.hit((fn$.call(this$)));
           for (i$ = 0, len$ = pairs.length; i$ < len$; ++i$) {
             p = pairs[i$];
-            c0 = {
-              x: (p[0].min.x + p[0].max.x) / 2,
-              y: (p[0].min.y + p[0].max.y) / 2
-            };
-            c1 = {
-              x: (p[1].min.x + p[1].max.x) / 2,
-              y: (p[1].min.y + p[1].max.y) / 2
-            };
-            v = {
-              x: (c1.x - c0.x) * step,
-              y: (c1.y - c0.y) * step
-            };
-            z$ = p[0].entity;
-            z$.x -= v.x;
-            z$.y -= v.y;
-            z1$ = p[1].entity;
-            z1$.x += v.x;
-            z1$.y += v.y;
+            z1$ = p[0].entity;
+            z1$.step += step;
+            z1$.computeOffset(p[0].entity.step);
             lresult$.push(z1$);
           }
           results$.push(lresult$);

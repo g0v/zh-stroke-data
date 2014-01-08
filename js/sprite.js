@@ -486,7 +486,7 @@
   Arrow = (function(superclass){
     var prototype = extend$((import$(Arrow, superclass).displayName = 'Arrow', Arrow), superclass).prototype, constructor = Arrow;
     function Arrow(stroke, index){
-      var max, track0, track, i$, ref$, len$, t, data, angle, x, y;
+      var max, track, i$, ref$, len$, t, data, angle;
       this.stroke = stroke;
       this.index = index;
       max = stroke.children.reduce(function(c, n){
@@ -496,7 +496,7 @@
           return n;
         }
       });
-      track0 = stroke.children[0];
+      this.track0 = stroke.children[0];
       for (i$ = 0, len$ = (ref$ = stroke.children).length; i$ < len$; ++i$) {
         t = ref$[i$];
         if (t.length > max.length / 2.5) {
@@ -505,6 +505,10 @@
         }
       }
       data = track.data;
+      this.offset = {
+        x: 0,
+        y: 0
+      };
       this.vector = {
         x: data.vector.x / track.length,
         y: data.vector.y / track.length
@@ -517,75 +521,81 @@
         x: Math.cos(angle),
         y: Math.sin(angle)
       };
-      x = data.size / 2 * this.vector.x;
-      y = data.size / 2 * this.vector.y;
-      x += data.size / 2 * this.up.x;
-      y += data.size / 2 * this.up.y;
-      this.textSize = 48;
-      this.arrow = {
-        rear: {
-          x: x - this.textSize * this.vector.x,
-          y: y - this.textSize * this.vector.y
-        },
-        tip: {
-          x: x + 2 * this.textSize * this.vector.x,
-          y: y + 2 * this.textSize * this.vector.y
-        },
-        text: {
-          x: x + this.textSize * this.up.x,
-          y: y + this.textSize * this.up.y
-        },
-        textMin: {
-          x: x + this.textSize * this.up.x - this.textSize,
-          y: y + this.textSize * this.up.y - this.textSize
-        },
-        textMax: {
-          x: x + this.textSize * this.up.x + this.textSize,
-          y: y + this.textSize * this.up.y + this.textSize
-        },
-        head: {
-          x: x + this.textSize * this.vector.x,
-          y: y + this.textSize * this.vector.y
-        },
-        edge: {
-          x: x + this.textSize * this.vector.x + this.textSize * this.up.x,
-          y: y + this.textSize * this.vector.y + this.textSize * this.up.y
-        }
-      };
+      this.dir = 1;
+      this.size = 160;
       Arrow.superclass.call(this);
-      this.x = stroke.x + track0.data.x;
-      this.y = stroke.y + track0.data.y;
+      this.computeOffset(0);
+      this.x = stroke.x + this.track0.data.x;
+      this.y = stroke.y + this.track0.data.y;
     }
     prototype.computeLength = function(){
       return this.length = this.stroke.length;
     };
     prototype.computeAABB = function(){
-      var key;
       this.aabb = new AABB;
-      for (key in this.arrow) {
-        this.aabb.addPoint(this.arrow[key]);
-      }
+      this.aabb.addPoint({
+        x: this.offset.x,
+        y: this.offset.y
+      });
+      this.aabb.addPoint({
+        x: this.offset.x + this.size * this.vector.x,
+        y: this.offset.y + this.size * this.vector.y
+      });
+      this.aabb.addPoint({
+        x: this.offset.x + this.vector.x * this.size * 0.5 + (this.dir >= 0
+          ? 1
+          : -1) * this.up.x * this.size * 0.5,
+        y: this.offset.y + this.vector.y * this.size * 0.5 + (this.dir >= 0
+          ? 1
+          : -1) * this.up.y * this.size * 0.5
+      });
       return this.aabb;
+    };
+    prototype.computeOffset = function(it){
+      var p, percent, x$;
+      it = +it;
+      if (it < 0) {
+        it = 0;
+      } else if (it < 1) {
+        this.dir = 1;
+      } else {
+        this.dir = -~~(it - 1) - 1;
+      }
+      p = Math.abs(it);
+      percent = p - ~~p;
+      x$ = this.offset;
+      x$.x = this.dir * this.track0.data.size * this.up.x / 2 + percent * this.size * this.vector.x;
+      x$.y = this.dir * this.track0.data.size * this.up.y / 2 + percent * this.size * this.vector.y;
+      return this.computeAABB();
     };
     prototype.doRender = function(ctx){
       var x$;
       x$ = ctx;
       x$.strokeStyle = '#c00';
-      x$.lineWidth = 12;
+      x$.lineWidth = 16;
       x$.beginPath();
-      x$.moveTo(this.arrow.rear.x, this.arrow.rear.y);
-      x$.lineTo(this.arrow.tip.x, this.arrow.tip.y);
+      x$.moveTo(this.offset.x, this.offset.y);
+      x$.lineTo(this.offset.x + this.vector.x * this.size * 0.66, this.offset.y + this.vector.y * this.size * 0.66);
       x$.stroke();
       x$.fillStyle = '#c00';
       x$.beginPath();
-      x$.moveTo(this.arrow.head.x, this.arrow.head.y);
-      x$.lineTo(this.arrow.tip.x, this.arrow.tip.y);
-      x$.lineTo(this.arrow.edge.x, this.arrow.edge.y);
+      x$.moveTo(this.offset.x + this.vector.x * this.size * 0.66, this.offset.y + this.vector.y * this.size * 0.66);
+      x$.lineTo(this.offset.x + this.vector.x * this.size, this.offset.y + this.vector.y * this.size);
+      x$.lineTo(this.offset.x + this.vector.x * this.size * 0.66 + (this.dir >= 0
+        ? 1
+        : -1) * this.up.x * this.size * 0.25, this.offset.y + this.vector.y * this.size * 0.66 + (this.dir >= 0
+        ? 1
+        : -1) * this.up.y * this.size * 0.25);
+      x$.stroke();
       x$.fill();
-      x$.font = 2 * this.textSize + "px sans-serif";
+      x$.font = this.size * 2 / 3 + "px sans-serif";
       x$.textAlign = 'center';
       x$.textBaseline = 'middle';
-      x$.fillText(this.index, this.arrow.text.x, this.arrow.text.y);
+      x$.fillText(this.index, this.offset.x + this.vector.x * this.size * 0.33 + (this.dir >= 0
+        ? 1
+        : -1) * this.up.x * this.size * 0.33, this.offset.y + this.vector.y * this.size * 0.33 + (this.dir >= 0
+        ? 1
+        : -1) * this.up.y * this.size * 0.33);
     };
     return Arrow;
   }(Comp));
