@@ -276,13 +276,16 @@ class Arrow extends Comp
   (@stroke, @index) ->
     max = stroke.children.reduce (c, n) ->
       if c.length > n.length then c else n
-    track0 = stroke.children.0
+    @track0 = stroke.children.0
     var track
     for t in stroke.children
       if t.length > max.length / 2.5
         track = t
         break
     data = track.data
+    @offset =
+      x: 0
+      y: 0
     @vector =
       x: data.vector.x / track.length
       y: data.vector.y / track.length
@@ -291,62 +294,74 @@ class Arrow extends Comp
     @up =
       x: Math.cos angle
       y: Math.sin angle
-    x = data.size / 2 * @vector.x
-    y = data.size / 2 * @vector.y
-    x += data.size / 2 * @up.x
-    y += data.size / 2 * @up.y
-    @text-size = 48
-    @arrow =
-      rear:
-        x: x - @text-size * @vector.x
-        y: y - @text-size * @vector.y
-      tip:
-        x: x + 2 * @text-size * @vector.x
-        y: y + 2 * @text-size * @vector.y
-      text:
-        x: x + @text-size * @up.x
-        y: y + @text-size * @up.y
-      text-min:
-        x: x + @text-size * @up.x - @text-size
-        y: y + @text-size * @up.y - @text-size
-      text-max:
-        x: x + @text-size * @up.x + @text-size
-        y: y + @text-size * @up.y + @text-size
-      head:
-        x: x + @text-size * @vector.x
-        y: y + @text-size * @vector.y
-      edge:
-        x: x + @text-size * @vector.x + @text-size * @up.x
-        y: y + @text-size * @vector.y + @text-size * @up.y
+    @dir = 1
+    @size = 160
     super!
-    @x = stroke.x + track0.data.x
-    @y = stroke.y + track0.data.y
+    @computeOffset 0
+    @x = stroke.x + @track0.data.x
+    @y = stroke.y + @track0.data.y
   computeLength: ->
     @length = @stroke.length
   computeAABB: ->
     @aabb = new AABB
-    for key of @arrow
-      @aabb.addPoint @arrow[key]
+    @aabb.addPoint do
+      x: @offset.x
+      y: @offset.y
+    @aabb.addPoint do
+      x: @offset.x + @size * @vector.x
+      y: @offset.y + @size * @vector.y
+    @aabb.addPoint do
+      x: @offset.x + (if @dir >= 0 then 1 else -1) * @up.x * @size * 2/3
+      y: @offset.y + (if @dir >= 0 then 1 else -1) * @up.y * @size * 2/3
+    @aabb.addPoint do
+      x: @offset.x + @size * @vector.x + (if @dir >= 0 then 1 else -1) * @up.x * @size * 2/3
+      y: @offset.y + @size * @vector.y + (if @dir >= 0 then 1 else -1) * @up.y * @size * 2/3
     @aabb
+  computeOffset: ->
+    it = +it
+    if it < 0
+      it = 0
+    else if it < 1
+      @dir = 1
+    else
+      @dir = -~~(it - 1) - 1
+    p = Math.abs it
+    percent = p - ~~p
+    @offset
+      ..x = @dir * @track0.data.size * @up.x / 2 + percent * @size * @vector.x
+      ..y = @dir * @track0.data.size * @up.y / 2 + percent * @size * @vector.y
+    @computeAABB!
   #render: !-> super it, on
   doRender: (ctx) !->
     ctx
       ..strokeStyle = \#c00
-      ..lineWidth = 12
+      ..lineWidth = 16
       ..beginPath!
-      ..moveTo @arrow.rear.x, @arrow.rear.y
-      ..lineTo @arrow.tip.x, @arrow.tip.y
+      ..moveTo @offset.x, @offset.y
+      ..lineTo do
+        @offset.x + @vector.x * @size * 0.75
+        @offset.y + @vector.y * @size * 0.75
       ..stroke!
       ..fillStyle = \#c00
       ..beginPath!
-      ..moveTo @arrow.head.x, @arrow.head.y
-      ..lineTo @arrow.tip.x, @arrow.tip.y
-      ..lineTo @arrow.edge.x, @arrow.edge.y
+      ..moveTo do
+        @offset.x + @vector.x * @size * 0.75
+        @offset.y + @vector.y * @size * 0.75
+      ..lineTo do
+        @offset.x + @vector.x * @size
+        @offset.y + @vector.y * @size
+      ..lineTo do
+        @offset.x + @vector.x * @size * 0.75 + (if @dir >= 0 then 1 else -1) * @up.x * @size * 0.125
+        @offset.y + @vector.y * @size * 0.75 + (if @dir >= 0 then 1 else -1) * @up.y * @size * 0.125
+      ..stroke!
       ..fill!
-      ..font = "#{2*@text-size}px sans-serif"
+      ..font = "#{@size*2/3}px sans-serif"
       ..textAlign = \center
       ..textBaseline = \middle
-      ..fillText @index, @arrow.text.x, @arrow.text.y
+      ..fillText do
+        @index
+        @offset.x + @vector.x * @size * 0.33 + (if @dir >= 0 then 1 else -1) * @up.x * @size * 0.33
+        @offset.y + @vector.y * @size * 0.33 + (if @dir >= 0 then 1 else -1) * @up.y * @size * 0.33
 
 (window.zh-stroke-data ?= {})
   ..AABB   = AABB
