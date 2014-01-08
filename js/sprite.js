@@ -542,20 +542,12 @@
         y: this.offset.y + this.size * this.vector.y
       });
       this.aabb.addPoint({
-        x: this.offset.x + (this.dir >= 0
+        x: this.offset.x + this.vector.x * this.size * 0.5 + (this.dir >= 0
           ? 1
-          : -1) * this.up.x * this.size * 2 / 3,
-        y: this.offset.y + (this.dir >= 0
+          : -1) * this.up.x * this.size * 0.5,
+        y: this.offset.y + this.vector.y * this.size * 0.5 + (this.dir >= 0
           ? 1
-          : -1) * this.up.y * this.size * 2 / 3
-      });
-      this.aabb.addPoint({
-        x: this.offset.x + this.size * this.vector.x + (this.dir >= 0
-          ? 1
-          : -1) * this.up.x * this.size * 2 / 3,
-        y: this.offset.y + this.size * this.vector.y + (this.dir >= 0
-          ? 1
-          : -1) * this.up.y * this.size * 2 / 3
+          : -1) * this.up.y * this.size * 0.5
       });
       return this.aabb;
     };
@@ -583,17 +575,17 @@
       x$.lineWidth = 16;
       x$.beginPath();
       x$.moveTo(this.offset.x, this.offset.y);
-      x$.lineTo(this.offset.x + this.vector.x * this.size * 0.75, this.offset.y + this.vector.y * this.size * 0.75);
+      x$.lineTo(this.offset.x + this.vector.x * this.size * 0.66, this.offset.y + this.vector.y * this.size * 0.66);
       x$.stroke();
       x$.fillStyle = '#c00';
       x$.beginPath();
-      x$.moveTo(this.offset.x + this.vector.x * this.size * 0.75, this.offset.y + this.vector.y * this.size * 0.75);
+      x$.moveTo(this.offset.x + this.vector.x * this.size * 0.66, this.offset.y + this.vector.y * this.size * 0.66);
       x$.lineTo(this.offset.x + this.vector.x * this.size, this.offset.y + this.vector.y * this.size);
-      x$.lineTo(this.offset.x + this.vector.x * this.size * 0.75 + (this.dir >= 0
+      x$.lineTo(this.offset.x + this.vector.x * this.size * 0.66 + (this.dir >= 0
         ? 1
-        : -1) * this.up.x * this.size * 0.125, this.offset.y + this.vector.y * this.size * 0.75 + (this.dir >= 0
+        : -1) * this.up.x * this.size * 0.25, this.offset.y + this.vector.y * this.size * 0.66 + (this.dir >= 0
         ? 1
-        : -1) * this.up.y * this.size * 0.125);
+        : -1) * this.up.y * this.size * 0.25);
       x$.stroke();
       x$.fill();
       x$.font = this.size * 2 / 3 + "px sans-serif";

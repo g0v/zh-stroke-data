@@ -311,12 +311,12 @@ class Arrow extends Comp
       x: @offset.x + @size * @vector.x
       y: @offset.y + @size * @vector.y
     @aabb.addPoint do
-      x: @offset.x + (if @dir >= 0 then 1 else -1) * @up.x * @size * 2/3
-      y: @offset.y + (if @dir >= 0 then 1 else -1) * @up.y * @size * 2/3
-    @aabb.addPoint do
-      x: @offset.x + @size * @vector.x + (if @dir >= 0 then 1 else -1) * @up.x * @size * 2/3
-      y: @offset.y + @size * @vector.y + (if @dir >= 0 then 1 else -1) * @up.y * @size * 2/3
+      x: @offset.x + @vector.x * @size * 0.5 + (if @dir >= 0 then 1 else -1) * @up.x * @size * 0.5
+      y: @offset.y + @vector.y * @size * 0.5 + (if @dir >= 0 then 1 else -1) * @up.y * @size * 0.5
     @aabb
+  ##
+  # At first, move the arrow forward,         (0 <= it < 1)
+  # if still collide, swap to the other side. (1 <= it)
   computeOffset: ->
     it = +it
     if it < 0
@@ -339,20 +339,20 @@ class Arrow extends Comp
       ..beginPath!
       ..moveTo @offset.x, @offset.y
       ..lineTo do
-        @offset.x + @vector.x * @size * 0.75
-        @offset.y + @vector.y * @size * 0.75
+        @offset.x + @vector.x * @size * 0.66
+        @offset.y + @vector.y * @size * 0.66
       ..stroke!
       ..fillStyle = \#c00
       ..beginPath!
       ..moveTo do
-        @offset.x + @vector.x * @size * 0.75
-        @offset.y + @vector.y * @size * 0.75
+        @offset.x + @vector.x * @size * 0.66
+        @offset.y + @vector.y * @size * 0.66
       ..lineTo do
         @offset.x + @vector.x * @size
         @offset.y + @vector.y * @size
       ..lineTo do
-        @offset.x + @vector.x * @size * 0.75 + (if @dir >= 0 then 1 else -1) * @up.x * @size * 0.125
-        @offset.y + @vector.y * @size * 0.75 + (if @dir >= 0 then 1 else -1) * @up.y * @size * 0.125
+        @offset.x + @vector.x * @size * 0.66 + (if @dir >= 0 then 1 else -1) * @up.x * @size * 0.25
+        @offset.y + @vector.y * @size * 0.66 + (if @dir >= 0 then 1 else -1) * @up.y * @size * 0.25
       ..stroke!
       ..fill!
       ..font = "#{@size*2/3}px sans-serif"
