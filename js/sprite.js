@@ -500,7 +500,6 @@
       for (i$ = 0, len$ = (ref$ = stroke.children).length; i$ < len$; ++i$) {
         t = ref$[i$];
         if (t.length > max.length / 2.5) {
-          console.log(t.length);
           track = t;
           break;
         }
@@ -569,16 +568,20 @@
       x$.y = this.dir * this.track0.data.size * this.up.y / 2 + percent * this.size * this.vector.y;
       return this.computeAABB();
     };
-    prototype.doRender = function(ctx){
+    prototype.drawArrow = function(ctx, color, width, bold){
       var x$;
+      color == null && (color = '#c00');
+      width == null && (width = 16);
+      bold == null && (bold = false);
       x$ = ctx;
-      x$.strokeStyle = '#c00';
-      x$.lineWidth = 16;
+      x$.lineCap = 'round';
+      x$.strokeStyle = color;
+      x$.lineWidth = width;
       x$.beginPath();
       x$.moveTo(this.offset.x, this.offset.y);
       x$.lineTo(this.offset.x + this.vector.x * this.size * 0.66, this.offset.y + this.vector.y * this.size * 0.66);
       x$.stroke();
-      x$.fillStyle = '#c00';
+      x$.fillStyle = color;
       x$.beginPath();
       x$.moveTo(this.offset.x + this.vector.x * this.size * 0.66, this.offset.y + this.vector.y * this.size * 0.66);
       x$.lineTo(this.offset.x + this.vector.x * this.size, this.offset.y + this.vector.y * this.size);
@@ -589,7 +592,7 @@
         : -1) * this.up.y * this.size * 0.25);
       x$.stroke();
       x$.fill();
-      x$.font = this.size * 2 / 3 + "px sans-serif";
+      x$.font = (this.size * 2 / 3 + "px sans-serif") + (bold ? ' bold' : '');
       x$.textAlign = 'center';
       x$.textBaseline = 'middle';
       x$.fillText(this.index, this.offset.x + this.vector.x * this.size * 0.33 + (this.dir >= 0
@@ -597,6 +600,10 @@
         : -1) * this.up.x * this.size * 0.33, this.offset.y + this.vector.y * this.size * 0.33 + (this.dir >= 0
         ? 1
         : -1) * this.up.y * this.size * 0.33);
+    };
+    prototype.doRender = function(ctx){
+      this.drawArrow(ctx, '#fff', 32, true);
+      this.drawArrow(ctx);
     };
     return Arrow;
   }(Comp));

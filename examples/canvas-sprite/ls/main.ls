@@ -1,12 +1,14 @@
 $ ->
   var ss, ps
-  $sprite =   $ \#sprite
+  $sprite   = $ \#sprite
   $printing = $ \#printing
-  $sdelay =   $ \#sdelay
-  $cdelay =   $ \#cdelay
-  $speed =    $ \#speed
-  $stroke =   $ \#stroke
-  $char =     $ \#char
+  $sdelay   = $ \#sdelay
+  $cdelay   = $ \#cdelay
+  $speed    = $ \#speed
+  $stroke   = $ \#stroke
+  $char     = $ \#char
+  $arrows   = $ \#arrows
+  $debug    = $ \#debug
 
   inputChanged = ->
     $sprite.empty!
@@ -17,6 +19,8 @@ $ ->
     $sdelay.text ss.stroke-delay
     $char.val    ss.char-delay
     $cdelay.text ss.char-delay
+    $arrows.attr \checked, ss.arrows
+    $debug.attr \checked, ss.debug
     $printing.empty!
     ps := new zh-stroke-data.PrintingStroker it, url: '../../json/'
     $(\#printing).append ps.dom-element
@@ -28,6 +32,8 @@ $ ->
   $char.change !->
     ss?char-delay = +$(@).val!
     $cdelay.text ss?char-delay
+  $arrows.change !-> ss?arrows = @checked
+  $debug.change !-> ss?debug = @checked
   $(\#play).click !->
     ss?pause no
     ss?play!

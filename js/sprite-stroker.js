@@ -23,7 +23,9 @@
         dataType: 'json',
         speed: 5000,
         strokeDelay: 0.2,
-        charDelay: 1
+        charDelay: 1,
+        arrows: false,
+        debug: false
       }, options);
       this.autoplay = options.autoplay;
       this.loop = options.loop;
@@ -33,6 +35,8 @@
       this.posters = options.posters;
       this.url = options.url;
       this.dataType = options.dataType;
+      this.arrows = options.arrows;
+      this.debug = options.debug;
       this.domElement = document.createElement('canvas');
       this.domElement.width = this.width;
       this.domElement.height = this.height;
@@ -107,7 +111,7 @@
         res$.push(constructor.loaders[this.dataType](this.url + "" + ch.codePointAt().toString(16) + "." + this.dataType));
       }
       promises = res$;
-      this.arrows = [];
+      this.arrowList = [];
       Q.all(promises).then(function(it){
         var chars, arrowGroupGroup, i, charData, strokes, arrows, count, arrowSize, j, data, stroke, arrow, x$, gap, char, arrowGroup, y$, z$, step, lresult$, pairs, a, i$, len$, p, e, z1$, results$ = [];
         chars = [];
@@ -127,7 +131,7 @@
             x$.length = stroke.length;
             x$.step = 0;
             x$.computeOffset(0);
-            this$.arrows.push(arrow);
+            this$.arrowList.push(arrow);
             if (+j === it.length - 1) {
               continue;
             }
@@ -180,7 +184,7 @@
         return results$;
         function fn$(){
           var i$, ref$, len$, x$, results$ = [];
-          for (i$ = 0, len$ = (ref$ = this.arrows).length; i$ < len$; ++i$) {
+          for (i$ = 0, len$ = (ref$ = this.arrowList).length; i$ < len$; ++i$) {
             a = ref$[i$];
             x$ = a.globalAABB();
             x$.entity = a;
@@ -220,8 +224,10 @@
       if (this.sprite) {
         this.domElement.width = this.domElement.width;
         ctx = this.domElement.getContext('2d');
-        this.sprite.render(ctx);
-        this.arrowSprite.render(ctx);
+        this.sprite.render(ctx, this.debug);
+        if (this.arrows) {
+          this.arrowSprite.render(ctx, this.debug);
+        }
         step = this.speed * 1 / 60;
         this.sprite.time += step / this.sprite.length;
         this.arrowSprite.time = this.sprite.time;
