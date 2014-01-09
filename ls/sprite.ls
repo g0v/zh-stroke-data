@@ -280,7 +280,6 @@ class Arrow extends Comp
     var track
     for t in stroke.children
       if t.length > max.length / 2.5
-        console.log t.length
         track = t
         break
     data = track.data
@@ -333,17 +332,18 @@ class Arrow extends Comp
       ..y = @dir * @track0.data.size * @up.y / 2 + percent * @size * @vector.y
     @computeAABB!
   #render: !-> super it, on
-  doRender: (ctx) !->
+  drawArrow: (ctx, color = \#c00, width = 16, bold = no) !->
     ctx
-      ..strokeStyle = \#c00
-      ..lineWidth = 16
+      ..lineCap = \round
+      ..strokeStyle = color
+      ..lineWidth = width
       ..beginPath!
       ..moveTo @offset.x, @offset.y
       ..lineTo do
         @offset.x + @vector.x * @size * 0.66
         @offset.y + @vector.y * @size * 0.66
       ..stroke!
-      ..fillStyle = \#c00
+      ..fillStyle = color
       ..beginPath!
       ..moveTo do
         @offset.x + @vector.x * @size * 0.66
@@ -356,13 +356,16 @@ class Arrow extends Comp
         @offset.y + @vector.y * @size * 0.66 + (if @dir >= 0 then 1 else -1) * @up.y * @size * 0.25
       ..stroke!
       ..fill!
-      ..font = "#{@size*2/3}px sans-serif"
+      ..font = "#{@size*2/3}px sans-serif" + if bold then ' bold' else ''
       ..textAlign = \center
       ..textBaseline = \middle
       ..fillText do
         @index
         @offset.x + @vector.x * @size * 0.33 + (if @dir >= 0 then 1 else -1) * @up.x * @size * 0.33
         @offset.y + @vector.y * @size * 0.33 + (if @dir >= 0 then 1 else -1) * @up.y * @size * 0.33
+  doRender: (ctx) !->
+    @drawArrow ctx, \#fff, 32, yes
+    @drawArrow ctx
 
 (window.zh-stroke-data ?= {})
   ..AABB   = AABB

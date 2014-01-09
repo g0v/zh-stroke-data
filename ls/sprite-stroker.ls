@@ -24,6 +24,8 @@ class SpriteStroker
       speed: 5000px_per_sec #px in original resolution
       stroke-delay: 0.2s
       char-delay: 1s
+      arrows: no
+      debug: no
       options
     @autoplay = options.autoplay
     @loop     = options.loop
@@ -33,6 +35,8 @@ class SpriteStroker
     @posters  = options.posters
     @url      = options.url
     @dataType = options.dataType
+    @arrows   = options.arrows
+    @debug    = options.debug
     @dom-element        = document.createElement \canvas
     @dom-element.width  = @width
     @dom-element.height = @height
@@ -86,7 +90,7 @@ class SpriteStroker
 
     promises = for ch in str.sortSurrogates!
       @@loaders[@dataType] "#{@url}#{ch.codePointAt!toString 16}.#{@dataType}"
-    @arrows = []
+    @arrow-list = []
     Q.all(promises).then ~>
       chars = []
       # WTF XDDDD
@@ -104,7 +108,7 @@ class SpriteStroker
             ..length = stroke.length
             ..step = 0
             ..computeOffset 0
-          @arrows.push arrow
+          @arrow-list.push arrow
           continue if +j is it.length - 1
           gap = new zh-stroke-data.Empty @stroke-gap
           @stroke-gap.objs.push gap
@@ -137,7 +141,7 @@ class SpriteStroker
       step = 0.05
       do
         pairs = zh-stroke-data.AABB.hit do
-          for a in @arrows
+          for a in @arrow-list
             (a.globalAABB!)
               ..entity = a
         for p in pairs
@@ -186,8 +190,8 @@ class SpriteStroker
     if @sprite
       @dom-element.width = @dom-element.width
       ctx = @dom-element.getContext \2d
-      @sprite.render ctx
-      @arrowSprite.render ctx#, on
+      @sprite.render ctx, @debug
+      @arrowSprite.render(ctx, @debug) if @arrows
       step = @speed * 1 / 60
       @sprite.time += step / @sprite.length
       @arrowSprite.time = @sprite.time
