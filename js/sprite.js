@@ -500,6 +500,7 @@
       for (i$ = 0, len$ = (ref$ = stroke.children).length; i$ < len$; ++i$) {
         t = ref$[i$];
         if (t.length > max.length / 2.5) {
+          console.log(t.length);
           track = t;
           break;
         }
@@ -513,10 +514,10 @@
         x: data.vector.x / track.length,
         y: data.vector.y / track.length
       };
-      angle = Math.atan2(this.vector.y, this.vector.x);
-      angle = Math.PI / 2 > angle && angle >= -Math.PI / 2
-        ? angle - Math.PI / 2
-        : angle + Math.PI / 2;
+      this.angle = Math.atan2(this.vector.y, this.vector.x);
+      angle = Math.PI / 2 > (ref$ = this.angle) && ref$ >= -Math.PI / 2
+        ? this.angle - Math.PI / 2
+        : this.angle + Math.PI / 2;
       this.up = {
         x: Math.cos(angle),
         y: Math.sin(angle)

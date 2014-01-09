@@ -94,12 +94,16 @@ class SpriteStroker
       for i, char-data of it
         strokes = []
         arrows  = []
+        count = char-data.length / 2
+        arrow-size = (2150 - (count * 40)) / count
         for j, data of char-data
           strokes.push (stroke = new zh-stroke-data.Stroke data)
           arrows.push  (arrow = new zh-stroke-data.Arrow stroke, +j+1)
           arrow
+            ..size = Math.min arrow.size, arrow-size
             ..length = stroke.length
             ..step = 0
+            ..computeOffset 0
           @arrows.push arrow
           continue if +j is it.length - 1
           gap = new zh-stroke-data.Empty @stroke-gap
@@ -137,9 +141,10 @@ class SpriteStroker
             (a.globalAABB!)
               ..entity = a
         for p in pairs
-          p.0.entity
+          e = if p.0.entity.angle > p.1.entity.angle then p.0.entity else p.1.entity
+          e
             ..step += step
-            ..computeOffset p.0.entity.step
+            ..computeOffset e.step
       while pairs.length isnt 0
   ###
   # mimic MediaElement

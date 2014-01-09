@@ -280,6 +280,7 @@ class Arrow extends Comp
     var track
     for t in stroke.children
       if t.length > max.length / 2.5
+        console.log t.length
         track = t
         break
     data = track.data
@@ -289,8 +290,8 @@ class Arrow extends Comp
     @vector =
       x: data.vector.x / track.length
       y: data.vector.y / track.length
-    angle = Math.atan2(@vector.y, @vector.x)
-    angle = if Math.PI/2 > angle >= - Math.PI/2 then angle - Math.PI/2 else angle + Math.PI/2
+    @angle = Math.atan2(@vector.y, @vector.x)
+    angle = if Math.PI/2 > @angle >= - Math.PI/2 then @angle - Math.PI/2 else @angle + Math.PI/2
     @up =
       x: Math.cos angle
       y: Math.sin angle

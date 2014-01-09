@@ -109,20 +109,24 @@
       promises = res$;
       this.arrows = [];
       Q.all(promises).then(function(it){
-        var chars, arrowGroupGroup, i, charData, strokes, arrows, j, data, stroke, arrow, x$, gap, char, arrowGroup, y$, z$, step, lresult$, pairs, a, i$, len$, p, z1$, results$ = [];
+        var chars, arrowGroupGroup, i, charData, strokes, arrows, count, arrowSize, j, data, stroke, arrow, x$, gap, char, arrowGroup, y$, z$, step, lresult$, pairs, a, i$, len$, p, e, z1$, results$ = [];
         chars = [];
         arrowGroupGroup = [];
         for (i in it) {
           charData = it[i];
           strokes = [];
           arrows = [];
+          count = charData.length / 2;
+          arrowSize = (2150 - count * 40) / count;
           for (j in charData) {
             data = charData[j];
             strokes.push(stroke = new zhStrokeData.Stroke(data));
             arrows.push(arrow = new zhStrokeData.Arrow(stroke, +j + 1));
             x$ = arrow;
+            x$.size = Math.min(arrow.size, arrowSize);
             x$.length = stroke.length;
             x$.step = 0;
+            x$.computeOffset(0);
             this$.arrows.push(arrow);
             if (+j === it.length - 1) {
               continue;
@@ -163,9 +167,12 @@
           pairs = zhStrokeData.AABB.hit((fn$.call(this$)));
           for (i$ = 0, len$ = pairs.length; i$ < len$; ++i$) {
             p = pairs[i$];
-            z1$ = p[0].entity;
+            e = p[0].entity.angle > p[1].entity.angle
+              ? p[0].entity
+              : p[1].entity;
+            z1$ = e;
             z1$.step += step;
-            z1$.computeOffset(p[0].entity.step);
+            z1$.computeOffset(e.step);
             lresult$.push(z1$);
           }
           results$.push(lresult$);
