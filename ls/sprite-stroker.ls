@@ -197,7 +197,7 @@ class SpriteStroker
       @arrowSprite.time = @sprite.time
       @currentTime = @sprite.time * @sprite.length / @speed
     # should get interval from Date
-    requestAnimationFrame @play if not @paused and @sprite.time < 1
+    requestAnimationFrame @play if not @paused and @sprite?time < 1
   ###
   # mimic VideoElement
   ###

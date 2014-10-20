@@ -272,6 +272,53 @@ class Stroke extends Comp
     ctx.restore!
     super ctx
 
+class ScanlineStroke extends Comp
+  (@data) ->
+    @scale-x = @scale-y = 4
+  computeLength: ->
+    @length = @data.lines.length *
+      if @data.direction is 0
+        then @scale-x
+        else @scale-y
+  computeAABB: ->
+    direction = @data.direction
+    @aabb = new AABB
+    for {idx, start, end} in @data.lines
+      if direction is 0
+        @aabb.addBox new AABB {
+          x: idx   * @scale-x + @x
+          y: start * @scale-y + @y
+        }, {
+          x: (idx + 1) * @scale-x + @x
+          y: end       * @scale-y + @y
+        }
+      else if direction is 1
+        @aabb.addBox new AABB {
+          x: start * @scale-x + @x
+          y: idx   * @scale-y + @y
+        }, {
+          x: end       * @scale-x + @x
+          y: (idx + 1) * @scale-y + @y
+        }
+    @aabb
+  doRender: (ctx) !->
+    direction = @data.direction
+    ctx.fillStyle = \#000
+    for i from 0 til ~~(@data.lines.length * @time)
+      {idx, start, end}
+      if direction is 0
+        ctx.fillRect do
+          idx   * @scale.x + @x
+          start * @scale.y + @y
+          @scale.x
+          (end - start) * @scale.y
+      else if dircetion is 1
+        ctx.fillRect is 0
+          start * @scale.x + @x
+          idx   * @scale.y + @y
+          (end - start) * @scale.x
+          @scale.y
+
 class Arrow extends Comp
   (@stroke, @index) ->
     max = stroke.children.reduce (c, n) ->
