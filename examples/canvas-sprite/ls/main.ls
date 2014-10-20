@@ -1,4 +1,5 @@
 $ ->
+  { SpriteStroker, PrintingStroker } = zh-stroke-data
   var ss, ps
   $sprite   = $ \#sprite
   $printing = $ \#printing
@@ -12,7 +13,7 @@ $ ->
 
   inputChanged = ->
     $sprite.empty!
-    ss := new zh-stroke-data.SpriteStroker it, url: '../../json/'
+    ss := new SpriteStroker it, { url: './', dataType: 'txt' }
     $(\#sprite).append ss.dom-element
     $speed.val   ss.speed
     $stroke.val  ss.stroke-delay
@@ -22,7 +23,7 @@ $ ->
     $arrows.attr \checked, ss.arrows
     $debug.attr \checked, ss.debug
     $printing.empty!
-    ps := new zh-stroke-data.PrintingStroker it, url: '../../json/'
+    ps := new PrintingStroker it, { url: './', dataType: 'txt' }
     $(\#printing).append ps.dom-element
 
   $speed.change !-> ss?speed = +$(@).val!

@@ -272,7 +272,7 @@ class Stroke extends Comp
     ctx.restore!
     super ctx
 
-class ScanlineStroke extends Comp
+class ScanlineTrack extends Comp
   (@data) ->
     @scale-x = @scale-y = 4
   computeLength: ->
@@ -313,11 +313,18 @@ class ScanlineStroke extends Comp
           @scale.x
           (end - start) * @scale.y
       else if dircetion is 1
-        ctx.fillRect is 0
+        ctx.fillRect do
           start * @scale.x + @x
           idx   * @scale.y + @y
           (end - start) * @scale.x
           @scale.y
+
+class ScanlineStroke extends Comp
+  (data) ->
+    console.log data
+    children = for track in data
+      new ScanlineTrack track
+    super children
 
 class Arrow extends Comp
   (@stroke, @index) ->
@@ -414,10 +421,6 @@ class Arrow extends Comp
     @drawArrow ctx, \#fff, 32, yes
     @drawArrow ctx
 
-(window.zh-stroke-data ?= {})
-  ..AABB   = AABB
-  ..Comp   = Comp
-  ..Empty  = Empty
-  ..Track  = Track
-  ..Stroke = Stroke
-  ..Arrow  = Arrow
+(window.zh-stroke-data ?= {}) <<< {
+  AABB, Comp, Empty, Track, Stroke, ScanlineTrack, ScanlineStroke, Arrow
+}

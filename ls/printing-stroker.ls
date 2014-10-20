@@ -1,8 +1,7 @@
 class PrintingStroker
-  @loaders =
-    xml : zh-stroke-data.loaders.XML
-    json: zh-stroke-data.loaders.JSON
-    bin : zh-stroke-data.loaders.Binary
+  @loaders = zh-stroke-data.loaders{
+    xml:XML, json:JSON, bin:Binary, txt: Scanline
+  }
   (str, options) ->
     options = $.extend do
       autoplay: off

@@ -1,5 +1,7 @@
 class SpriteStroker
-  @loaders = zh-stroke-data{XML:xml, JSON:json, Binary:bin, Scanline:txt}
+  @loaders = zh-stroke-data.loaders{
+    xml:XML, json:JSON, bin:Binary, txt:Scanline
+  }
   (str, options) ->
     options = $.extend do
       ###
@@ -98,7 +100,12 @@ class SpriteStroker
         count = char-data.length / 2
         arrow-size = (2150 - (count * 40)) / count
         for j, data of char-data
-          strokes.push (stroke = new zh-stroke-data.Stroke data)
+          stroke =
+            if @dataType is 'txt'
+              new zh-stroke-data.ScanlineStroke data
+            else
+              new zh-stroke-data.Stroke data
+          strokes.push stroke
           arrows.push  (arrow = new zh-stroke-data.Arrow stroke, +j+1)
           arrow
             ..size = Math.min arrow.size, arrow-size
