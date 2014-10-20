@@ -246,10 +246,29 @@ BinaryLoader = (path, d) !->
     ret.push outline: outline, track: track
   d.resolve ret
 
+ScanlineLoader = (path, d) !->
+  get path .progress -> d.notify it
+           .fail     -> d.reject it
+           .then     ->
+              strokes = []
+              data = null
+              lines = it.split /\r+\n+/
+              for line in lines
+                if r = /^([0|1]),(\d+)$/exec line
+                  strokes.push data if data
+                  break if r.1 is '0' and r.2 is '0'
+                  data =
+                    direction: +r.1
+                    lines: []
+                else if r = /^(\d+),(\d+),(\d+)$/exec line
+                  data.lines.push idx: +r.1, start: +r.2, end: +r.3
+              d.resolve strokes
+
 loaders =
-  XML:    callbackify XMLLoader
-  JSON:   callbackify JSONLoader
-  Binary: callbackify BinaryLoader
+  XML:      callbackify XMLLoader
+  JSON:     callbackify JSONLoader
+  Binary:   callbackify BinaryLoader
+  Scanline: callbackify ScanlineLoader
 
 if root.window
   root.zh-stroke-data or= {}
