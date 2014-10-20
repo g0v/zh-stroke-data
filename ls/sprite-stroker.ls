@@ -106,42 +106,43 @@ class SpriteStroker
             else
               new zh-stroke-data.Stroke data
           strokes.push stroke
-          arrows.push  (arrow = new zh-stroke-data.Arrow stroke, +j+1)
-          arrow
-            ..size = Math.min arrow.size, arrow-size
-            ..length = stroke.length
-            ..step = 0
-            ..computeOffset 0
-          @arrow-list.push arrow
+          #arrows.push  (arrow = new zh-stroke-data.Arrow stroke, +j+1)
+          #arrow
+          #  ..size = Math.min arrow.size, arrow-size
+          #  ..length = stroke.length
+          #  ..step = 0
+          #  ..computeOffset 0
+          #@arrow-list.push arrow
           continue if +j is it.length - 1
           gap = new zh-stroke-data.Empty @stroke-gap
           @stroke-gap.objs.push gap
           strokes.push gap
           gap = new zh-stroke-data.Empty @stroke-gap
           @stroke-gap.objs.push gap
-          arrows.push  gap
+          #arrows.push  gap
         char = new zh-stroke-data.Comp strokes
-        arrowGroup = new zh-stroke-data.Comp arrows
+        #arrowGroup = new zh-stroke-data.Comp arrows
         # should be char width
         char.x = 2150 * +i
-        arrowGroup.x = char.x
+        #arrowGroup.x = char.x
         chars.push char
-        arrowGroupGroup.push arrowGroup
+        #arrowGroupGroup.push arrowGroup
         continue if +i is it.length - 1
         gap = new zh-stroke-data.Empty @char-gap
         @char-gap.objs.push gap
         chars.push gap
         gap = new zh-stroke-data.Empty @char-gap
         @char-gap.objs.push gap
-        arrowGroupGroup.push gap
+        #arrowGroupGroup.push gap
       (@sprite = new zh-stroke-data.Comp chars)
         ..scale-x = @width  / 2150
         ..scale-y = @height / 2150
-      (@arrowSprite = new zh-stroke-data.Comp arrowGroupGroup)
-        ..scale-x = @width  / 2150
-        ..scale-y = @height / 2150
+      #(@arrowSprite = new zh-stroke-data.Comp arrowGroupGroup)
+      #  ..scale-x = @width  / 2150
+      #  ..scale-y = @height / 2150
       @dom-element.width  = @width * promises.length
       # simple force layout
+      /**
       step = 0.05
       do
         pairs = zh-stroke-data.AABB.hit do
@@ -154,6 +155,7 @@ class SpriteStroker
             ..step += step
             ..computeOffset e.step
       while pairs.length isnt 0
+      /**/
   ###
   # mimic MediaElement
   ###
@@ -198,7 +200,7 @@ class SpriteStroker
       @arrowSprite.render(ctx, @debug) if @arrows
       step = @speed * 1 / 60
       @sprite.time += step / @sprite.length
-      @arrowSprite.time = @sprite.time
+      @arrowSprite.time = @sprite.time if @arrows
       @currentTime = @sprite.time * @sprite.length / @speed
     # should get interval from Date
     requestAnimationFrame @play if not @paused and @sprite?time < 1

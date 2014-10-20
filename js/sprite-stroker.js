@@ -114,7 +114,7 @@
       promises = res$;
       this.arrowList = [];
       Q.all(promises).then(function(it){
-        var chars, arrowGroupGroup, i, charData, strokes, arrows, count, arrowSize, j, data, stroke, arrow, x$, gap, char, arrowGroup, y$, z$, step, lresult$, pairs, a, i$, len$, p, e, z1$, results$ = [];
+        var chars, arrowGroupGroup, i, charData, strokes, arrows, count, arrowSize, j, data, stroke, gap, char, x$;
         chars = [];
         arrowGroupGroup = [];
         for (i in it) {
@@ -129,13 +129,6 @@
               ? new zhStrokeData.ScanlineStroke(data)
               : new zhStrokeData.Stroke(data);
             strokes.push(stroke);
-            arrows.push(arrow = new zhStrokeData.Arrow(stroke, +j + 1));
-            x$ = arrow;
-            x$.size = Math.min(arrow.size, arrowSize);
-            x$.length = stroke.length;
-            x$.step = 0;
-            x$.computeOffset(0);
-            this$.arrowList.push(arrow);
             if (+j === it.length - 1) {
               continue;
             }
@@ -144,14 +137,10 @@
             strokes.push(gap);
             gap = new zhStrokeData.Empty(this$.strokeGap);
             this$.strokeGap.objs.push(gap);
-            arrows.push(gap);
           }
           char = new zhStrokeData.Comp(strokes);
-          arrowGroup = new zhStrokeData.Comp(arrows);
           char.x = 2150 * +i;
-          arrowGroup.x = char.x;
           chars.push(char);
-          arrowGroupGroup.push(arrowGroup);
           if (+i === it.length - 1) {
             continue;
           }
@@ -160,42 +149,11 @@
           chars.push(gap);
           gap = new zhStrokeData.Empty(this$.charGap);
           this$.charGap.objs.push(gap);
-          arrowGroupGroup.push(gap);
         }
-        y$ = this$.sprite = new zhStrokeData.Comp(chars);
-        y$.scaleX = this$.width / 2150;
-        y$.scaleY = this$.height / 2150;
-        z$ = this$.arrowSprite = new zhStrokeData.Comp(arrowGroupGroup);
-        z$.scaleX = this$.width / 2150;
-        z$.scaleY = this$.height / 2150;
-        this$.domElement.width = this$.width * promises.length;
-        step = 0.05;
-        do {
-          lresult$ = [];
-          pairs = zhStrokeData.AABB.hit((fn$.call(this$)));
-          for (i$ = 0, len$ = pairs.length; i$ < len$; ++i$) {
-            p = pairs[i$];
-            e = p[0].entity.angle > p[1].entity.angle
-              ? p[0].entity
-              : p[1].entity;
-            z1$ = e;
-            z1$.step += step;
-            z1$.computeOffset(e.step);
-            lresult$.push(z1$);
-          }
-          results$.push(lresult$);
-        } while (pairs.length !== 0);
-        return results$;
-        function fn$(){
-          var i$, ref$, len$, x$, results$ = [];
-          for (i$ = 0, len$ = (ref$ = this.arrowList).length; i$ < len$; ++i$) {
-            a = ref$[i$];
-            x$ = a.globalAABB();
-            x$.entity = a;
-            results$.push(x$);
-          }
-          return results$;
-        }
+        x$ = this$.sprite = new zhStrokeData.Comp(chars);
+        x$.scaleX = this$.width / 2150;
+        x$.scaleY = this$.height / 2150;
+        return this$.domElement.width = this$.width * promises.length;
       });
     }
     prototype.videoTracks = 1;
@@ -234,7 +192,9 @@
         }
         step = this.speed * 1 / 60;
         this.sprite.time += step / this.sprite.length;
-        this.arrowSprite.time = this.sprite.time;
+        if (this.arrows) {
+          this.arrowSprite.time = this.sprite.time;
+        }
         this.currentTime = this.sprite.time * this.sprite.length / this.speed;
       }
       if (!this.paused && ((ref$ = this.sprite) != null ? ref$.time : void 8) < 1) {

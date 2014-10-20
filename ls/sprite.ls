@@ -274,16 +274,17 @@ class Stroke extends Comp
 
 class ScanlineTrack extends Comp
   (@data) ->
-    @scale-x = @scale-y = 4
+    super!
+    @scale-x = @scale-y = 2
+    # FIXME: rethink the workflow in super
+    @computeAABB!
+    @length *= 2
   computeLength: ->
-    @length = @data.lines.length *
-      if @data.direction is 0
-        then @scale-x
-        else @scale-y
+    @length = @data.lines.length
   computeAABB: ->
     direction = @data.direction
     @aabb = new AABB
-    for {idx, start, end} in @data.lines
+    for { idx, start, end } in @data.lines
       if direction is 0 # vertical
         @aabb.addBox new AABB {
           x: start * @scale-x + @x
@@ -303,25 +304,26 @@ class ScanlineTrack extends Comp
     @aabb
   doRender: (ctx) !->
     direction = @data.direction
-    ctx.fillStyle = \#000
+    ctx
+      ..beginPath!
+      ..fillStyle = \#000
     for i from 0 til ~~(@data.lines.length * @time)
-      {idx, start, end}
+      { idx, start, end } = @data.lines[i]
       if direction is 0
         ctx.fillRect do
-          idx   * @scale.x + @x
-          start * @scale.y + @y
-          @scale.x
-          (end - start) * @scale.y
-      else if dircetion is 1
+          start     * @scale-x + @x
+          (idx - 1) * @scale-y + @y
+          (end - start) * @scale-x
+          @scale-y * 2
+      else if direction is 1
         ctx.fillRect do
-          start * @scale.x + @x
-          idx   * @scale.y + @y
-          (end - start) * @scale.x
-          @scale.y
+          (idx - 1) * @scale-x + @x
+          start     * @scale-y + @y
+          @scale-x * 2
+          (end - start) * @scale-y
 
 class ScanlineStroke extends Comp
   (data) ->
-    console.log data
     children = for track in data
       new ScanlineTrack track
     super children

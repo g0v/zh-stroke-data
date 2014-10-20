@@ -38,7 +38,7 @@
       }
       promises = res$;
       Q.all(promises).then(function(it){
-        var max, chars, res$, i, charData, strokes, res1$, j, data, x$, c, lresult$, lresult1$, i$, k, y$, results$ = [];
+        var max, chars, res$, i, charData, strokes, res1$, j, data, stroke, x$, y$, c, lresult$, lresult1$, i$, k, z$, results$ = [];
         max = 0;
         res$ = [];
         for (i in it) {
@@ -46,10 +46,9 @@
           res1$ = [];
           for (j in charData) {
             data = charData[j];
-            x$ = new zhStrokeData.Stroke(data);
-            x$.scaleX = this$.width / 2150;
-            x$.scaleY = this$.height / 2150;
-            res1$.push(x$);
+            res1$.push(stroke = this$.dataType === 'txt'
+              ? (x$ = new zhStrokeData.ScanlineStroke(data), x$.scaleX = this$.width / 2048, x$.scaleY = this$.height / 2048, x$)
+              : (y$ = new zhStrokeData.Stroke(data), y$.scaleX = this$.width / 2150, y$.scaleY = this$.height / 2150, y$));
           }
           strokes = res1$;
           if (strokes.length > max) {
@@ -69,12 +68,12 @@
             j = +j;
             for (i$ = 0; i$ <= j; ++i$) {
               k = i$;
-              y$ = c[+k];
-              y$.time = 1;
-              y$.x = this$.width * j;
-              y$.y = this$.height * i;
-              y$.render(this$.domElement.getContext('2d'));
-              lresult1$.push(y$);
+              z$ = c[+k];
+              z$.time = 1;
+              z$.x = this$.width * j;
+              z$.y = this$.height * i;
+              z$.render(this$.domElement.getContext('2d'));
+              lresult1$.push(z$);
             }
             lresult$.push(lresult1$);
           }

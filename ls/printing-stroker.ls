@@ -29,9 +29,14 @@ class PrintingStroker
       max = 0
       chars = for i, char-data of it
         strokes = for j, data of char-data
-          new zh-stroke-data.Stroke data
-            ..scale-x = @width  / 2150
-            ..scale-y = @height / 2150
+          stroke = if @dataType is 'txt'
+            new zh-stroke-data.ScanlineStroke data
+              ..scale-x = @width  / 2048
+              ..scale-y = @height / 2048
+          else
+            new zh-stroke-data.Stroke data
+              ..scale-x = @width  / 2150
+              ..scale-y = @height / 2150
         if strokes.length > max then max = strokes.length
         strokes
       @dom-element.width  = @width  * max

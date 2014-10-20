@@ -487,12 +487,13 @@
     var prototype = extend$((import$(ScanlineTrack, superclass).displayName = 'ScanlineTrack', ScanlineTrack), superclass).prototype, constructor = ScanlineTrack;
     function ScanlineTrack(data){
       this.data = data;
-      this.scaleX = this.scaleY = 4;
+      ScanlineTrack.superclass.call(this);
+      this.scaleX = this.scaleY = 2;
+      this.computeAABB();
+      this.length *= 2;
     }
     prototype.computeLength = function(){
-      return this.length = this.data.lines.length * (this.data.direction === 0
-        ? this.scaleX
-        : this.scaleY);
+      return this.length = this.data.lines.length;
     };
     prototype.computeAABB = function(){
       var direction, i$, ref$, len$, ref1$, idx, start, end;
@@ -521,20 +522,18 @@
       return this.aabb;
     };
     prototype.doRender = function(ctx){
-      var direction, i$, to$, i;
+      var direction, x$, i$, to$, i, ref$, idx, start, end;
       direction = this.data.direction;
-      ctx.fillStyle = '#000';
+      x$ = ctx;
+      x$.beginPath();
+      x$.fillStyle = '#000';
       for (i$ = 0, to$ = ~~(this.data.lines.length * this.time); i$ < to$; ++i$) {
         i = i$;
-        ({
-          idx: idx,
-          start: start,
-          end: end
-        });
+        ref$ = this.data.lines[i], idx = ref$.idx, start = ref$.start, end = ref$.end;
         if (direction === 0) {
-          ctx.fillRect(idx * this.scale.x + this.x, start * this.scale.y + this.y, this.scale.x, (end - start) * this.scale.y);
-        } else if (dircetion === 1) {
-          ctx.fillRect(start * this.scale.x + this.x, idx * this.scale.y + this.y, (end - start) * this.scale.x, this.scale.y);
+          ctx.fillRect(start * this.scaleX + this.x, (idx - 1) * this.scaleY + this.y, (end - start) * this.scaleX, this.scaleY * 2);
+        } else if (direction === 1) {
+          ctx.fillRect((idx - 1) * this.scaleX + this.x, start * this.scaleY + this.y, this.scaleX * 2, (end - start) * this.scaleY);
         }
       }
     };
@@ -544,7 +543,6 @@
     var prototype = extend$((import$(ScanlineStroke, superclass).displayName = 'ScanlineStroke', ScanlineStroke), superclass).prototype, constructor = ScanlineStroke;
     function ScanlineStroke(data){
       var children, res$, i$, len$, track;
-      console.log(data);
       res$ = [];
       for (i$ = 0, len$ = data.length; i$ < len$; ++i$) {
         track = data[i$];
