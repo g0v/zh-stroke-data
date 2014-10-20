@@ -284,21 +284,21 @@ class ScanlineStroke extends Comp
     direction = @data.direction
     @aabb = new AABB
     for {idx, start, end} in @data.lines
-      if direction is 0
-        @aabb.addBox new AABB {
-          x: idx   * @scale-x + @x
-          y: start * @scale-y + @y
-        }, {
-          x: (idx + 1) * @scale-x + @x
-          y: end       * @scale-y + @y
-        }
-      else if direction is 1
+      if direction is 0 # vertical
         @aabb.addBox new AABB {
           x: start * @scale-x + @x
           y: idx   * @scale-y + @y
         }, {
           x: end       * @scale-x + @x
           y: (idx + 1) * @scale-y + @y
+        }
+      else if direction is 1 # horizontal
+        @aabb.addBox new AABB {
+          x: idx   * @scale-x + @x
+          y: start * @scale-y + @y
+        }, {
+          x: (idx + 1) * @scale-x + @x
+          y: end       * @scale-y + @y
         }
     @aabb
   doRender: (ctx) !->

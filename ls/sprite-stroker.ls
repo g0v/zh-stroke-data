@@ -1,8 +1,5 @@
 class SpriteStroker
-  @loaders =
-    xml : zh-stroke-data.loaders.XML
-    json: zh-stroke-data.loaders.JSON
-    bin : zh-stroke-data.loaders.Binary
+  @loaders = zh-stroke-data{XML:xml, JSON:json, Binary:bin, Scanline:txt}
   (str, options) ->
     options = $.extend do
       ###
@@ -93,7 +90,7 @@ class SpriteStroker
     @arrow-list = []
     Q.all(promises).then ~>
       chars = []
-      # WTF XDDDD
+      # XXX: GroupGroup, WTF XDDDD
       arrowGroupGroup = []
       for i, char-data of it
         strokes = []

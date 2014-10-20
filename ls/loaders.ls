@@ -251,15 +251,21 @@ ScanlineLoader = (path, d) !->
            .fail     -> d.reject it
            .then     ->
               strokes = []
+              stroke = []
               data = null
               lines = it.split /\r+\n+/
               for line in lines
                 if r = /^([0|1]),(\d+)$/exec line
-                  strokes.push data if data
-                  break if r.1 is '0' and r.2 is '0'
-                  data =
-                    direction: +r.1
-                    lines: []
+                  if r.1 is '0' and r.2 is '0'
+                    stroke.push data
+                    strokes.push stroke
+                    stroke = []
+                    data = null
+                  else
+                    stroke.push data if data
+                    data =
+                      direction: +r.1
+                      lines: []
                 else if r = /^(\d+),(\d+),(\d+)$/exec line
                   data.lines.push idx: +r.1, start: +r.2, end: +r.3
               d.resolve strokes
