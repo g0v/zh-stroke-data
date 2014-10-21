@@ -684,7 +684,7 @@
     for (i$ = 1, to$ = data.track.length; i$ < to$; ++i$) {
       i = i$;
       c = data.track[i - 1];
-      n = data.trace[i];
+      n = data.track[i];
       x = n.x - c.x;
       y = n.y - c.y;
       length = Math.sqrt(x * x + y * y);
@@ -695,7 +695,7 @@
       });
     }
     vectors = res$;
-    max = lengths.reduce(function(c, n){
+    max = vectors.reduce(function(c, n){
       if (c.length > n.length) {
         return c;
       } else {
@@ -705,7 +705,7 @@
     for (i$ = 0, len$ = vectors.length; i$ < len$; ++i$) {
       v = vectors[i$];
       if (v.length > max.length / 2.5) {
-        track = t;
+        track = v;
         break;
       }
     }
@@ -732,15 +732,16 @@
   Hint = (function(superclass){
     var prototype = extend$((import$(Hint, superclass).displayName = 'Hint', Hint), superclass).prototype, constructor = Hint;
     function Hint(arg$){
-      var guideline;
-      this.track = arg$.track, guideline = arg$.guideline;
-      computeVectors(this.track);
+      this.track = arg$.track, this.guideline = arg$.guideline;
       this.offset = {
         x: 0,
         y: 0
       };
+      this.text = '';
       this.dir = 1;
       this.size = 160;
+      this.computeVectors(this.track);
+      Hint.superclass.call(this);
     }
     prototype.computeVectors = function(track){
       var rad;
@@ -748,7 +749,7 @@
         x: track.x / track.length,
         y: track.y / track.length
       };
-      rad = Math.atan2(this.unit.y, this.unit.x);
+      rad = Math.atan2(this.front.y, this.front.x);
       rad = halfPi > rad && rad >= -halfPi
         ? rad - halfPi
         : rad + halfPi;
@@ -793,8 +794,8 @@
       p = Math.abs(it);
       percent = p - ~~p;
       x$ = this.offset;
-      x$.x = this.dir * this.track.guideline.length * this.up.x / 2 + percent * this.size * this.vector.x;
-      x$.y = this.dir * this.track.guideline.length * this.up.y / 2 + percent * this.size * this.vector.y;
+      x$.x = this.dir * this.guideline.length * this.up.x / 2 + percent * this.size * this.front.x;
+      x$.y = this.dir * this.guideline.length * this.up.y / 2 + percent * this.size * this.front.y;
       return this.computeAABB();
     };
     prototype.drawArrow = function(ctx, color, width, bold){
@@ -808,15 +809,15 @@
       x$.lineWidth = width;
       x$.beginPath();
       x$.moveTo(this.offset.x, this.offset.y);
-      x$.lineTo(this.offset.x + this.vector.x * this.size * 0.66, this.offset.y + this.vector.y * this.size * 0.66);
+      x$.lineTo(this.offset.x + this.front.x * this.size * 0.66, this.offset.y + this.front.y * this.size * 0.66);
       x$.stroke();
       x$.fillStyle = color;
       x$.beginPath();
-      x$.moveTo(this.offset.x + this.vector.x * this.size * 0.66, this.offset.y + this.vector.y * this.size * 0.66);
-      x$.lineTo(this.offset.x + this.vector.x * this.size, this.offset.y + this.vector.y * this.size);
-      x$.lineTo(this.offset.x + this.vector.x * this.size * 0.66 + (this.dir >= 0
+      x$.moveTo(this.offset.x + this.front.x * this.size * 0.66, this.offset.y + this.front.y * this.size * 0.66);
+      x$.lineTo(this.offset.x + this.front.x * this.size, this.offset.y + this.front.y * this.size);
+      x$.lineTo(this.offset.x + this.front.x * this.size * 0.66 + (this.dir >= 0
         ? 1
-        : -1) * this.up.x * this.size * 0.25, this.offset.y + this.vector.y * this.size * 0.66 + (this.dir >= 0
+        : -1) * this.up.x * this.size * 0.25, this.offset.y + this.front.y * this.size * 0.66 + (this.dir >= 0
         ? 1
         : -1) * this.up.y * this.size * 0.25);
       x$.stroke();
@@ -824,9 +825,9 @@
       x$.font = (this.size * 2 / 3 + "px sans-serif") + (bold ? ' bold' : '');
       x$.textAlign = 'center';
       x$.textBaseline = 'middle';
-      x$.fillText(this.index, this.offset.x + this.vector.x * this.size * 0.33 + (this.dir >= 0
+      x$.fillText(this.text, this.offset.x + this.front.x * this.size * 0.33 + (this.dir >= 0
         ? 1
-        : -1) * this.up.x * this.size * 0.33, this.offset.y + this.vector.y * this.size * 0.33 + (this.dir >= 0
+        : -1) * this.up.x * this.size * 0.33, this.offset.y + this.front.y * this.size * 0.33 + (this.dir >= 0
         ? 1
         : -1) * this.up.y * this.size * 0.33);
     };
@@ -846,7 +847,9 @@
   ref$.Stroke = Stroke;
   ref$.ScanlineTrack = ScanlineTrack;
   ref$.ScanlineStroke = ScanlineStroke;
-  ref$.Arrow = Arrow;
+  ref$.hintDataFromMOE = hintDataFromMOE;
+  ref$.hintDataFromScanline = hintDataFromScanline;
+  ref$.Hint = Hint;
   function bind$(obj, key, target){
     return function(){ return (target || obj)[key].apply(obj, arguments) };
   }

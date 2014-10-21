@@ -427,16 +427,16 @@ class Arrow extends Comp
 hintDataFromMOE = (data) ->
   vectors = for i from 1 til data.track.length
     c = data.track[i-1]
-    n = data.trace[i]
+    n = data.track[i]
     x = n.x - c.x
     y = n.y - c.y
     length = Math.sqrt x * x + y * y
     { x, y, length }
-  max = lengths.reduce (c, n) -> if c.length > n.length then c else n
+  max = vectors.reduce (c, n) -> if c.length > n.length then c else n
   var track
   for v in vectors
     if v.length > max.length / 2.5
-      track = t
+      track = v
       break
   { track, guideline:vectors.0 }
 
@@ -452,16 +452,18 @@ hintDataFromScanline = (data) ->
 
 half-pi = Math.PI/2
 class Hint extends Comp
-  ({@track, guideline}) ->
-    computeVectors @track
+  ({@track, @guideline}) ->
     @offset = x: 0, y: 0
+    @text = ''
     @dir = 1
     @size = 160
+    @computeVectors @track
+    super!
   computeVectors: (track) ->
     @front =
       x: track.x / track.length
       y: track.y / track.length
-    rad = Math.atan2 @unit.y, @unit.x
+    rad = Math.atan2 @front.y, @front.x
     rad = if half-pi > rad >= -half-pi then rad - half-pi else rad + half-pi
     @up =
       x: Math.cos rad
@@ -495,8 +497,8 @@ class Hint extends Comp
     p = Math.abs it
     percent = p - ~~p
     @offset
-      ..x = @dir * @track.guideline.length * @up.x / 2 + percent * @size * @vector.x
-      ..y = @dir * @track.guideline.length * @up.y / 2 + percent * @size * @vector.y
+      ..x = @dir * @guideline.length * @up.x / 2 + percent * @size * @front.x
+      ..y = @dir * @guideline.length * @up.y / 2 + percent * @size * @front.y
     @computeAABB!
   drawArrow: (ctx, color = \#c00, width = 16, bold = no) !->
     ctx
@@ -506,29 +508,29 @@ class Hint extends Comp
       ..beginPath!
       ..moveTo @offset.x, @offset.y
       ..lineTo do
-        @offset.x + @vector.x * @size * 0.66
-        @offset.y + @vector.y * @size * 0.66
+        @offset.x + @front.x * @size * 0.66
+        @offset.y + @front.y * @size * 0.66
       ..stroke!
       ..fillStyle = color
       ..beginPath!
       ..moveTo do
-        @offset.x + @vector.x * @size * 0.66
-        @offset.y + @vector.y * @size * 0.66
+        @offset.x + @front.x * @size * 0.66
+        @offset.y + @front.y * @size * 0.66
       ..lineTo do
-        @offset.x + @vector.x * @size
-        @offset.y + @vector.y * @size
+        @offset.x + @front.x * @size
+        @offset.y + @front.y * @size
       ..lineTo do
-        @offset.x + @vector.x * @size * 0.66 + (if @dir >= 0 then 1 else -1) * @up.x * @size * 0.25
-        @offset.y + @vector.y * @size * 0.66 + (if @dir >= 0 then 1 else -1) * @up.y * @size * 0.25
+        @offset.x + @front.x * @size * 0.66 + (if @dir >= 0 then 1 else -1) * @up.x * @size * 0.25
+        @offset.y + @front.y * @size * 0.66 + (if @dir >= 0 then 1 else -1) * @up.y * @size * 0.25
       ..stroke!
       ..fill!
       ..font = "#{@size*2/3}px sans-serif" + if bold then ' bold' else ''
       ..textAlign = \center
       ..textBaseline = \middle
       ..fillText do
-        @index
-        @offset.x + @vector.x * @size * 0.33 + (if @dir >= 0 then 1 else -1) * @up.x * @size * 0.33
-        @offset.y + @vector.y * @size * 0.33 + (if @dir >= 0 then 1 else -1) * @up.y * @size * 0.33
+        @text
+        @offset.x + @front.x * @size * 0.33 + (if @dir >= 0 then 1 else -1) * @up.x * @size * 0.33
+        @offset.y + @front.y * @size * 0.33 + (if @dir >= 0 then 1 else -1) * @up.y * @size * 0.33
   doRender: (ctx) !->
     @drawArrow ctx, \#fff, 32, yes
     @drawArrow ctx
@@ -536,5 +538,6 @@ class Hint extends Comp
 
 
 (window.zh-stroke-data ?= {}) <<< {
-  AABB, Comp, Empty, Track, Stroke, ScanlineTrack, ScanlineStroke, Arrow
+  AABB, Comp, Empty, Track, Stroke, ScanlineTrack, ScanlineStroke,
+  hintDataFromMOE, hintDataFromScanline, Hint
 }

@@ -15,10 +15,11 @@ $ ->
       url: '../../json/'
     scanline:
       url: './', dataType: 'txt'
+  source = src.moe
 
   inputChanged = ->
     $sprite.empty!
-    ss := new SpriteStroker it, src.scanline
+    ss := new SpriteStroker it, source
     $(\#sprite).append ss.dom-element
     $speed.val   ss.speed
     $stroke.val  ss.stroke-delay
@@ -28,7 +29,7 @@ $ ->
     $arrows.attr \checked, ss.arrows
     $debug.attr \checked, ss.debug
     $printing.empty!
-    ps := new PrintingStroker it, src.scanline
+    ps := new PrintingStroker it, source
     $(\#printing).append ps.dom-element
 
   $speed.change !-> ss?speed = +$(@).val!

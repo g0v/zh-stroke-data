@@ -1,7 +1,10 @@
+{
+  AABB, loaders, Stroke, ScanlineStroke, Empty, Comp,
+  hintDataFromMOE, hintDataFromScanline, Hint
+} = zh-stroke-data
+
 class SpriteStroker
-  @loaders = zh-stroke-data.loaders{
-    xml:XML, json:JSON, bin:Binary, txt:Scanline
-  }
+  @loaders = loaders{ xml:XML, json:JSON, bin:Binary, txt:Scanline }
   (str, options) ->
     options = $.extend do
       ###
@@ -100,49 +103,53 @@ class SpriteStroker
         count = char-data.length / 2
         arrow-size = (2150 - (count * 40)) / count
         for j, data of char-data
-          stroke =
-            if @dataType is 'txt'
-              new zh-stroke-data.ScanlineStroke data
-            else
-              new zh-stroke-data.Stroke data
+          if @dataType is 'txt'
+            stroke = new ScanlineStroke data
+            arrow = new Hint hintDataFromScanline data
+          else
+            stroke = new Stroke data
+            arrow = new Hint hintDataFromMOE data
           strokes.push stroke
-          #arrows.push  (arrow = new zh-stroke-data.Arrow stroke, +j+1)
-          #arrow
-          #  ..size = Math.min arrow.size, arrow-size
-          #  ..length = stroke.length
-          #  ..step = 0
-          #  ..computeOffset 0
-          #@arrow-list.push arrow
+          arrow
+            ..x = stroke.x
+            ..y = stroke.y
+            ..text = +j + 1
+            ..size = Math.min arrow.size, arrow-size
+            ..length = stroke.length
+            ..step = 0
+            ..computeOffset 0
+          arrows.push arrow
+          @arrow-list.push arrow
           continue if +j is it.length - 1
-          gap = new zh-stroke-data.Empty @stroke-gap
+          gap = new Empty @stroke-gap
           @stroke-gap.objs.push gap
           strokes.push gap
-          gap = new zh-stroke-data.Empty @stroke-gap
+          gap = new Empty @stroke-gap
           @stroke-gap.objs.push gap
-          #arrows.push  gap
-        char = new zh-stroke-data.Comp strokes
-        #arrowGroup = new zh-stroke-data.Comp arrows
+          arrows.push gap
+        char = new Comp strokes
+        arrowGroup = new Comp arrows
         # should be char width
         char.x = 2150 * +i
-        #arrowGroup.x = char.x
+        arrowGroup.x = char.x
         chars.push char
-        #arrowGroupGroup.push arrowGroup
+        arrowGroupGroup.push arrowGroup
         continue if +i is it.length - 1
-        gap = new zh-stroke-data.Empty @char-gap
+        gap = new Empty @char-gap
         @char-gap.objs.push gap
         chars.push gap
-        gap = new zh-stroke-data.Empty @char-gap
+        gap = new Empty @char-gap
         @char-gap.objs.push gap
-        #arrowGroupGroup.push gap
-      (@sprite = new zh-stroke-data.Comp chars)
+        arrowGroupGroup.push gap
+      (@sprite = new Comp chars)
         ..scale-x = @width  / 2150
         ..scale-y = @height / 2150
-      #(@arrowSprite = new zh-stroke-data.Comp arrowGroupGroup)
-      #  ..scale-x = @width  / 2150
-      #  ..scale-y = @height / 2150
+      (@arrowSprite = new Comp arrowGroupGroup)
+        ..scale-x = @width  / 2150
+        ..scale-y = @height / 2150
       @dom-element.width  = @width * promises.length
       # simple force layout
-      /**
+      /**/
       step = 0.05
       do
         pairs = zh-stroke-data.AABB.hit do
