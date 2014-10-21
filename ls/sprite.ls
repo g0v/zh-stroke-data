@@ -221,6 +221,7 @@ class Track extends Comp
 
 class Stroke extends Comp
   (data) ->
+    console.log data
     children = []
     for i from 1 til data.track.length
       prev = data.track[i-1]
@@ -422,6 +423,117 @@ class Arrow extends Comp
   doRender: (ctx) !->
     @drawArrow ctx, \#fff, 32, yes
     @drawArrow ctx
+
+hintDataFromMOE = (data) ->
+  vectors = for i from 1 til data.track.length
+    c = data.track[i-1]
+    n = data.trace[i]
+    x = n.x - c.x
+    y = n.y - c.y
+    length = Math.sqrt x * x + y * y
+    { x, y, length }
+  max = lengths.reduce (c, n) -> if c.length > n.length then c else n
+  var track
+  for v in vectors
+    if v.length > max.length / 2.5
+      track = t
+      break
+  { track, guideline:vectors.0 }
+
+hintDataFromScanline = (data) ->
+  track:
+    x: 0
+    y: 0
+    length: 0
+  guideline:
+    x: 0
+    y: 0
+    length: 0
+
+half-pi = Math.PI/2
+class Hint extends Comp
+  ({@track, guideline}) ->
+    computeVectors @track
+    @offset = x: 0, y: 0
+    @dir = 1
+    @size = 160
+  computeVectors: (track) ->
+    @front =
+      x: track.x / track.length
+      y: track.y / track.length
+    rad = Math.atan2 @unit.y, @unit.x
+    rad = if half-pi > rad >= -half-pi then rad - half-pi else rad + half-pi
+    @up =
+      x: Math.cos rad
+      y: Math.sin rad
+    { front: @front, up: @up }
+  computeLength: ->
+    @length = 0 # XXX
+  computeAABB: ->
+    @aabb = new AABB
+    @aabb.addPoint do
+      x: @offset.x
+      y: @offset.y
+    @aabb.addPoint do
+      x: @offset.x + @size * @front.x
+      y: @offset.y + @size * @front.y
+    @aabb.addPoint do
+      x: @offset.x + @front.x * @size * 0.5 + @up.x * @size * 0.5
+      y: @offset.y + @front.y * @size * 0.5 + @up.y * @size * 0.5
+    @aabb
+  ##
+  # At first, move the arrow forward,         (0 <= it < 1)
+  # if still collide, swap to the other side. (1 <= it)
+  computeOffset: ->
+    it = +it
+    if it < 0
+      it = 0
+    else if it < 1
+      @dir = 1
+    else
+      @dir = -~~(it - 1) - 1
+    p = Math.abs it
+    percent = p - ~~p
+    @offset
+      ..x = @dir * @track.guideline.length * @up.x / 2 + percent * @size * @vector.x
+      ..y = @dir * @track.guideline.length * @up.y / 2 + percent * @size * @vector.y
+    @computeAABB!
+  drawArrow: (ctx, color = \#c00, width = 16, bold = no) !->
+    ctx
+      ..lineCap = \round
+      ..strokeStyle = color
+      ..lineWidth = width
+      ..beginPath!
+      ..moveTo @offset.x, @offset.y
+      ..lineTo do
+        @offset.x + @vector.x * @size * 0.66
+        @offset.y + @vector.y * @size * 0.66
+      ..stroke!
+      ..fillStyle = color
+      ..beginPath!
+      ..moveTo do
+        @offset.x + @vector.x * @size * 0.66
+        @offset.y + @vector.y * @size * 0.66
+      ..lineTo do
+        @offset.x + @vector.x * @size
+        @offset.y + @vector.y * @size
+      ..lineTo do
+        @offset.x + @vector.x * @size * 0.66 + (if @dir >= 0 then 1 else -1) * @up.x * @size * 0.25
+        @offset.y + @vector.y * @size * 0.66 + (if @dir >= 0 then 1 else -1) * @up.y * @size * 0.25
+      ..stroke!
+      ..fill!
+      ..font = "#{@size*2/3}px sans-serif" + if bold then ' bold' else ''
+      ..textAlign = \center
+      ..textBaseline = \middle
+      ..fillText do
+        @index
+        @offset.x + @vector.x * @size * 0.33 + (if @dir >= 0 then 1 else -1) * @up.x * @size * 0.33
+        @offset.y + @vector.y * @size * 0.33 + (if @dir >= 0 then 1 else -1) * @up.y * @size * 0.33
+  doRender: (ctx) !->
+    @drawArrow ctx, \#fff, 32, yes
+    @drawArrow ctx
+
+
 
 (window.zh-stroke-data ?= {}) <<< {
   AABB, Comp, Empty, Track, Stroke, ScanlineTrack, ScanlineStroke, Arrow

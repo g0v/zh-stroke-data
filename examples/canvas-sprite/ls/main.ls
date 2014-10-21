@@ -10,10 +10,15 @@ $ ->
   $char     = $ \#char
   $arrows   = $ \#arrows
   $debug    = $ \#debug
+  src =
+    moe:
+      url: '../../json/'
+    scanline:
+      url: './', dataType: 'txt'
 
   inputChanged = ->
     $sprite.empty!
-    ss := new SpriteStroker it, { url: './', dataType: 'txt' }
+    ss := new SpriteStroker it, src.scanline
     $(\#sprite).append ss.dom-element
     $speed.val   ss.speed
     $stroke.val  ss.stroke-delay
@@ -23,7 +28,7 @@ $ ->
     $arrows.attr \checked, ss.arrows
     $debug.attr \checked, ss.debug
     $printing.empty!
-    ps := new PrintingStroker it, { url: './', dataType: 'txt' }
+    ps := new PrintingStroker it, src.scanline
     $(\#printing).append ps.dom-element
 
   $speed.change !-> ss?speed = +$(@).val!
