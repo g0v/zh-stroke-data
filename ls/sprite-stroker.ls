@@ -111,8 +111,8 @@ class SpriteStroker
             arrow = new Hint hintDataFromMOE data
           strokes.push stroke
           arrow
-            ..x = stroke.x
-            ..y = stroke.y
+            ..x += stroke.x
+            ..y += stroke.y
             ..text = +j + 1
             ..size = Math.min arrow.size, arrow-size
             ..length = stroke.length

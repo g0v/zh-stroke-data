@@ -710,12 +710,16 @@
       }
     }
     return {
+      x: data.track[0].x,
+      y: data.track[0].y,
       track: track,
       guideline: vectors[0]
     };
   };
   hintDataFromScanline = function(data){
     return {
+      x: 0,
+      y: 0,
       track: {
         x: 0,
         y: 0,
@@ -731,8 +735,9 @@
   halfPi = Math.PI / 2;
   Hint = (function(superclass){
     var prototype = extend$((import$(Hint, superclass).displayName = 'Hint', Hint), superclass).prototype, constructor = Hint;
-    function Hint(arg$){
-      this.track = arg$.track, this.guideline = arg$.guideline;
+    function Hint(data){
+      var track;
+      track = data.track;
       this.offset = {
         x: 0,
         y: 0
@@ -740,8 +745,9 @@
       this.text = '';
       this.dir = 1;
       this.size = 160;
-      this.computeVectors(this.track);
+      this.computeVectors(track);
       Hint.superclass.call(this);
+      import$(this, data);
     }
     prototype.computeVectors = function(track){
       var rad;

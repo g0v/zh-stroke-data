@@ -15,7 +15,7 @@ $ ->
       url: '../../json/'
     scanline:
       url: './', dataType: 'txt'
-  source = src.moe
+  source = src.scanline
 
   inputChanged = ->
     $sprite.empty!

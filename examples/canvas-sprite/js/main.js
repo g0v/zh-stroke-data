@@ -20,7 +20,7 @@ $(function(){
       dataType: 'txt'
     }
   };
-  source = src.moe;
+  source = src.scanline;
   inputChanged = function(it){
     $sprite.empty();
     ss = new SpriteStroker(it, source);

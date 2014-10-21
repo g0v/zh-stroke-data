@@ -438,9 +438,15 @@ hintDataFromMOE = (data) ->
     if v.length > max.length / 2.5
       track = v
       break
-  { track, guideline:vectors.0 }
+  x: data.track.0.x
+  y: data.track.0.y
+  track: track
+  guideline: vectors.0
 
+# TODO
 hintDataFromScanline = (data) ->
+  x: 0
+  y: 0
   track:
     x: 0
     y: 0
@@ -452,13 +458,15 @@ hintDataFromScanline = (data) ->
 
 half-pi = Math.PI/2
 class Hint extends Comp
-  ({@track, @guideline}) ->
+  ({track}:data) ->
     @offset = x: 0, y: 0
     @text = ''
     @dir = 1
     @size = 160
-    @computeVectors @track
+    @computeVectors track
     super!
+    # import x, y, track, guideline
+    this <<< data
   computeVectors: (track) ->
     @front =
       x: track.x / track.length

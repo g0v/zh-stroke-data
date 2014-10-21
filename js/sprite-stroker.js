@@ -135,8 +135,8 @@
             }
             strokes.push(stroke);
             x$ = arrow;
-            x$.x = stroke.x;
-            x$.y = stroke.y;
+            x$.x += stroke.x;
+            x$.y += stroke.y;
             x$.text = +j + 1;
             x$.size = Math.min(arrow.size, arrowSize);
             x$.length = stroke.length;
