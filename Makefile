@@ -1,6 +1,7 @@
 COMPOSE = node ./compose.js
 DIR_MISSING = ./missing
 DIR_COMPOSED = ./json
+DIR_STROKER = ./ls
 STROKES_MISSING = $(wildcard $(DIR_MISSING)/*.json)
 STROKES_COMPOSED = $(STROKES_MISSING:$(DIR_MISSING)/%=$(DIR_COMPOSED)/%)
 
@@ -11,7 +12,7 @@ $(DIR_COMPOSED)/%.json : $(DIR_MISSING)/%.json
 	lsc -c $<
 
 serve ::
-	node ./static-here.js 8888
+	node ./static-here.js 8888 | $(MAKE) -C $(DIR_STROKER)
 
 main ::
 	cat ./js/utils.stroke-words.js ./js/draw.js ./js/draw.canvas.js ./js/jquery.stroke-words.js > /Users/audreyt/w/moedict-webkit/js/jquery.strokeWords.js
