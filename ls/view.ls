@@ -1,6 +1,7 @@
 React = require 'react'
 
 { canvas } = React.DOM
+{ Surface, Group, Shape, Transform } = require 'react-art'
 
 class AABB
   # private
@@ -121,14 +122,56 @@ class AABB
 
 
 
-SpriteMixin =
-  doRender: ->
-    @willRender!
-    @didRender!
-  componentDidMount: ->
-  componentDidUpdate: ->
-  render: -> canvas ref: \canvas
+T = React.createClass do
+  getDefaultProps: ->
+    data: []
+    x: 0
+    y: 0
+  render: ->
+    console.log 'Track'
+    track = for pt in @props.data.track => ''
+    Group do
+      x: @props.x
+      y: @props.y
+      Shape do
+        d: track.join ' '
+        stroke: \#F90
+        stroke-width: 1
 
+S = React.createClass do
+  getDefaultProps: ->
+    data: []
+    x: 0
+    y: 0
+  render: ->
+    console.log 'Stroke'
+    outline = for cmd in @props.data.outline => ''
+    Group do
+      x: @props.x
+      y: @props.y
+      for i, track of @props.data.track
+        T key: i, data: track
+      Shape do
+        d: outline.join ' '
+        stroke: \#F90
+        stroke-width: 1
+
+W = React.createClass do
+  getDefaultProps: ->
+    data: []
+    x: 0
+    y: 0
+  render: ->
+    console.log 'Word'
+    Group do
+      x: @props.x
+      y: @props.y
+      for i, stroke of @props.data
+        S key: i, data: stroke
+
+
+
+/**
 class Empty extends Comp
   (@data) -> super!
   computeLength: ->
@@ -489,10 +532,8 @@ class Hint extends Comp
   doRender: (ctx) !->
     @drawArrow ctx, \#fff, 32, yes
     @drawArrow ctx
+/**/
 
 
 
-(window.zh-stroke-data ?= {}) <<< {
-  AABB, Comp, Empty, Track, Stroke, ScanlineTrack, ScanlineStroke,
-  hintDataFromMOE, hintDataFromScanline, Hint
-}
+(window.zh-stroke-data ?= {}) <<< module.exports = { W, S, T }
