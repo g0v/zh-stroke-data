@@ -129,12 +129,14 @@ T = React.createClass do
     y: 0
   render: ->
     console.log 'Track'
-    track = for pt in @props.data.track => ''
+    { start, end } = @props.data
+    track = "M#{start?x or 0},#{start?y or 0} L#{end?x or 0},#{end?y or 0}"
+    console.log track
     Group do
       x: @props.x
       y: @props.y
       Shape do
-        d: track.join ' '
+        d: track
         stroke: \#F90
         stroke-width: 1
 
@@ -149,12 +151,15 @@ S = React.createClass do
     Group do
       x: @props.x
       y: @props.y
-      for i, track of @props.data.track
-        T key: i, data: track
-      Shape do
-        d: outline.join ' '
-        stroke: \#F90
-        stroke-width: 1
+      track = @props.data.track
+      for i til track.length - 1
+        start = track[i]
+        end = track[i + 1]
+        T key: i, data: { start, end }
+      #Shape do
+      #  d: outline.join ' '
+      #  stroke: \#F90
+      #  stroke-width: 1
 
 W = React.createClass do
   getDefaultProps: ->
@@ -163,11 +168,14 @@ W = React.createClass do
     y: 0
   render: ->
     console.log 'Word'
-    Group do
-      x: @props.x
-      y: @props.y
-      for i, stroke of @props.data
-        S key: i, data: stroke
+    Surface do
+      width: 2050
+      height: 2050
+      Group do
+        x: @props.x
+        y: @props.y
+        for i, stroke of @props.data
+          S key: i, data: stroke
 
 
 

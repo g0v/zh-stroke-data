@@ -255,19 +255,16 @@
       };
     },
     render: function(){
-      var track, res$, i$, ref$, len$, pt;
+      var ref$, start, end, track;
       console.log('Track');
-      res$ = [];
-      for (i$ = 0, len$ = (ref$ = this.props.data.track).length; i$ < len$; ++i$) {
-        pt = ref$[i$];
-        res$.push('');
-      }
-      track = res$;
+      ref$ = this.props.data, start = ref$.start, end = ref$.end;
+      track = "M" + ((start != null ? start.x : void 8) || 0) + "," + ((start != null ? start.y : void 8) || 0) + " L" + ((end != null ? end.x : void 8) || 0) + "," + ((end != null ? end.y : void 8) || 0);
+      console.log(track);
       return Group({
         x: this.props.x,
         y: this.props.y
       }, Shape({
-        d: track.join(' '),
+        d: track,
         stroke: '#F90',
         strokeWidth: 1
       }));
@@ -282,7 +279,7 @@
       };
     },
     render: function(){
-      var outline, res$, i$, ref$, len$, cmd, i, track;
+      var outline, res$, i$, ref$, len$, cmd, track, i, start, end;
       console.log('Stroke');
       res$ = [];
       for (i$ = 0, len$ = (ref$ = this.props.data.outline).length; i$ < len$; ++i$) {
@@ -293,21 +290,22 @@
       return Group({
         x: this.props.x,
         y: this.props.y
-      }, (function(){
-        var ref$, results$ = [];
-        for (i in ref$ = this.props.data.track) {
-          track = ref$[i];
+      }, track = this.props.data.track, (function(){
+        var i$, to$, results$ = [];
+        for (i$ = 0, to$ = track.length - 1; i$ < to$; ++i$) {
+          i = i$;
+          start = track[i];
+          end = track[i + 1];
           results$.push(T({
             key: i,
-            data: track
+            data: {
+              start: start,
+              end: end
+            }
           }));
         }
         return results$;
-      }.call(this)), Shape({
-        d: outline.join(' '),
-        stroke: '#F90',
-        strokeWidth: 1
-      }));
+      }()));
     }
   });
   W = React.createClass({
@@ -321,7 +319,10 @@
     render: function(){
       var i, stroke;
       console.log('Word');
-      return Group({
+      return Surface({
+        width: 2050,
+        height: 2050
+      }, Group({
         x: this.props.x,
         y: this.props.y
       }, (function(){
@@ -334,7 +335,7 @@
           }));
         }
         return results$;
-      }.call(this)));
+      }.call(this))));
     }
   });
   /**
