@@ -1,8 +1,5 @@
 React = require 'react'
 
-{ canvas } = React.DOM
-{ Surface, Group, Shape, Transform } = require 'react-art'
-
 class AABB
   # private
   axises = <[ x y ]>
@@ -122,56 +119,101 @@ class AABB
 
 
 
+{ svg, g, path, defs, clip-path } = React.DOM
+
 T = React.createClass do
   getDefaultProps: ->
     data: []
     x: 0
     y: 0
+  computeLength: ->
+    { bgn, end } = @props.data
+    x = end.x - bgn.x
+    y = end.y - bgn.y
+    bgn.length = Math.sqrt x * x + y * y
+  componentWillMount: @computeLength
+  componentWillReceiveProps: @computeLength
   render: ->
     console.log 'Track'
-    { start, end } = @props.data
-    track = "M#{start?x or 0},#{start?y or 0} L#{end?x or 0},#{end?y or 0}"
-    console.log track
-    Group do
+    { bgn, end } = @props.data
+    console.log bgn
+    track = "M#{bgn?x or 0} #{bgn?y or 0} L#{end?x or 0} #{end?y or 0}"
+    g do
       x: @props.x
       y: @props.y
-      Shape do
+      #mask: "url(##{@props.mask})"
+      path do
         d: track
-        stroke: \#F90
-        stroke-width: 1
+        fill: \transparent
+        stroke: \#000
+        stroke-width: bgn.size or 250
+        stroke-linecap: \round
 
 S = React.createClass do
   getDefaultProps: ->
     data: []
     x: 0
     y: 0
+  computeLength: ->
+    stroke = @props.data
+    sum = 0
+    for t in stroke.track
+      sum += t.length
+    sum
+  componentWillMount: @computeLength
+  componentWillReceiveProps: @computeLength
   render: ->
     console.log 'Stroke'
-    outline = for cmd in @props.data.outline => ''
-    Group do
+    outline = for cmd in @props.data.outline
+      switch cmd.type
+        | \M => "M #{cmd.x} #{cmd.y}"
+        | \L => "L #{cmd.x} #{cmd.y}"
+        | \Q => "Q #{cmd.begin.x} #{cmd.begin.y}, #{cmd.end.x} #{cmd.end.y}"
+        | \C => "C #{cmd.begin.x} #{cmd.begin.y}, #{cmd.mid.x} #{cmd.mid.y}, #{cmd.end.x} #{cmd.end.y}"
+    outline = "#{outline.join ' '} Z"
+    id = outline.replace new RegExp(' ', \g), '%20'
+    console.log id
+    track = @props.data.track
+    g do
       x: @props.x
       y: @props.y
-      track = @props.data.track
+      'clip-path': id
       for i til track.length - 1
-        start = track[i]
+        bgn = track[i]
         end = track[i + 1]
-        T key: i, data: { start, end }
-      #Shape do
-      #  d: outline.join ' '
-      #  stroke: \#F90
-      #  stroke-width: 1
+        T do
+          key: i
+          data: { bgn, end, track }
+          #mask: id
+      defs {},
+        clip-path do
+          id: id
+          path do
+            d: outline
+            fill: \#000
 
 W = React.createClass do
   getDefaultProps: ->
     data: []
     x: 0
     y: 0
+    width:  410
+    height: 410
+  computeLength: ->
+    sum = 0
+    for stroke in @props.data
+      sum += stroke.length
+    @props.data.length = sum
+  componentWillMount: @computeLength
+  componentDidMount: @compuheLength
   render: ->
-    console.log 'Word'
-    Surface do
-      width: 2050
-      height: 2050
-      Group do
+    svg do
+      width:  @props.width
+      height: @props.height
+      view-box: "0 0 2050 2050"
+      version: 1.1
+      xmlns: '"http://www.w3.org/2000/svg'
+      g do
         x: @props.x
         y: @props.y
         for i, stroke of @props.data

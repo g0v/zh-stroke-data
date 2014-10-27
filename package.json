@@ -17,8 +17,7 @@
   "dependencies": {
     "ByteBuffer": "^0.2.5",
     "jquery": "^2.1.1",
-    "react": "^0.11.1",
-    "react-art": "^0.11.0",
+    "react": "^0.11.2",
     "sax": "~0.5.4"
   },
   "devDependencies": {
