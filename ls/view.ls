@@ -141,13 +141,13 @@ T = React.createClass do
     g do
       x: @props.x
       y: @props.y
-      #mask: "url(##{@props.mask})"
       path do
         d: track
         fill: \transparent
         stroke: \#000
         stroke-width: bgn.size or 250
         stroke-linecap: \round
+FT = React.createFactory T
 
 S = React.createClass do
   getDefaultProps: ->
@@ -172,25 +172,28 @@ S = React.createClass do
         | \C => "C #{cmd.begin.x} #{cmd.begin.y}, #{cmd.mid.x} #{cmd.mid.y}, #{cmd.end.x} #{cmd.end.y}"
     outline = "#{outline.join ' '} Z"
     id = outline.replace new RegExp(' ', \g), '%20'
-    console.log id
     track = @props.data.track
-    g do
+    React.createElement do
+      \g
       x: @props.x
       y: @props.y
-      'clip-path': id
+      abc: 'foobar'
+      'clippath': 'url(#clip)'
+      defs {},
+        # SVG element clip-path is not support yet
+        React.createElement do
+          \clipPath
+          id: 'clip'
+          path do
+            d: outline
+            fill: \#F00
       for i til track.length - 1
         bgn = track[i]
         end = track[i + 1]
-        T do
+        FT do
           key: i
           data: { bgn, end, track }
-          #mask: id
-      defs {},
-        clip-path do
-          id: id
-          path do
-            d: outline
-            fill: \#000
+FS = React.createFactory S
 
 W = React.createClass do
   getDefaultProps: ->
@@ -217,7 +220,7 @@ W = React.createClass do
         x: @props.x
         y: @props.y
         for i, stroke of @props.data
-          S key: i, data: stroke
+          FS key: i, data: stroke
 
 
 
