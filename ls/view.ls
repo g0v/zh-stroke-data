@@ -131,12 +131,11 @@ T = React.createClass do
     x = end.x - bgn.x
     y = end.y - bgn.y
     bgn.length = Math.sqrt x * x + y * y
-  componentWillMount: @computeLength
-  componentWillReceiveProps: @computeLength
+  componentWillMount:        -> @computeLength ...
+  componentWillReceiveProps: -> @computeLength ...
   render: ->
     console.log 'Track'
     { bgn, end } = @props.data
-    console.log bgn
     track = "M#{bgn?x or 0} #{bgn?y or 0} L#{end?x or 0} #{end?y or 0}"
     g do
       x: @props.x
@@ -155,13 +154,19 @@ S = React.createClass do
     x: 0
     y: 0
   computeLength: ->
+    console.log 'length!'
     stroke = @props.data
     sum = 0
     for t in stroke.track
       sum += t.length
-    sum
-  componentWillMount: @computeLength
-  componentWillReceiveProps: @computeLength
+    @props.data.length = sum
+  injectClipPath: ->
+    console.log 'updated!'
+    @refs.stroke.getDOMNode!setAttribute 'clip-path' "url(##{@id})"
+  componentWillMount:        -> @computeLength ...
+  componentWillReceiveProps: -> @computeLength ...
+  componentDidMount:  -> @injectClipPath ...
+  componentDidUpdate: -> @injectClipPath ...
   render: ->
     console.log 'Stroke'
     outline = for cmd in @props.data.outline
@@ -171,19 +176,17 @@ S = React.createClass do
         | \Q => "Q #{cmd.begin.x} #{cmd.begin.y}, #{cmd.end.x} #{cmd.end.y}"
         | \C => "C #{cmd.begin.x} #{cmd.begin.y}, #{cmd.mid.x} #{cmd.mid.y}, #{cmd.end.x} #{cmd.end.y}"
     outline = "#{outline.join ' '} Z"
-    id = outline.replace new RegExp(' ', \g), '%20'
+    @id = outline.replace new RegExp(' ', \g), '%20'
     track = @props.data.track
-    React.createElement do
-      \g
+    g do
+      ref: \stroke
       x: @props.x
       y: @props.y
-      abc: 'foobar'
-      'clippath': 'url(#clip)'
       defs {},
         # SVG element clip-path is not support yet
         React.createElement do
           \clipPath
-          id: 'clip'
+          id: @id
           path do
             d: outline
             fill: \#F00
@@ -202,13 +205,14 @@ W = React.createClass do
     y: 0
     width:  410
     height: 410
+    progress: 1
   computeLength: ->
     sum = 0
     for stroke in @props.data
       sum += stroke.length
-    @props.data.length = sum
-  componentWillMount: @computeLength
-  componentDidMount: @compuheLength
+    @props.length = sum
+  componentWillMount:        -> @computeLength ...
+  componentWillReceiveProps: -> @compuheLength ...
   render: ->
     svg do
       width:  @props.width
