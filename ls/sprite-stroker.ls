@@ -93,7 +93,7 @@ class SpriteStroker
     promises = for ch in str.sortSurrogates!
       @@loaders[@dataType] "#{@url}#{ch.codePointAt!toString 16}.#{@dataType}"
     @arrow-list = []
-    Q.all(promises).then ~>
+    @promise = Q.all(promises).then ~>
       chars = []
       # XXX: GroupGroup, WTF XDDDD
       arrowGroupGroup = []
