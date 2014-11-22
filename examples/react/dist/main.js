@@ -5,9 +5,36 @@ React = require('react');
 W = require('./Stroker/view').W;
 computeLength = require('./Stroker/data').computeLength;
 W = React.createFactory(W);
-$.getJSON('../../json/4e00.json', function(data){
+$.getJSON('../../json/840c.json', function(data){
+  var progress, onEnter, onLeave, onEnterStroke, onLeaveStroke, word, update;
   data = computeLength(data);
-  return React.render(W({
-    data: data
+  progress = 0;
+  onEnter = function(){
+    return console.log('enter');
+  };
+  onLeave = function(){
+    return console.log('leave');
+  };
+  onEnterStroke = function(){
+    return console.log('enter stroke');
+  };
+  onLeaveStroke = function(){
+    return console.log('leave stroke');
+  };
+  word = React.render(W({
+    data: data,
+    progress: progress,
+    onEnter: onEnter,
+    onLeave: onLeave,
+    onEnterStroke: onEnterStroke,
+    onLeaveStroke: onLeaveStroke
   }), document.getElementById('app'));
+  update = function(){
+    word.setProps({
+      progress: progress
+    });
+    progress += 10;
+    return requestAnimationFrame(update);
+  };
+  return requestAnimationFrame(update);
 });

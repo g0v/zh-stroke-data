@@ -266,7 +266,6 @@
     },
     render: function(){
       var ref$, bgn, end, progress, ratio, dx, dy, track, valid;
-      console.log('Track');
       ref$ = this.props.data, bgn = ref$.bgn, end = ref$.end;
       progress = this.props.progress;
       if (progress < 0) {
@@ -279,7 +278,7 @@
       dx = (end.x - bgn.x) * ratio;
       dy = (end.y - bgn.y) * ratio;
       track = "M" + bgn.x + " " + bgn.y + " L" + (bgn.x + dx) + " " + (bgn.y + dy);
-      valid = !isNaN(ratio) && ratio !== Infinity;
+      valid = !isNaN(ratio) && ratio !== Infinity && ratio !== 0;
       return g({
         x: this.props.x,
         y: this.props.y
@@ -287,7 +286,7 @@
         d: valid ? track : 'M0 0 L0 0',
         fill: 'transparent',
         stroke: '#000',
-        strokeWidth: valid ? bgn.size || 250 : 0,
+        strokeWidth: valid ? 4 * bgn.size || 250 : 0,
         strokeLinecap: 'round'
       }));
     }
@@ -303,11 +302,23 @@
         },
         x: 0,
         y: 0,
-        progress: Infinity
+        progress: Infinity,
+        onEnterStroke: function(){},
+        onLeaveStroke: function(){}
       };
     },
     injectClipPath: function(){
       return this.refs.stroke.getDOMNode().setAttribute('clip-path', "url(#" + this.id + ")");
+    },
+    componentWillReceiveProps: function(next){
+      var length;
+      length = this.props.data.length;
+      if (this.props.progress <= 0 && next.progress > 0) {
+        this.props.onEnterStroke();
+      }
+      if (this.props.progress <= length && next.progress > length) {
+        return this.props.onLeaveStroke();
+      }
     },
     componentDidMount: function(){
       return this.injectClipPath.apply(this, arguments);
@@ -317,7 +328,6 @@
     },
     render: function(){
       var length, progress, outline, res$, i$, ref$, len$, cmd, track, i, bgn, end, comp;
-      console.log('Stroke');
       length = this.props.data.length;
       progress = this.props.progress;
       if (progress < 0) {
@@ -389,8 +399,22 @@
         y: 0,
         width: 410,
         height: 410,
-        progress: Infinity
+        progress: Infinity,
+        onEnter: function(){},
+        onLeave: function(){},
+        onEnterStroke: function(){},
+        onLeaveStroke: function(){}
       };
+    },
+    componentWillReceiveProps: function(next){
+      var length;
+      length = this.props.data.length;
+      if (this.props.progress <= 0 && next.progress > 0) {
+        this.props.onEnter();
+      }
+      if (this.props.progress <= length && next.progress > length) {
+        return this.props.onLeave();
+      }
     },
     render: function(){
       var ref$, length, word, progress, i, stroke, comp;
@@ -418,13 +442,15 @@
           comp = FS({
             key: i,
             data: stroke,
-            progress: progress
+            progress: progress,
+            onEnterStroke: this.props.onEnterStroke,
+            onLeaveStroke: this.props.onLeaveStroke
           });
           progress -= stroke.length;
           results$.push(comp);
         }
         return results$;
-      }())));
+      }.call(this))));
     }
   });
   /**

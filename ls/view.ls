@@ -135,7 +135,6 @@ T = React.createClass do
     y: 0
     progress: Infinity
   render: ->
-    console.log 'Track'
     { bgn, end } = @props.data
     { progress } = @props
     progress = 0      if progress < 0
@@ -144,7 +143,9 @@ T = React.createClass do
     dx = (end.x - bgn.x) * ratio
     dy = (end.y - bgn.y) * ratio
     track = "M#{bgn.x} #{bgn.y} L#{bgn.x + dx} #{bgn.y + dy}"
-    valid = not isNaN ratio and ratio isnt Infinity
+    valid = not isNaN ratio     and
+            ratio isnt Infinity and
+            ratio isnt 0
     g do
       x: @props.x
       y: @props.y
@@ -155,7 +156,7 @@ T = React.createClass do
         fill: \transparent
         stroke: \#000
         stroke-width: if valid
-          then bgn.size or 250
+          then 4 * bgn.size or 250
           else 0
         stroke-linecap: \round
 FT = React.createFactory T
@@ -169,12 +170,20 @@ S = React.createClass do
     x: 0
     y: 0
     progress: Infinity
+    onEnterStroke: ->
+    onLeaveStroke: ->
   injectClipPath: ->
     @refs.stroke.getDOMNode!setAttribute 'clip-path' "url(##{@id})"
+  componentWillReceiveProps: (next) ->
+    { length } = @props.data
+    # XXX: one way
+    if @props.progress <= 0 and next.progress > 0
+      @props.onEnterStroke!
+    if @props.progress <= length and next.progress > length
+      @props.onLeaveStroke!
   componentDidMount:  -> @injectClipPath ...
   componentDidUpdate: -> @injectClipPath ...
   render: ->
-    console.log 'Stroke'
     { length }   = @props.data
     { progress } = @props
     # XXX: guard
@@ -222,6 +231,16 @@ W = React.createClass do
     width:  410
     height: 410
     progress: Infinity
+    onEnter: ->
+    onLeave: ->
+    onEnterStroke: ->
+    onLeaveStroke: ->
+  componentWillReceiveProps: (next) ->
+    { length } = @props.data
+    if @props.progress <= 0 and next.progress > 0
+      @props.onEnter!
+    if @props.progress <= length and next.progress > length
+      @props.onLeave!
   render: ->
     { length, word } = @props.data
     { progress }     = @props
@@ -241,6 +260,8 @@ W = React.createClass do
             key:      i
             data:     stroke
             progress: progress
+            onEnterStroke: @props.onEnterStroke
+            onLeaveStroke: @props.onLeaveStroke
           progress -= stroke.length
           comp
 
