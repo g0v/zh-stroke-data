@@ -127,24 +127,36 @@ T = React.createClass do
       bgn:
         x: 0
         y: 0
+        length: 0
       end:
         x: 0
         y: 0
-      length: 0
     x: 0
     y: 0
+    progress: Infinity
   render: ->
     console.log 'Track'
     { bgn, end } = @props.data
-    track = "M#{bgn?x or 0} #{bgn?y or 0} L#{end?x or 0} #{end?y or 0}"
+    { progress } = @props
+    progress = 0      if progress < 0
+    progress = bgn.length if progress > bgn.length
+    ratio = progress / bgn.length
+    dx = (end.x - bgn.x) * ratio
+    dy = (end.y - bgn.y) * ratio
+    track = "M#{bgn.x} #{bgn.y} L#{bgn.x + dx} #{bgn.y + dy}"
+    valid = not isNaN ratio and ratio isnt Infinity
     g do
       x: @props.x
       y: @props.y
       path do
-        d: track
+        d: if valid
+          then track
+          else 'M0 0 L0 0'
         fill: \transparent
         stroke: \#000
-        stroke-width: bgn.size or 250
+        stroke-width: if valid
+          then bgn.size or 250
+          else 0
         stroke-linecap: \round
 FT = React.createFactory T
 
@@ -156,12 +168,18 @@ S = React.createClass do
       length:  0
     x: 0
     y: 0
+    progress: Infinity
   injectClipPath: ->
     @refs.stroke.getDOMNode!setAttribute 'clip-path' "url(##{@id})"
   componentDidMount:  -> @injectClipPath ...
   componentDidUpdate: -> @injectClipPath ...
   render: ->
     console.log 'Stroke'
+    { length }   = @props.data
+    { progress } = @props
+    # XXX: guard
+    progress = 0      if progress < 0
+    progress = length if progress > length
     outline = for cmd in @props.data.outline
       switch cmd.type
         | \M => "M #{cmd.x} #{cmd.y}"
@@ -186,9 +204,12 @@ S = React.createClass do
       for i til track.length - 1
         bgn = track[i]
         end = track[i + 1]
-        FT do
-          key: i
-          data: { bgn, end, track }
+        comp = FT do
+          key:      i
+          data:     { bgn, end }
+          progress: progress
+        progress -= bgn.length
+        comp
 FS = React.createFactory S
 
 W = React.createClass do
@@ -200,8 +221,12 @@ W = React.createClass do
     y: 0
     width:  410
     height: 410
-    progress: 1
+    progress: Infinity
   render: ->
+    { length, word } = @props.data
+    { progress }     = @props
+    progress = 0      if progress < 0
+    progress = length if progress > length
     svg do
       width:  @props.width
       height: @props.height
@@ -211,10 +236,13 @@ W = React.createClass do
       g do
         x: @props.x
         y: @props.y
-        for i, stroke of @props.data.word
-          # XXX: modify the @props is not a good idea
-          @props.data.length += stroke.length
-          FS key: i, data: stroke
+        for i, stroke of word
+          comp = FS do
+            key:      i
+            data:     stroke
+            progress: progress
+          progress -= stroke.length
+          comp
 
 
 

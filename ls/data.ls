@@ -184,17 +184,18 @@ fromScanline = (txt, done) !->
 
 
 computeLength = (word) ->
+  length = 0
   for stroke in word
-    length = 0
+    len = 0
     for i, curr of stroke.track
       if prev = stroke.track[i-1]
         if not prev.length
           dx = curr.x - prev.x
           dy = curr.y - prev.y
           prev.length = Math.sqrt dx * dx + dy * dy
-        length += prev.length
-    stroke.length = length
-  word
+        len += prev.length
+    length += stroke.length = len
+  { word, length }
 
 
 

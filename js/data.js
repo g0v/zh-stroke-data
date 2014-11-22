@@ -305,10 +305,11 @@
     done(null, strokes);
   };
   computeLength = function(word){
-    var i$, len$, stroke, length, i, ref$, curr, prev, dx, dy;
+    var length, i$, len$, stroke, len, i, ref$, curr, prev, dx, dy;
+    length = 0;
     for (i$ = 0, len$ = word.length; i$ < len$; ++i$) {
       stroke = word[i$];
-      length = 0;
+      len = 0;
       for (i in ref$ = stroke.track) {
         curr = ref$[i];
         if (prev = stroke.track[i - 1]) {
@@ -317,12 +318,15 @@
             dy = curr.y - prev.y;
             prev.length = Math.sqrt(dx * dx + dy * dy);
           }
-          length += prev.length;
+          len += prev.length;
         }
       }
-      stroke.length = length;
+      length += stroke.length = len;
     }
-    return word;
+    return {
+      word: word,
+      length: length
+    };
   };
   module.exports = {
     fromXML: fromXML,

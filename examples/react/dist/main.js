@@ -8,9 +8,6 @@ W = React.createFactory(W);
 $.getJSON('../../json/4e00.json', function(data){
   data = computeLength(data);
   return React.render(W({
-    data: {
-      word: data,
-      length: 0
-    }
+    data: data
   }), document.getElementById('app'));
 });

@@ -251,31 +251,43 @@
         data: {
           bgn: {
             x: 0,
-            y: 0
+            y: 0,
+            length: 0
           },
           end: {
             x: 0,
             y: 0
-          },
-          length: 0
+          }
         },
         x: 0,
-        y: 0
+        y: 0,
+        progress: Infinity
       };
     },
     render: function(){
-      var ref$, bgn, end, track;
+      var ref$, bgn, end, progress, ratio, dx, dy, track, valid;
       console.log('Track');
       ref$ = this.props.data, bgn = ref$.bgn, end = ref$.end;
-      track = "M" + ((bgn != null ? bgn.x : void 8) || 0) + " " + ((bgn != null ? bgn.y : void 8) || 0) + " L" + ((end != null ? end.x : void 8) || 0) + " " + ((end != null ? end.y : void 8) || 0);
+      progress = this.props.progress;
+      if (progress < 0) {
+        progress = 0;
+      }
+      if (progress > bgn.length) {
+        progress = bgn.length;
+      }
+      ratio = progress / bgn.length;
+      dx = (end.x - bgn.x) * ratio;
+      dy = (end.y - bgn.y) * ratio;
+      track = "M" + bgn.x + " " + bgn.y + " L" + (bgn.x + dx) + " " + (bgn.y + dy);
+      valid = !isNaN(ratio) && ratio !== Infinity;
       return g({
         x: this.props.x,
         y: this.props.y
       }, path({
-        d: track,
+        d: valid ? track : 'M0 0 L0 0',
         fill: 'transparent',
         stroke: '#000',
-        strokeWidth: bgn.size || 250,
+        strokeWidth: valid ? bgn.size || 250 : 0,
         strokeLinecap: 'round'
       }));
     }
@@ -290,7 +302,8 @@
           length: 0
         },
         x: 0,
-        y: 0
+        y: 0,
+        progress: Infinity
       };
     },
     injectClipPath: function(){
@@ -303,8 +316,16 @@
       return this.injectClipPath.apply(this, arguments);
     },
     render: function(){
-      var outline, res$, i$, ref$, len$, cmd, track, i, bgn, end;
+      var length, progress, outline, res$, i$, ref$, len$, cmd, track, i, bgn, end, comp;
       console.log('Stroke');
+      length = this.props.data.length;
+      progress = this.props.progress;
+      if (progress < 0) {
+        progress = 0;
+      }
+      if (progress > length) {
+        progress = length;
+      }
       res$ = [];
       for (i$ = 0, len$ = (ref$ = this.props.data.outline).length; i$ < len$; ++i$) {
         cmd = ref$[i$];
@@ -341,14 +362,16 @@
           i = i$;
           bgn = track[i];
           end = track[i + 1];
-          results$.push(FT({
+          comp = FT({
             key: i,
             data: {
               bgn: bgn,
-              end: end,
-              track: track
-            }
-          }));
+              end: end
+            },
+            progress: progress
+          });
+          progress -= bgn.length;
+          results$.push(comp);
         }
         return results$;
       }()));
@@ -366,11 +389,19 @@
         y: 0,
         width: 410,
         height: 410,
-        progress: 1
+        progress: Infinity
       };
     },
     render: function(){
-      var i, stroke;
+      var ref$, length, word, progress, i, stroke, comp;
+      ref$ = this.props.data, length = ref$.length, word = ref$.word;
+      progress = this.props.progress;
+      if (progress < 0) {
+        progress = 0;
+      }
+      if (progress > length) {
+        progress = length;
+      }
       return svg({
         width: this.props.width,
         height: this.props.height,
@@ -382,16 +413,18 @@
         y: this.props.y
       }, (function(){
         var ref$, results$ = [];
-        for (i in ref$ = this.props.data.word) {
+        for (i in ref$ = word) {
           stroke = ref$[i];
-          this.props.data.length += stroke.length;
-          results$.push(FS({
+          comp = FS({
             key: i,
-            data: stroke
-          }));
+            data: stroke,
+            progress: progress
+          });
+          progress -= stroke.length;
+          results$.push(comp);
         }
         return results$;
-      }.call(this))));
+      }())));
     }
   });
   /**

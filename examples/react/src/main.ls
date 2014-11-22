@@ -9,5 +9,5 @@ W = React.createFactory W
 data <- $.getJSON '../../json/4e00.json'
 data = computeLength data
 React.render do
-  W data: { word: data, length: 0 }
+  W { data }
   document.getElementById \app
