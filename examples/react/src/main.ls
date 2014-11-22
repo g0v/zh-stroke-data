@@ -1,10 +1,10 @@
 $ = require 'jquery'
 React = require 'react'
 
-{ W }             = require './Stroker/view'
+{ Word }          = require './Stroker/view'
 { computeLength } = require './Stroker/data'
 
-W = React.createFactory W
+Word = React.createFactory Word
 
 data <- $.getJSON '../../json/840c.json'
 data     = computeLength data
@@ -16,7 +16,7 @@ onEnterStroke = -> console.log 'enter stroke'
 onLeaveStroke = -> console.log 'leave stroke'
 
 word = React.render do
-  W {
+  Word {
     data
     progress
     onEnter
