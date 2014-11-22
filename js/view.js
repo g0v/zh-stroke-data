@@ -248,23 +248,20 @@
   T = React.createClass({
     getDefaultProps: function(){
       return {
-        data: [],
+        data: {
+          bgn: {
+            x: 0,
+            y: 0
+          },
+          end: {
+            x: 0,
+            y: 0
+          },
+          length: 0
+        },
         x: 0,
         y: 0
       };
-    },
-    computeLength: function(){
-      var ref$, bgn, end, x, y;
-      ref$ = this.props.data, bgn = ref$.bgn, end = ref$.end;
-      x = end.x - bgn.x;
-      y = end.y - bgn.y;
-      return bgn.length = Math.sqrt(x * x + y * y);
-    },
-    componentWillMount: function(){
-      return this.computeLength.apply(this, arguments);
-    },
-    componentWillReceiveProps: function(){
-      return this.computeLength.apply(this, arguments);
     },
     render: function(){
       var ref$, bgn, end, track;
@@ -287,31 +284,17 @@
   S = React.createClass({
     getDefaultProps: function(){
       return {
-        data: [],
+        data: {
+          outline: [],
+          track: [],
+          length: 0
+        },
         x: 0,
         y: 0
       };
     },
-    computeLength: function(){
-      var stroke, sum, i$, ref$, len$, t;
-      console.log('length!');
-      stroke = this.props.data;
-      sum = 0;
-      for (i$ = 0, len$ = (ref$ = stroke.track).length; i$ < len$; ++i$) {
-        t = ref$[i$];
-        sum += t.length;
-      }
-      return this.props.data.length = sum;
-    },
     injectClipPath: function(){
-      console.log('updated!');
       return this.refs.stroke.getDOMNode().setAttribute('clip-path', "url(#" + this.id + ")");
-    },
-    componentWillMount: function(){
-      return this.computeLength.apply(this, arguments);
-    },
-    componentWillReceiveProps: function(){
-      return this.computeLength.apply(this, arguments);
     },
     componentDidMount: function(){
       return this.injectClipPath.apply(this, arguments);
@@ -375,28 +358,16 @@
   W = React.createClass({
     getDefaultProps: function(){
       return {
-        data: [],
+        data: {
+          word: [],
+          length: 0
+        },
         x: 0,
         y: 0,
         width: 410,
         height: 410,
         progress: 1
       };
-    },
-    computeLength: function(){
-      var sum, i$, ref$, len$, stroke;
-      sum = 0;
-      for (i$ = 0, len$ = (ref$ = this.props.data).length; i$ < len$; ++i$) {
-        stroke = ref$[i$];
-        sum += stroke.length;
-      }
-      return this.props.length = sum;
-    },
-    componentWillMount: function(){
-      return this.computeLength.apply(this, arguments);
-    },
-    componentWillReceiveProps: function(){
-      return this.compuheLength.apply(this, arguments);
     },
     render: function(){
       var i, stroke;
@@ -411,8 +382,9 @@
         y: this.props.y
       }, (function(){
         var ref$, results$ = [];
-        for (i in ref$ = this.props.data) {
+        for (i in ref$ = this.props.data.word) {
           stroke = ref$[i];
+          this.props.data.length += stroke.length;
           results$.push(FS({
             key: i,
             data: stroke

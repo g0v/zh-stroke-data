@@ -1,11 +1,13 @@
 $ = require 'jquery'
 React = require 'react'
 
-{ W } = require './Stroker/view'
+{ W }             = require './Stroker/view'
+{ computeLength } = require './Stroker/data'
+
 W = React.createFactory W
 
 data <- $.getJSON '../../json/4e00.json'
-console.log data
+data = computeLength data
 React.render do
-  W { data }
+  W data: { word: data, length: 0 }
   document.getElementById \app

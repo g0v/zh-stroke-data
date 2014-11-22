@@ -123,16 +123,16 @@ class AABB
 
 T = React.createClass do
   getDefaultProps: ->
-    data: []
+    data:
+      bgn:
+        x: 0
+        y: 0
+      end:
+        x: 0
+        y: 0
+      length: 0
     x: 0
     y: 0
-  computeLength: ->
-    { bgn, end } = @props.data
-    x = end.x - bgn.x
-    y = end.y - bgn.y
-    bgn.length = Math.sqrt x * x + y * y
-  componentWillMount:        -> @computeLength ...
-  componentWillReceiveProps: -> @computeLength ...
   render: ->
     console.log 'Track'
     { bgn, end } = @props.data
@@ -150,21 +150,14 @@ FT = React.createFactory T
 
 S = React.createClass do
   getDefaultProps: ->
-    data: []
+    data:
+      outline: []
+      track:   []
+      length:  0
     x: 0
     y: 0
-  computeLength: ->
-    console.log 'length!'
-    stroke = @props.data
-    sum = 0
-    for t in stroke.track
-      sum += t.length
-    @props.data.length = sum
   injectClipPath: ->
-    console.log 'updated!'
     @refs.stroke.getDOMNode!setAttribute 'clip-path' "url(##{@id})"
-  componentWillMount:        -> @computeLength ...
-  componentWillReceiveProps: -> @computeLength ...
   componentDidMount:  -> @injectClipPath ...
   componentDidUpdate: -> @injectClipPath ...
   render: ->
@@ -200,19 +193,14 @@ FS = React.createFactory S
 
 W = React.createClass do
   getDefaultProps: ->
-    data: []
+    data:
+      word:   []
+      length: 0
     x: 0
     y: 0
     width:  410
     height: 410
     progress: 1
-  computeLength: ->
-    sum = 0
-    for stroke in @props.data
-      sum += stroke.length
-    @props.length = sum
-  componentWillMount:        -> @computeLength ...
-  componentWillReceiveProps: -> @compuheLength ...
   render: ->
     svg do
       width:  @props.width
@@ -223,7 +211,9 @@ W = React.createClass do
       g do
         x: @props.x
         y: @props.y
-        for i, stroke of @props.data
+        for i, stroke of @props.data.word
+          # XXX: modify the @props is not a good idea
+          @props.data.length += stroke.length
           FS key: i, data: stroke
 
 

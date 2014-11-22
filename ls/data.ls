@@ -46,10 +46,15 @@ fromXML = (doc, done) !->
     else if track
       switch node.name
         when \MoveTo
-          track.push do
+          curr =
             x: parseFloat node.attributes.x
             y: parseFloat node.attributes.y
             size: if node.attributes.size then parseFloat(node.attributes.size) else undefined
+          if prev = track[*-1]
+            dx = curr.x - prev.x
+            dy = curr.y - prev.y
+            prev.length = Math.sqrt dx * dx + dy * dy
+          track.push curr
     # not in any outline or track
     else
       if node.name is \Outline
@@ -137,7 +142,14 @@ fromBinary = (buffer, done) !->
       xs = undelta(for from 0 til num-tracks => bb.readUint8!)map scale
       ys = undelta(for from 0 til num-tracks => bb.readUint8!)map scale
       ss = (for from 0 til num-sizes => bb.readUint8!)map scale
-      track = for i til num-tracks => x: xs[i], y: ys[i]
+      track = []
+      for i til num-tracks
+        curr = x: xs[i], y: ys[i]
+        if prev = track[*-1]
+          dx = curr.x - prev.x
+          dy = curr.y - prev.y
+          prev.length = Math.sqrt dx * dx + dy * dy
+        track.push curr
       i = 0
       for idx in idx-sizes => track[idx]size = ss[i++]
       outline: outline, track: track
@@ -169,4 +181,21 @@ fromScanline = (txt, done) !->
       data.lines.push idx: +r.1, start: +r.2, end: +r.3
   done null, strokes
 
-module.exports = { fromXML, fromBinary, fromScanline }
+
+
+computeLength = (word) ->
+  for stroke in word
+    length = 0
+    for i, curr of stroke.track
+      if prev = stroke.track[i-1]
+        if not prev.length
+          dx = curr.x - prev.x
+          dy = curr.y - prev.y
+          prev.length = Math.sqrt dx * dx + dy * dy
+        length += prev.length
+    stroke.length = length
+  word
+
+
+
+module.exports = { fromXML, fromBinary, fromScanline, computeLength }
