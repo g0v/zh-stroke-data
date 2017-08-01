@@ -1,11 +1,74 @@
 常用國字標準字體筆劃 XML 資料檔
 ===============================
 
-## 抓資料 / Install resources
+## 抓資料 / Fetch resources
 
 ```go
 go run fetch.go
 ```
+
+`fetch.go` 從 `http://stroke-order.learningweb.moe.edu.tw/provideStrokeInfo.do` 抓筆順資料。
+
+`fetch.go` gets bopomofo strokes and chinese character strokes from `http://stroke-order.learningweb.moe.edu.tw/provideStrokeInfo.do`.
+
+使用參數 `big5=<case-insensitive Big5 code in hex>` 可以取得筆順資料。
+
+Character strokes are fetched by parameter `big5=<case-insensitive Big5 code in hex>`.
+
+加上參數 `bpm=<index>` 可以取得從 1 開始索引的筆順，注意在 Big5 編碼中，注音符號是不連續的，但此處的索引是連續的：
+
+Bopomofo strokes are indexed by intergers with parameter `bpm=<index>`, but they are not continuous in Big5:
+
+```
+bopomofo,big5,index
+ㄅ,0xA374,1
+ㄆ,0xA375,2
+ㄇ,0xA376,3
+ㄈ,0xA377,4
+ㄉ,0xA378,5
+ㄊ,0xA379,6
+ㄋ,0xA37A,7
+ㄌ,0xA37B,8
+ㄍ,0xA37C,9
+ㄎ,0xA37D,10
+ㄏ,0xA37E,11
+ㄐ,0xA3A1,12
+ㄑ,0xA3A2,13
+ㄒ,0xA3A3,14
+ㄓ,0xA3A4,15
+ㄔ,0xA3A5,16
+ㄕ,0xA3A6,17
+ㄖ,0xA3A7,18
+ㄗ,0xA3A8,19
+ㄘ,0xA3A9,20
+ㄙ,0xA3AA,21
+ㄚ,0xA3AB,22
+ㄛ,0xA3AC,23
+ㄜ,0xA3AD,24
+ㄝ,0xA3AE,25
+ㄞ,0xA3AF,26
+ㄟ,0xA3B0,27
+ㄠ,0xA3B1,28
+ㄡ,0xA3B2,29
+ㄢ,0xA3B3,30
+ㄣ,0xA3B4,31
+ㄤ,0xA3B5,32
+ㄥ,0xA3B6,33
+ㄦ,0xA3B7,34
+ㄧ,0xA3B8,35
+ㄨ,0xA3B9,36
+ㄩ,0xA3BA,37
+```
+
+調號筆順由 2016 年的[注音符號手冊][bopomofo-handbook]提供。
+
+Tonal marks' strokes are created by [caasi/bopomofo-handbook][bopomofo-handbook].
+
+[bopomofo-handbook]: https://github.com/caasi/bopomofo-handbook
+
+加上參數 `useAlt=1` 時，可以拿到注音符號的另外一種寫法。現在只有`ㄓ`（索引 15）和`ㄖ`（索引 18）有不同寫法。
+
+With parameter `useAlt=1`, you can get alternative strokes. Only `ㄓ`(index 15) and `ㄖ`(index 18) have alternative strokes for now. And they are not fetched by `fetch.go`.
 
 ## 產生 demo 用的 script / Create the demo script
 
